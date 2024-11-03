@@ -17,7 +17,7 @@ const PORT = 9999
 var enet_peer = ENetMultiplayerPeer.new()
 var turn_start=0
 @export var server_age=0
-var player_id
+var player_id:String
 
 #var sf= SurfaceTool.new()
 
@@ -33,7 +33,7 @@ func save_game():
 	print('save_game')
 	var save_file = FileAccess.open('user://savegame.save', FileAccess.WRITE)
 	#var save_file = FileAccess.open('user://savegame_'+str(Time.get_ticks_msec())+'.save', FileAccess.WRITE)
-
+	print(save_file.get_path_absolute())
 	var save_nodes = get_tree().get_nodes_in_group("Persist")
 	for node in save_nodes:
 		# Check the node is an instanced scene so it can be instanced again during load.
@@ -55,13 +55,17 @@ func save_game():
 		# Store the save dictionary as a new line in the save file.
 		save_file.store_line(json_string)
 	#save_file.close()
-	var backup = FileAccess.open('user://savegame_'+str(Time.get_ticks_msec()+server_age)+'.save', FileAccess.WRITE)
-	backup.store_string(save_file.get_as_text())
-	save_file.close()
-	backup.close()
+	save_file.flush()
+	DirAccess.copy_absolute(save_file.get_path_absolute(),'user://savegame_'+str(Time.get_ticks_msec()+server_age)+'.save')
+	#var backup = FileAccess.open('user://savegame_'+str(Time.get_ticks_msec()+server_age)+'.save', FileAccess.WRITE)
+	#backup.store_string(save_file.get_as_text())
+	#save_file.close()
+	#backup.close()
 
 func load_game():
+	#print('load_game')
 	if not FileAccess.file_exists("user://savegame.save"):
+		#print('save not found')
 		return # Error! We don't have a save to load.
 
 	# We need to revert the game state so we're not cloning objects
@@ -71,7 +75,7 @@ func load_game():
 	#var save_nodes = get_tree().get_nodes_in_group("Persist")
 	#for i in save_nodes:
 		#i.queue_free()
-		
+
 
 	# Load the file line by line and process that dictionary to restore
 	# the object it represents.
@@ -82,8 +86,9 @@ func load_game():
 	var parse_result = json.parse(world_line)
 	if(json.data.has("server_age")):
 		world.server_age=int(json.data["server_age"])
-	#TODO process player nodes
-	while false and save_file.get_position() < save_file.get_length():
+	#process player nodes
+	#print('looking for players')
+	while save_file.get_position() < save_file.get_length():
 		var json_string = save_file.get_line()
 
 		# Check if there is any error while parsing the JSON string, skip in case of failure.
@@ -94,17 +99,20 @@ func load_game():
 
 		# Get the data from the JSON object.
 		var node_data = json.data
+		#print('loading ',node_data["player_id"])
 
 		# Firstly, we need to create the object and add it to the tree and set its position.
-		var new_object = load(node_data["filename"]).instantiate()
-		get_node(node_data["parent"]).add_child(new_object)
-		#new_object.position = Vector3(node_data["pos_x"], node_data["pos_y"], node_data["pos_z"])
+		var player = load(node_data["filename"]).instantiate()
+		player.name=node_data["name"]
+		player.player_id=node_data["player_id"]
+		get_node(node_data["parent"]).add_child(player)
+		player.position = Vector3(node_data["pos_x"], node_data["pos_y"], node_data["pos_z"])
 
 		# Now we set the remaining variables.
-		for i in node_data.keys():
-			if i == "filename" or i == "parent" or i == "pos_x" or i == "pos_y":
-				continue
-			new_object.set(i, node_data[i])
+		#for i in node_data.keys():
+			#if i == "filename" or i == "parent" or i == "pos_x" or i == "pos_y":
+				#continue
+			#player.set(i, node_data[i])
 
 func _ready():
 	var arguments = {}
@@ -116,7 +124,7 @@ func _ready():
 			# Options without an argument will be present in the dictionary,
 			# with the value set to an empty string.
 			arguments[argument.trim_prefix("--")] = ""
-	
+
 	print(arguments)
 	if arguments.has("server"):
 		start_server()
@@ -130,7 +138,7 @@ func _ready():
 
 func _process(_delta):
 	var now=Time.get_ticks_msec()
-	
+
 	if multiplayer.is_server():
 		turnTimer.value=(now+server_age)%6000
 		var newTurnNumber = (now+server_age) / (6 * 1000) +1
@@ -145,7 +153,9 @@ func update_turn_number(value):
 	turn_start=Time.get_ticks_msec()
 
 func _unhandled_input(_event):
+	#print('_unhandled_input')
 	if Input.is_action_just_pressed("quit"):
+		#print('quit')
 		if(multiplayer.is_server()):
 			save_game()
 		get_tree().quit()
@@ -154,18 +164,18 @@ func _on_host_button_pressed():
 	main_menu.hide()
 	hud.show()
 	start_server()
-	add_player(multiplayer.get_unique_id())
+	#add_player(multiplayer.get_unique_id())
 
 func start_server():
-	print('start_server')
+	#print('start_server')
 	enet_peer.create_server(PORT)
 	multiplayer.multiplayer_peer = enet_peer
-	multiplayer.peer_connected.connect(add_player)
+	#multiplayer.peer_connected.connect(add_player)
 	#multiplayer.peer_disconnected.connect(remove_player)
 	load_game()
 
 func server_disconnected():
-	print('server_disconnected')
+	#print('server_disconnected')
 	get_tree().quit()
 
 func _on_join_button_pressed():
@@ -176,12 +186,10 @@ func _on_join_button_pressed():
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.server_disconnected.connect(server_disconnected)
 	multiplayer.multiplayer_peer = enet_peer
-	print(player_id)
-	#await get_tree().create_timer(0.5).timeout
-	#world.register_player.rpc_id(1,player_id)
+	#print(player_id)
 
 func _on_connected_to_server():
-	print('_on_connected_to_server')
+	#print('_on_connected_to_server')
 	world.register_player.rpc_id(1,player_id)
 
 func _on_multiplayer_spawner_spawned(node):
@@ -193,14 +201,17 @@ func _on_multiplayer_spawner_spawned(node):
 # with the keys being each player's unique IDs.
 var players = {}
 
-func add_player(peer_id):
+func add_player(_peer_id,player_id):
 	#first check if this player already has a node
 	#_register_player.rpc_id(peer_id, player_id)
-	
-	var player = Player.instantiate()
-	player.name = str(peer_id)
-	add_child(player)
-	print('add_player ',player.name)
+	#print('add_player ',player_id)
+	var player=get_node_or_null(player_id)
+	#print(player)
+	if(!player):
+		player = Player.instantiate()
+		player.name = player_id
+		player.player_id=player_id
+		add_child(player)
 	#if player.is_multiplayer_authority():
 	#if multiplayer.get_unique_id()==str(name).to_int():
 		#player.health_changed.connect(update_health_bar)
@@ -208,8 +219,10 @@ func add_player(peer_id):
 @rpc("any_peer", "reliable")
 func register_player(new_player_info):
 	var peer_id = multiplayer.get_remote_sender_id()
-	print(peer_id,':',new_player_info)
+	#print('register_player:',peer_id,':',new_player_info)
 	players[peer_id] = new_player_info
+	add_player(peer_id,new_player_info)
+
 	#player_connected.emit(new_player_id, new_player_info)
 	#var player = Player.instantiate()
 	#player.name = str(peer_id)
