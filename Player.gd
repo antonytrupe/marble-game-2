@@ -8,6 +8,9 @@ signal health_changed(health_value)
 @onready var raycast = $Camera3D/RayCast3D
 
 @export var health = 3
+@export var player_id:String
+
+@onready var world=$"/root/World"
 
 const SPEED = 10.0
 const JUMP_VELOCITY = 10.0
@@ -19,6 +22,9 @@ func save():
 	var save_dict = {
 		"filename" : get_scene_file_path(),
 		"parent" : get_parent().get_path(),
+		"path": get_path(),
+		"name":name,
+		"player_id":player_id,
 		"pos_x" : position.x, # Vector2 is not supported by JSON
 		"pos_y" : position.y,
 		"pos_z":position.z,
@@ -47,8 +53,9 @@ func _enter_tree():
 
 func _ready():
 	#if not is_multiplayer_authority(): return
-	#print(is_multiplayer_authority())
-	if multiplayer.get_unique_id()==str(name).to_int():
+	#print(world.player_id,':',player_id)
+	if player_id and player_id==world.player_id:
+	#if multiplayer.get_unique_id()==str(name).to_int():
 		#print('me')
 		#print(multiplayer.get_unique_id())
 		#print(name)
@@ -62,12 +69,13 @@ func _unhandled_input(event):
 	#print('_unhandled_input')
 	#print(multiplayer.get_unique_id())
 	#print(name)
-	if multiplayer.get_unique_id()!=str(name).to_int(): 
+	if player_id!=world.player_id:
+	#if multiplayer.get_unique_id()!=str(name).to_int():
 		#print('not the client player')
 		#print(multiplayer.get_unique_id())
 		#print(name)
 		return
-	
+
 	if event is InputEventMouseMotion:
 		if(Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)):
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -79,7 +87,7 @@ func _unhandled_input(event):
 			camera.rotation.x = clamp(camera.rotation.x, -PI/2, PI/2)
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	
+
 	if Input.is_action_just_pressed("shoot") and anim_player.current_animation != "shoot":
 		#shoot()
 		pass
@@ -108,7 +116,7 @@ func check_for_hit():
 func _physics_process(delta):
 	#TODO
 	#if not is_multiplayer_authority(): return
-	
+
 	# Add the gravity.
 	if not is_on_floor():
 		velocity.y -= gravity * delta
@@ -116,19 +124,21 @@ func _physics_process(delta):
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("left", "right", "up", "down")
-	if multiplayer.get_unique_id()==str(name).to_int():
+	if player_id==world.player_id:
+	#if multiplayer.get_unique_id()==str(name).to_int():
 		# Handle Jump.
 		if Input.is_action_just_pressed("jump") and is_on_floor():
 			if multiplayer.is_server():
 				jump()
 			else:
 				jump.rpc_id(1)
-			
+
 		if multiplayer.is_server():
 			process_input(input_dir)
 		else:
+			#print('calling process_input')
 			process_input.rpc_id(1,input_dir)
-	
+
 	if anim_player.current_animation == "shoot":
 		pass
 	elif input_dir != Vector2.ZERO and is_on_floor():
@@ -140,7 +150,7 @@ func _physics_process(delta):
 
 @rpc("any_peer")
 func jump():
-	velocity.y = JUMP_VELOCITY	
+	velocity.y = JUMP_VELOCITY
 
 @rpc("any_peer")
 func process_input(input_dir):
@@ -151,7 +161,7 @@ func process_input(input_dir):
 		#print('multiplayer id ',multiplayer.get_unique_id())
 		#print('moving ',name)
 		pass
-		
+
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if direction:
 		velocity.x = direction.x * SPEED
