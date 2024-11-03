@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cgfpsf73dbmvb"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_yf5ij"]
+
+[node name="Chunk" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_yf5ij")
