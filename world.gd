@@ -25,7 +25,8 @@ func save():
 	var save_dict = {
 		"filename" : get_scene_file_path(),
 		"parent" : get_parent().get_path(),
-		"server_age":server_age+Time.get_ticks_msec()
+		"server_age":server_age+Time.get_ticks_msec(),
+		"host_player_id":player_id
 	}
 	return save_dict
 
@@ -84,6 +85,9 @@ func load_game():
 	var world_line=save_file.get_line()
 	var json = JSON.new()
 	var parse_result = json.parse(world_line)
+	if not parse_result == OK:
+		print("JSON Parse Error: ", json.get_error_message(), " in ", world_line, " at line ", json.get_error_line())
+		return
 	if(json.data.has("server_age")):
 		world.server_age=int(json.data["server_age"])
 	#process player nodes
@@ -102,11 +106,18 @@ func load_game():
 		#print('loading ',node_data["player_id"])
 
 		# Firstly, we need to create the object and add it to the tree and set its position.
-		var player = load(node_data["filename"]).instantiate()
-		player.name=node_data["name"]
-		player.player_id=node_data["player_id"]
-		get_node(node_data["parent"]).add_child(player)
-		player.position = Vector3(node_data["pos_x"], node_data["pos_y"], node_data["pos_z"])
+		var node = load(node_data["filename"]).instantiate()
+
+		# Check the node has a save function.
+		if !node.has_method("load"):
+			print("persistent node '%s' is missing a load() function, skipped" % node.name)
+			continue
+		node.call("load",node_data)
+
+		#node.name=node_data["name"]
+		#node.player_id=node_data["player_id"]
+		get_node(node_data["parent"]).add_child(node)
+		#node.position = Vector3(node_data["pos_x"], node_data["pos_y"], node_data["pos_z"])
 
 		# Now we set the remaining variables.
 		#for i in node_data.keys():
@@ -133,8 +144,9 @@ func _ready():
 		health_bar.hide()
 		serverCamera.show()
 		serverCamera.current=true
-	else:
+	elif arguments.has("player_id"):
 		player_id=arguments['player_id']
+		_on_join_button_pressed()
 
 func _process(_delta):
 	var now=Time.get_ticks_msec()
@@ -157,6 +169,7 @@ func _unhandled_input(_event):
 	if Input.is_action_just_pressed("quit"):
 		#print('quit')
 		if(multiplayer.is_server()):
+			print('is_server')
 			save_game()
 		get_tree().quit()
 
@@ -201,16 +214,17 @@ func _on_multiplayer_spawner_spawned(node):
 # with the keys being each player's unique IDs.
 var players = {}
 
-func add_player(_peer_id,player_id):
+func add_player(_peer_id,_player_id):
 	#first check if this player already has a node
 	#_register_player.rpc_id(peer_id, player_id)
 	#print('add_player ',player_id)
-	var player=get_node_or_null(player_id)
+	var player=get_node_or_null(_player_id)
 	#print(player)
 	if(!player):
 		player = Player.instantiate()
-		player.name = player_id
-		player.player_id=player_id
+		player.name = _player_id
+		player.player_id=_player_id
+		#TODO make sure player isn't colliding with existing player
 		add_child(player)
 	#if player.is_multiplayer_authority():
 	#if multiplayer.get_unique_id()==str(name).to_int():

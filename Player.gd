@@ -18,16 +18,61 @@ const JUMP_VELOCITY = 10.0
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = 20.0
 
+static func Transform3D_to_Dictionary(t:Transform3D):
+	var d={
+		"basis":{
+			"x":Vector3_to_Dictionary(t.basis.x),
+			"y":Vector3_to_Dictionary(t.basis.y),
+			"z":Vector3_to_Dictionary(t.basis.z)
+		},
+		"origin":Vector3_to_Dictionary(t.origin)
+	}
+	#print(d)
+	return d
+
+static func Dictionary_to_Transform3D(d:Dictionary):
+	#x_axis: Vector3, y_axis: Vector3, z_axis: Vector3, origin: Vector3)
+	#print(d)
+	var x_axis=Dictionary_to_Vector3(d.basis.x)
+	var y_axis=Dictionary_to_Vector3(d.basis.y)
+	var z_axis=Dictionary_to_Vector3(d.basis.z)
+	var origin=Dictionary_to_Vector3(d.origin)
+	var _basis=Basis(x_axis,y_axis,z_axis)
+
+	return Transform3D(_basis,origin)
+
+static func Dictionary_to_Vector3(d:Dictionary):
+	return Vector3(d.x,d.y,d.z)
+
+static func Vector3_to_Dictionary(vector3:Vector3):
+	var d= {
+		"x":vector3.x,
+		"y":vector3.y,
+		"z":vector3.z
+		}
+	#print(d)
+	return d
+
+func load(node_data):
+	#print('player load')
+	name=node_data["name"]
+	player_id=node_data["player_id"]
+	transform=Dictionary_to_Transform3D(node_data["transform"])
+
 func save():
+	var json = JSON.new()
+	var transform_json=JSON.stringify(transform)
+	#print('transform_json:',transform_json)
+	json.parse(transform_json)
+	#print('json.data:',json.data)
+	#print('json.data.x:',json.data.X)
 	var save_dict = {
 		"filename" : get_scene_file_path(),
-		"parent" : get_parent().get_path(),
-		"path": get_path(),
 		"name":name,
+		"parent" : get_parent().get_path(),
+		#"path": get_path(),
 		"player_id":player_id,
-		"pos_x" : position.x, # Vector2 is not supported by JSON
-		"pos_y" : position.y,
-		"pos_z":position.z,
+		"transform": Transform3D_to_Dictionary(transform),
 		"health": health,
 		#"attack" : attack,
 		#"defense" : defense,
@@ -35,14 +80,6 @@ func save():
 		#"max_health" : max_health,
 		#"damage" : damage,
 		#"regen" : regen,
-		#"experience" : experience,
-		#"tnl" : tnl,
-		#"level" : level,
-		#"attack_growth" : attack_growth,
-		#"defense_growth" : defense_growth,
-		#"health_growth" : health_growth,
-		#"is_alive" : is_alive,
-		#"last_attack" : last_attack
 	}
 	return save_dict
 
@@ -52,6 +89,7 @@ func _enter_tree():
 	pass
 
 func _ready():
+
 	#if not is_multiplayer_authority(): return
 	#print(world.player_id,':',player_id)
 	if player_id and player_id==world.player_id:
@@ -64,6 +102,8 @@ func _ready():
 	else:
 		#print('someone else')
 		pass
+	var bubble = load('res://ChatBubble.tscn').instantiate()
+	add_child(bubble)
 
 func _unhandled_input(event):
 	#print('_unhandled_input')
