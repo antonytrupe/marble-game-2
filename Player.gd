@@ -31,12 +31,7 @@ func load(node_data):
 	#camera.rotation=rotation
 
 func save():
-	var json = JSON.new()
 	var transform_json=JSON.stringify(transform)
-	#print('transform_json:',transform_json)
-	json.parse(transform_json)
-	#print('json.data:',json.data)
-	#print('json.data.x:',json.data.X)
 	var save_dict = {
 		"filename" : get_scene_file_path(),
 		"name":name,
@@ -60,31 +55,18 @@ func _enter_tree():
 	pass
 
 func _ready():
-
-	#if not is_multiplayer_authority(): return
-	#print(world.player_id,':',player_id)
 	if player_id and player_id==world.player_id:
-	#if multiplayer.get_unique_id()==str(name).to_int():
 		#print('me')
-		#print(multiplayer.get_unique_id())
-		#print(name)
-		#Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		camera.current = true
 	else:
 		#print('someone else')
 		pass
 	var bubble = load('res://ChatBubble.tscn').instantiate()
-	add_child(bubble)
+	#add_child(bubble)
 
 func _unhandled_input(event):
 	#print('_unhandled_input')
-	#print(multiplayer.get_unique_id())
-	#print(name)
 	if player_id!=world.player_id:
-	#if multiplayer.get_unique_id()!=str(name).to_int():
-		#print('not the client player')
-		#print(multiplayer.get_unique_id())
-		#print(name)
 		return
 
 	if event is InputEventMouseMotion:
@@ -110,8 +92,6 @@ func _unhandled_input(event):
 		chatTextEdit.release_focus()
 		chatMode=false
 	if Input.is_action_just_pressed("chat"):
-		#shoot()
-		#print('chat')
 		if(!chatMode):
 			chatTextEdit.show()
 			chatTextEdit.grab_focus()
@@ -129,10 +109,6 @@ func _unhandled_input(event):
 @rpc("any_peer")
 func chat(message):
 	sendChat.rpc(message)
-	#if multiplayer.is_server():
-		#sendChat.rpc(message)
-	#else:
-		#sendChat.rpc(message)
 
 #this the function that runs on all the peers that only the server can call
 @rpc("authority","call_local")

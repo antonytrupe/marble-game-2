@@ -7,7 +7,6 @@ var player
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	#print('chatbubble ready:',text)
 	start=Time.get_ticks_msec()
 	player=get_parent_node_3d()
 	label.text=text
@@ -16,7 +15,6 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	var now=Time.get_ticks_msec()
 	var y=player.position.y+.5+(now-start)/10000.0
-	#print(y)
 	position.y=y
 	if(now-start>12000):
 		queue_free()

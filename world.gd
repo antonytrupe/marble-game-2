@@ -207,32 +207,19 @@ var players = {}
 
 func add_player(_peer_id,_player_id):
 	#first check if this player already has a node
-	#_register_player.rpc_id(peer_id, player_id)
-	#print('add_player ',player_id)
 	var player=get_node_or_null(_player_id)
-	#print(player)
 	if(!player):
 		player = Player.instantiate()
 		player.name = _player_id
 		player.player_id=_player_id
 		#TODO make sure player isn't colliding with existing player
 		add_child(player)
-	#if player.is_multiplayer_authority():
-	#if multiplayer.get_unique_id()==str(name).to_int():
-		#player.health_changed.connect(update_health_bar)
 
 @rpc("any_peer", "reliable")
 func register_player(new_player_info):
 	var peer_id = multiplayer.get_remote_sender_id()
-	#print('register_player:',peer_id,':',new_player_info)
 	players[peer_id] = new_player_info
 	add_player(peer_id,new_player_info)
-
-	#player_connected.emit(new_player_id, new_player_info)
-	#var player = Player.instantiate()
-	#player.name = str(peer_id)
-	#add_child(player)
-	#print('add_player ',player.name)
 
 func remove_player(peer_id):
 	var player = get_node_or_null(str(peer_id))
