@@ -6,11 +6,13 @@ signal health_changed(health_value)
 @onready var anim_player =  $AnimationPlayer
 @onready var muzzle_flash = $Pistol/MuzzleFlash
 @onready var raycast = $Camera3D/RayCast3D
+@onready var chatTextEdit:TextEdit=$/root/World/UI/HUD/ChatInput
+var chatMode=false
 
 @export var health = 3
 @export var player_id:String
 
-@onready var world=$"/root/World"
+@onready var world=$/root/World
 
 const SPEED = 10.0
 const JUMP_VELOCITY = 10.0
@@ -18,46 +20,15 @@ const JUMP_VELOCITY = 10.0
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = 20.0
 
-static func Transform3D_to_Dictionary(t:Transform3D):
-	var d={
-		"basis":{
-			"x":Vector3_to_Dictionary(t.basis.x),
-			"y":Vector3_to_Dictionary(t.basis.y),
-			"z":Vector3_to_Dictionary(t.basis.z)
-		},
-		"origin":Vector3_to_Dictionary(t.origin)
-	}
-	#print(d)
-	return d
-
-static func Dictionary_to_Transform3D(d:Dictionary):
-	#x_axis: Vector3, y_axis: Vector3, z_axis: Vector3, origin: Vector3)
-	#print(d)
-	var x_axis=Dictionary_to_Vector3(d.basis.x)
-	var y_axis=Dictionary_to_Vector3(d.basis.y)
-	var z_axis=Dictionary_to_Vector3(d.basis.z)
-	var origin=Dictionary_to_Vector3(d.origin)
-	var _basis=Basis(x_axis,y_axis,z_axis)
-
-	return Transform3D(_basis,origin)
-
-static func Dictionary_to_Vector3(d:Dictionary):
-	return Vector3(d.x,d.y,d.z)
-
-static func Vector3_to_Dictionary(vector3:Vector3):
-	var d= {
-		"x":vector3.x,
-		"y":vector3.y,
-		"z":vector3.z
-		}
-	#print(d)
-	return d
-
 func load(node_data):
 	#print('player load')
 	name=node_data["name"]
 	player_id=node_data["player_id"]
 	transform=Dictionary_to_Transform3D(node_data["transform"])
+	#TODO figure out camera rotation
+	#print(rotation)
+	#print(camera)
+	#camera.rotation=rotation
 
 func save():
 	var json = JSON.new()
@@ -132,6 +103,45 @@ func _unhandled_input(event):
 		#shoot()
 		pass
 
+	if Input.is_action_just_pressed("quit") and chatMode:
+		#don't let this event bubble up
+		get_viewport().set_input_as_handled()
+		chatTextEdit.hide()
+		chatTextEdit.release_focus()
+		chatMode=false
+	if Input.is_action_just_pressed("chat"):
+		#shoot()
+		#print('chat')
+		if(!chatMode):
+			chatTextEdit.show()
+			chatTextEdit.grab_focus()
+			chatMode=true
+		else:
+			chatTextEdit.hide()
+			chatTextEdit.release_focus()
+			print(chatTextEdit.text)
+			chat.rpc_id(1,chatTextEdit.text)
+			chatTextEdit.text=""
+			chatMode=false
+		pass
+
+#this is the function that runs on the server that any peer can call
+@rpc("any_peer")
+func chat(message):
+	sendChat.rpc(message)
+	#if multiplayer.is_server():
+		#sendChat.rpc(message)
+	#else:
+		#sendChat.rpc(message)
+
+#this the function that runs on all the peers that only the server can call
+@rpc("authority","call_local")
+func sendChat(message):
+	print('sendChat',message)
+	var bubble = load('res://ChatBubble.tscn').instantiate()
+	bubble.text=message
+	add_child(bubble)
+
 @rpc("any_peer")
 func _rotate(value):
 	rotate_y(value * .005)
@@ -164,7 +174,7 @@ func _physics_process(delta):
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("left", "right", "up", "down")
-	if player_id==world.player_id:
+	if player_id==world.player_id and !chatMode:
 	#if multiplayer.get_unique_id()==str(name).to_int():
 		# Handle Jump.
 		if Input.is_action_just_pressed("jump") and is_on_floor():
@@ -229,3 +239,38 @@ func receive_damage():
 func _on_animation_player_animation_finished(anim_name):
 	if anim_name == "shoot":
 		anim_player.play("idle")
+
+static func Transform3D_to_Dictionary(t:Transform3D):
+	var d={
+		"basis":{
+			"x":Vector3_to_Dictionary(t.basis.x),
+			"y":Vector3_to_Dictionary(t.basis.y),
+			"z":Vector3_to_Dictionary(t.basis.z)
+		},
+		"origin":Vector3_to_Dictionary(t.origin)
+	}
+	#print(d)
+	return d
+
+static func Dictionary_to_Transform3D(d:Dictionary):
+	#x_axis: Vector3, y_axis: Vector3, z_axis: Vector3, origin: Vector3)
+	#print(d)
+	var x_axis=Dictionary_to_Vector3(d.basis.x)
+	var y_axis=Dictionary_to_Vector3(d.basis.y)
+	var z_axis=Dictionary_to_Vector3(d.basis.z)
+	var origin=Dictionary_to_Vector3(d.origin)
+	var _basis=Basis(x_axis,y_axis,z_axis)
+
+	return Transform3D(_basis,origin)
+
+static func Dictionary_to_Vector3(d:Dictionary):
+	return Vector3(d.x,d.y,d.z)
+
+static func Vector3_to_Dictionary(vector3:Vector3):
+	var d= {
+		"x":vector3.x,
+		"y":vector3.y,
+		"z":vector3.z
+		}
+	#print(d)
+	return d

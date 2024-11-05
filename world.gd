@@ -8,7 +8,6 @@ extends Node
 @onready var turnTimer=$UI/HUD/TurnTimer
 @onready var serverCamera=$Node3D/ServerCamera3D
 @onready var world=$"."
-
 @export var turn_number=1:
 	set = update_turn_number
 
@@ -114,16 +113,7 @@ func load_game():
 			continue
 		node.call("load",node_data)
 
-		#node.name=node_data["name"]
-		#node.player_id=node_data["player_id"]
 		get_node(node_data["parent"]).add_child(node)
-		#node.position = Vector3(node_data["pos_x"], node_data["pos_y"], node_data["pos_z"])
-
-		# Now we set the remaining variables.
-		#for i in node_data.keys():
-			#if i == "filename" or i == "parent" or i == "pos_x" or i == "pos_y":
-				#continue
-			#player.set(i, node_data[i])
 
 func _ready():
 	var arguments = {}
@@ -172,6 +162,7 @@ func _unhandled_input(_event):
 			print('is_server')
 			save_game()
 		get_tree().quit()
+
 
 func _on_host_button_pressed():
 	main_menu.hide()

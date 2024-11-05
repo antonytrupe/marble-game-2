@@ -6,5 +6,6 @@
 script = ExtResource("1_nfq3l")
 
 [node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
 text = "Hello World
 Line 2"
