@@ -7,7 +7,7 @@ signal health_changed(health_value)
 @onready var muzzle_flash = $Pistol/MuzzleFlash
 @onready var raycast = $Camera3D/RayCast3D
 @onready var chatTextEdit:TextEdit=$/root/Game/UI/HUD/ChatInput
-@onready var world=$/root/Game
+@onready var game=$/root/Game
 
 @export var health = 3
 @export var player_id:String
@@ -51,7 +51,7 @@ func _enter_tree():
 	pass
 
 func _ready():
-	if player_id and player_id==world.player_id:
+	if player_id and player_id==game.player_id:
 		#print('me')
 		camera.current = true
 	else:
@@ -60,7 +60,7 @@ func _ready():
 
 func _unhandled_input(event):
 	#print('_unhandled_input')
-	if world and player_id!=world.player_id:
+	if game and player_id!=game.player_id:
 		return
 
 	if event is InputEventMouseMotion:
@@ -145,7 +145,7 @@ func _physics_process(delta):
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("left", "right", "up", "down")
-	if world and player_id==world.player_id and !chatMode:
+	if game and player_id==game.player_id and !chatMode:
 	#if multiplayer.get_unique_id()==str(name).to_int():
 		# Handle Jump.
 		if Input.is_action_just_pressed("jump") and is_on_floor():

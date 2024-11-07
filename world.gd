@@ -8,7 +8,7 @@ extends Node
 @onready var turnTimer=$UI/HUD/TurnTimer
 @onready var serverCamera=$CameraPivot/ServerCamera3D
 @onready var Players=$Players
-@onready var world=$"."
+@onready var game=$"."
 @onready var Chunks=$Chunks
 @export var turn_number=1:
 	set = update_turn_number
@@ -111,7 +111,7 @@ func load_game():
 		print("JSON Parse Error: ", json.get_error_message(), " in ", world_line, " at line ", json.get_error_line())
 		return
 	if(json.data.has("server_age")):
-		world.server_age=int(json.data["server_age"])
+		game.server_age=int(json.data["server_age"])
 	#process player nodes
 	#print('looking for players')
 	while save_file.get_position() < save_file.get_length():
