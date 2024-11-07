@@ -6,39 +6,37 @@ signal health_changed(health_value)
 @onready var anim_player =  $AnimationPlayer
 @onready var muzzle_flash = $Pistol/MuzzleFlash
 @onready var raycast = $Camera3D/RayCast3D
-@onready var chatTextEdit:TextEdit=$/root/World/UI/HUD/ChatInput
-var chatMode=false
+@onready var chatTextEdit:TextEdit=$/root/Game/UI/HUD/ChatInput
+@onready var world=$/root/Game
 
 @export var health = 3
 @export var player_id:String
-
-@onready var world=$/root/World
 
 const SPEED = 10.0
 const JUMP_VELOCITY = 10.0
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = 20.0
+var chatMode=false
 
 func load(node_data):
 	#print('player load')
 	name=node_data["name"]
 	player_id=node_data["player_id"]
-	transform=Dictionary_to_Transform3D(node_data["transform"])
+	transform=JSON3D.DictionaryToTransform3D(node_data["transform"])
 	#TODO figure out camera rotation
 	#print(rotation)
 	#print(camera)
 	#camera.rotation=rotation
 
 func save():
-	var transform_json=JSON.stringify(transform)
 	var save_dict = {
 		"filename" : get_scene_file_path(),
 		"name":name,
 		"parent" : get_parent().get_path(),
 		#"path": get_path(),
 		"player_id":player_id,
-		"transform": Transform3D_to_Dictionary(transform),
+		"transform": JSON3D.Transform3DtoDictionary(transform),
 		"health": health,
 		#"attack" : attack,
 		#"defense" : defense,
@@ -50,8 +48,6 @@ func save():
 	return save_dict
 
 func _enter_tree():
-	#set_multiplayer_authority(str(name).to_int())
-	#add_to_group("Persist")
 	pass
 
 func _ready():
@@ -61,16 +57,15 @@ func _ready():
 	else:
 		#print('someone else')
 		pass
-	var bubble = load('res://ChatBubble.tscn').instantiate()
-	#add_child(bubble)
 
 func _unhandled_input(event):
 	#print('_unhandled_input')
-	if player_id!=world.player_id:
+	if world and player_id!=world.player_id:
 		return
 
 	if event is InputEventMouseMotion:
-		if(Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)):
+		if(Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or\
+			Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE)):
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			if multiplayer.is_server():
 				_rotate(-event.relative.x)
@@ -150,7 +145,7 @@ func _physics_process(delta):
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("left", "right", "up", "down")
-	if player_id==world.player_id and !chatMode:
+	if world and player_id==world.player_id and !chatMode:
 	#if multiplayer.get_unique_id()==str(name).to_int():
 		# Handle Jump.
 		if Input.is_action_just_pressed("jump") and is_on_floor():
@@ -215,38 +210,3 @@ func receive_damage():
 func _on_animation_player_animation_finished(anim_name):
 	if anim_name == "shoot":
 		anim_player.play("idle")
-
-static func Transform3D_to_Dictionary(t:Transform3D):
-	var d={
-		"basis":{
-			"x":Vector3_to_Dictionary(t.basis.x),
-			"y":Vector3_to_Dictionary(t.basis.y),
-			"z":Vector3_to_Dictionary(t.basis.z)
-		},
-		"origin":Vector3_to_Dictionary(t.origin)
-	}
-	#print(d)
-	return d
-
-static func Dictionary_to_Transform3D(d:Dictionary):
-	#x_axis: Vector3, y_axis: Vector3, z_axis: Vector3, origin: Vector3)
-	#print(d)
-	var x_axis=Dictionary_to_Vector3(d.basis.x)
-	var y_axis=Dictionary_to_Vector3(d.basis.y)
-	var z_axis=Dictionary_to_Vector3(d.basis.z)
-	var origin=Dictionary_to_Vector3(d.origin)
-	var _basis=Basis(x_axis,y_axis,z_axis)
-
-	return Transform3D(_basis,origin)
-
-static func Dictionary_to_Vector3(d:Dictionary):
-	return Vector3(d.x,d.y,d.z)
-
-static func Vector3_to_Dictionary(vector3:Vector3):
-	var d= {
-		"x":vector3.x,
-		"y":vector3.y,
-		"z":vector3.z
-		}
-	#print(d)
-	return d

@@ -17,3 +17,6 @@ uv1_triplanar = true
 [node name="Plane" parent="." index="0"]
 surface_material_override/0 = SubResource("StandardMaterial3D_if5ix")
 surface_material_override/1 = SubResource("StandardMaterial3D_jylvv")
+
+[node name="StaticBody3D" parent="Plane" index="0"]
+collision_mask = 0

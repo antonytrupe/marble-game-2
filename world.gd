@@ -6,12 +6,15 @@ extends Node
 @onready var health_bar = $UI/HUD/HealthBar
 @onready var turnNumberLabel=$UI/HUD/TurnTimer/TurnNumber
 @onready var turnTimer=$UI/HUD/TurnTimer
-@onready var serverCamera=$Node3D/ServerCamera3D
+@onready var serverCamera=$CameraPivot/ServerCamera3D
+@onready var Players=$Players
 @onready var world=$"."
+@onready var Chunks=$Chunks
 @export var turn_number=1:
 	set = update_turn_number
 
 const Player = preload("res://player.tscn")
+const Chunk = preload("res://chunk.tscn")
 const PORT = 9999
 var enet_peer = ENetMultiplayerPeer.new()
 var turn_start=0
@@ -19,6 +22,26 @@ var turn_start=0
 var player_id:String
 
 #var sf= SurfaceTool.new()
+func _on_player_zoned(_player_id, chunk_id):
+	#print("_on_player_zoned",_player_id,chunk_id)
+	var chunk_json=JSON.parse_string(chunk_id)
+	#return
+	#print(chunk_json)
+	for x in range(-1,1+1):
+		for z in range(-1,1+1):
+			var adj_x=chunk_json[0]+x
+			var adj_y=chunk_json[1]+0
+			var adj_z=chunk_json[2]+z
+			var adj_chunk_name="[%s,%s,%s]" %[adj_x,adj_y,adj_z]
+			#print('adj_chunk_name:',adj_chunk_name)
+			var adj_chunk=Chunks.get_node_or_null(adj_chunk_name)
+			if !adj_chunk:
+				var new_chunk=Chunk.instantiate()
+				new_chunk.position=Vector3(adj_x*60,adj_y*60,adj_z*60)
+				new_chunk.name=adj_chunk_name
+				Chunks.add_child(new_chunk)
+				#print('added new chunk')
+	pass
 
 func save():
 	var save_dict = {
@@ -104,18 +127,29 @@ func load_game():
 		var node_data = json.data
 		#print('loading ',node_data["player_id"])
 
-		# Firstly, we need to create the object and add it to the tree and set its position.
-		var node = load(node_data["filename"]).instantiate()
-
+		# Firstly, we need to create the object and add it to the tree
+		#TODO check if the node is in the tree already
+		var node=get_node_or_null(node_data.parent+'/'+node_data.name)
+		if !node:
+			#print('new node')
+			node = load(node_data["filename"]).instantiate()
+		else:
+			#print('found node')
+			pass
 		# Check the node has a save function.
 		if !node.has_method("load"):
 			print("persistent node '%s' is missing a load() function, skipped" % node.name)
 			continue
 		node.call("load",node_data)
-
-		get_node(node_data["parent"]).add_child(node)
+		#var ms=$MultiplayerSynchronizer
+		#ms.set_visibility_for()
+		get_node_or_null(node_data["parent"]).add_child(node)
+		#print('added ',node.name)
 
 func _ready():
+	#var signals=load("res://Signals.cs").new()
+	Signals.PlayerZoned.connect(_on_player_zoned)
+
 	var arguments = {}
 	for argument in OS.get_cmdline_user_args():
 		if argument.contains("="):
@@ -196,24 +230,19 @@ func _on_connected_to_server():
 	#print('_on_connected_to_server')
 	world.register_player.rpc_id(1,player_id)
 
-func _on_multiplayer_spawner_spawned(node):
-	#TODO
-	if true:
-		node.health_changed.connect(update_health_bar)
-
 # This will contain player info for every player,
 # with the keys being each player's unique IDs.
 var players = {}
 
 func add_player(_peer_id,_player_id):
 	#first check if this player already has a node
-	var player=get_node_or_null(_player_id)
+	var player=Players.get_node_or_null(_player_id)
 	if(!player):
 		player = Player.instantiate()
 		player.name = _player_id
 		player.player_id=_player_id
 		#TODO make sure player isn't colliding with existing player
-		add_child(player)
+		Players.add_child(player)
 
 @rpc("any_peer", "reliable")
 func register_player(new_player_info):
