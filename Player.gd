@@ -7,24 +7,24 @@ signal health_changed(health_value)
 @onready var muzzle_flash = $Pistol/MuzzleFlash
 @onready var raycast = $Camera3D/RayCast3D
 @onready var chatTextEdit:TextEdit=$/root/Game/UI/HUD/ChatInput
-var chatMode=false
+@onready var world=$/root/Game
+#@onready var JSON3D=$/root/Game/JSON
 
 @export var health = 3
 @export var player_id:String
-
-@onready var world=$/root/Game
 
 const SPEED = 10.0
 const JUMP_VELOCITY = 10.0
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = 20.0
+var chatMode=false
 
 func load(node_data):
 	#print('player load')
 	name=node_data["name"]
 	player_id=node_data["player_id"]
-	transform=Dictionary_to_Transform3D(node_data["transform"])
+	transform=JSON3D.DictionaryToTransform3D(node_data["transform"])
 	#TODO figure out camera rotation
 	#print(rotation)
 	#print(camera)
@@ -37,7 +37,7 @@ func save():
 		"parent" : get_parent().get_path(),
 		#"path": get_path(),
 		"player_id":player_id,
-		"transform": Transform3D_to_Dictionary(transform),
+		"transform": JSON3D.Transform3DtoDictionary(transform),
 		"health": health,
 		#"attack" : attack,
 		#"defense" : defense,
@@ -211,38 +211,3 @@ func receive_damage():
 func _on_animation_player_animation_finished(anim_name):
 	if anim_name == "shoot":
 		anim_player.play("idle")
-
-static func Transform3D_to_Dictionary(t:Transform3D):
-	var d={
-		"basis":{
-			"x":Vector3_to_Dictionary(t.basis.x),
-			"y":Vector3_to_Dictionary(t.basis.y),
-			"z":Vector3_to_Dictionary(t.basis.z)
-		},
-		"origin":Vector3_to_Dictionary(t.origin)
-	}
-	#print(d)
-	return d
-
-static func Dictionary_to_Transform3D(d:Dictionary):
-	#x_axis: Vector3, y_axis: Vector3, z_axis: Vector3, origin: Vector3)
-	#print(d)
-	var x_axis=Dictionary_to_Vector3(d.basis.x)
-	var y_axis=Dictionary_to_Vector3(d.basis.y)
-	var z_axis=Dictionary_to_Vector3(d.basis.z)
-	var origin=Dictionary_to_Vector3(d.origin)
-	var _basis=Basis(x_axis,y_axis,z_axis)
-
-	return Transform3D(_basis,origin)
-
-static func Dictionary_to_Vector3(d:Dictionary):
-	return Vector3(d.x,d.y,d.z)
-
-static func Vector3_to_Dictionary(vector3:Vector3):
-	var d= {
-		"x":vector3.x,
-		"y":vector3.y,
-		"z":vector3.z
-		}
-	#print(d)
-	return d

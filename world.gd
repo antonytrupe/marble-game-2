@@ -7,6 +7,7 @@ extends Node
 @onready var turnNumberLabel=$UI/HUD/TurnTimer/TurnNumber
 @onready var turnTimer=$UI/HUD/TurnTimer
 @onready var serverCamera=$CameraPivot/ServerCamera3D
+@onready var Players=$Players
 @onready var world=$"."
 @export var turn_number=1:
 	set = update_turn_number
@@ -117,12 +118,21 @@ func load_game():
 			print("persistent node '%s' is missing a load() function, skipped" % node.name)
 			continue
 		node.call("load",node_data)
-		var ms=$MultiplayerSynchronizer
+		#var ms=$MultiplayerSynchronizer
 		#ms.set_visibility_for()
 		get_node_or_null(node_data["parent"]).add_child(node)
 		print('added ',node.name)
 
+func _on_player_zoned(_player_id, chunk_id):
+	print("_on_player_zoned",_player_id,chunk_id)
+	pass
+
 func _ready():
+
+	#var signals=load("res://Signals.cs").new()
+	Signals.PlayerZoned.connect(_on_player_zoned)
+
+
 	var arguments = {}
 	for argument in OS.get_cmdline_user_args():
 		if argument.contains("="):
@@ -203,24 +213,19 @@ func _on_connected_to_server():
 	#print('_on_connected_to_server')
 	world.register_player.rpc_id(1,player_id)
 
-func _on_multiplayer_spawner_spawned(node):
-	#TODO
-	if false:
-		node.health_changed.connect(update_health_bar)
-
 # This will contain player info for every player,
 # with the keys being each player's unique IDs.
 var players = {}
 
 func add_player(_peer_id,_player_id):
 	#first check if this player already has a node
-	var player=get_node_or_null(_player_id)
+	var player=Players.get_node_or_null(_player_id)
 	if(!player):
 		player = Player.instantiate()
 		player.name = _player_id
 		player.player_id=_player_id
 		#TODO make sure player isn't colliding with existing player
-		add_child(player)
+		Players.add_child(player)
 
 @rpc("any_peer", "reliable")
 func register_player(new_player_info):
