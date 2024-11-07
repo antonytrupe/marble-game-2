@@ -6,7 +6,7 @@ extends Node
 @onready var health_bar = $UI/HUD/HealthBar
 @onready var turnNumberLabel=$UI/HUD/TurnTimer/TurnNumber
 @onready var turnTimer=$UI/HUD/TurnTimer
-@onready var serverCamera=$Node3D/ServerCamera3D
+@onready var serverCamera=$CameraPivot/ServerCamera3D
 @onready var world=$"."
 @export var turn_number=1:
 	set = update_turn_number
@@ -104,16 +104,23 @@ func load_game():
 		var node_data = json.data
 		#print('loading ',node_data["player_id"])
 
-		# Firstly, we need to create the object and add it to the tree and set its position.
-		var node = load(node_data["filename"]).instantiate()
-
+		# Firstly, we need to create the object and add it to the tree
+		#TODO check if the node is in the tree already
+		var node=get_node_or_null(node_data.parent+'/'+node_data.name)
+		if !node:
+			print('new node')
+			node = load(node_data["filename"]).instantiate()
+		else:
+			print('found node')
 		# Check the node has a save function.
 		if !node.has_method("load"):
 			print("persistent node '%s' is missing a load() function, skipped" % node.name)
 			continue
 		node.call("load",node_data)
-
-		get_node(node_data["parent"]).add_child(node)
+		var ms=$MultiplayerSynchronizer
+		#ms.set_visibility_for()
+		get_node_or_null(node_data["parent"]).add_child(node)
+		print('added ',node.name)
 
 func _ready():
 	var arguments = {}
@@ -198,7 +205,7 @@ func _on_connected_to_server():
 
 func _on_multiplayer_spawner_spawned(node):
 	#TODO
-	if true:
+	if false:
 		node.health_changed.connect(update_health_bar)
 
 # This will contain player info for every player,

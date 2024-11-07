@@ -1,21 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=8 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_6tkge"]
-[ext_resource type="PackedScene" uid="uid://c1j7an8woikyd" path="res://environment.tscn" id="1_iktak"]
 [ext_resource type="Script" path="res://chat_input.gd" id="3_3e53o"]
-
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_u5pdl"]
-sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
-ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
-
-[sub_resource type="Sky" id="Sky_w2qqb"]
-sky_material = SubResource("ProceduralSkyMaterial_u5pdl")
-
-[sub_resource type="Environment" id="Environment_6knbf"]
-background_mode = 2
-sky = SubResource("Sky_w2qqb")
-tonemap_mode = 2
-glow_enabled = true
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ujyws"]
 bg_color = Color(1, 0.117647, 0, 1)
@@ -28,17 +14,18 @@ properties/0/path = NodePath(".:turn_number")
 properties/0/spawn = true
 properties/0/replication_mode = 2
 
-[node name="World" type="Node" groups=["Persist"]]
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_pnarc"]
+
+[sub_resource type="Environment" id="Environment_svs1a"]
+fog_density = 0.001
+volumetric_fog_density = 0.0
+
+[node name="Game" type="Node" groups=["Persist"]]
 script = ExtResource("1_6tkge")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
 shadow_enabled = true
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_6knbf")
-
-[node name="Environment" parent="." instance=ExtResource("1_iktak")]
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -146,19 +133,25 @@ grow_vertical = 0
 script = ExtResource("3_3e53o")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://player.tscn")
+_spawnable_scenes = PackedStringArray("res://player.tscn", "res://chunk.tscn")
 spawn_path = NodePath("..")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_vl0i4")
 
-[node name="Node3D" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 50, 0)
-visible = false
+[node name="CameraPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 200, 0)
 
-[node name="ServerCamera3D" type="Camera3D" parent="Node3D"]
+[node name="ServerCamera3D" type="Camera3D" parent="CameraPivot"]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
-visible = false
+
+[node name="FloorStaticBody" type="StaticBody3D" parent="."]
+
+[node name="FloorCollisionShape3D" type="CollisionShape3D" parent="FloorStaticBody"]
+shape = SubResource("WorldBoundaryShape3D_pnarc")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_svs1a")
 
 [connection signal="pressed" from="UI/MainMenu/MarginContainer/VBoxContainer/HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="UI/MainMenu/MarginContainer/VBoxContainer/JoinButton" to="." method="_on_join_button_pressed"]

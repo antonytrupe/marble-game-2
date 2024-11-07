@@ -6,13 +6,13 @@ signal health_changed(health_value)
 @onready var anim_player =  $AnimationPlayer
 @onready var muzzle_flash = $Pistol/MuzzleFlash
 @onready var raycast = $Camera3D/RayCast3D
-@onready var chatTextEdit:TextEdit=$/root/World/UI/HUD/ChatInput
+@onready var chatTextEdit:TextEdit=$/root/Game/UI/HUD/ChatInput
 var chatMode=false
 
 @export var health = 3
 @export var player_id:String
 
-@onready var world=$/root/World
+@onready var world=$/root/Game
 
 const SPEED = 10.0
 const JUMP_VELOCITY = 10.0
@@ -31,7 +31,6 @@ func load(node_data):
 	#camera.rotation=rotation
 
 func save():
-	var transform_json=JSON.stringify(transform)
 	var save_dict = {
 		"filename" : get_scene_file_path(),
 		"name":name,
@@ -50,8 +49,6 @@ func save():
 	return save_dict
 
 func _enter_tree():
-	#set_multiplayer_authority(str(name).to_int())
-	#add_to_group("Persist")
 	pass
 
 func _ready():
@@ -61,16 +58,15 @@ func _ready():
 	else:
 		#print('someone else')
 		pass
-	var bubble = load('res://ChatBubble.tscn').instantiate()
-	#add_child(bubble)
 
 func _unhandled_input(event):
 	#print('_unhandled_input')
-	if player_id!=world.player_id:
+	if world and player_id!=world.player_id:
 		return
 
 	if event is InputEventMouseMotion:
-		if(Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)):
+		if(Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or\
+			Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE)):
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			if multiplayer.is_server():
 				_rotate(-event.relative.x)
@@ -150,7 +146,7 @@ func _physics_process(delta):
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("left", "right", "up", "down")
-	if player_id==world.player_id and !chatMode:
+	if world and player_id==world.player_id and !chatMode:
 	#if multiplayer.get_unique_id()==str(name).to_int():
 		# Handle Jump.
 		if Input.is_action_just_pressed("jump") and is_on_floor():
