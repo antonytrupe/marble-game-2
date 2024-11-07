@@ -148,7 +148,7 @@ func _physics_process(delta):
 
 	var mode=1
 	if Input.is_action_pressed("run"):
-		print('running')
+		#print('running')
 		mode=2
 
 	if game and player_id==game.player_id and !chatMode:
@@ -166,12 +166,12 @@ func _physics_process(delta):
 			#print('calling process_input')
 			server_move.rpc_id(1,input_dir,mode)
 
-	if anim_player.current_animation == "shoot":
-		pass
-	elif input_dir != Vector2.ZERO and is_on_floor():
-		anim_player.play("move")
-	else:
-		anim_player.play("idle")
+	#if anim_player.current_animation == "shoot":
+		#pass
+	#elif input_dir != Vector2.ZERO and is_on_floor():
+		#anim_player.play("move")
+	#else:
+		#anim_player.play("idle")
 
 	move_and_slide()
 
