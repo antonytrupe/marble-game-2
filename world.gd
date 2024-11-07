@@ -228,7 +228,7 @@ func _on_join_button_pressed():
 
 func _on_connected_to_server():
 	#print('_on_connected_to_server')
-	world.register_player.rpc_id(1,player_id)
+	game.register_player.rpc_id(1,player_id)
 
 # This will contain player info for every player,
 # with the keys being each player's unique IDs.

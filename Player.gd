@@ -145,6 +145,12 @@ func _physics_process(delta):
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("left", "right", "up", "down")
+
+	var mode=1
+	if Input.is_action_pressed("run"):
+		print('running')
+		mode=2
+
 	if game and player_id==game.player_id and !chatMode:
 	#if multiplayer.get_unique_id()==str(name).to_int():
 		# Handle Jump.
@@ -155,10 +161,10 @@ func _physics_process(delta):
 				jump.rpc_id(1)
 
 		if multiplayer.is_server():
-			process_input(input_dir)
+			server_move(input_dir,mode)
 		else:
 			#print('calling process_input')
-			process_input.rpc_id(1,input_dir)
+			server_move.rpc_id(1,input_dir,mode)
 
 	if anim_player.current_animation == "shoot":
 		pass
@@ -174,16 +180,10 @@ func jump():
 	velocity.y = JUMP_VELOCITY
 
 @rpc("any_peer")
-func process_input(input_dir):
-	var z=  Vector2(0,0)
-	if(input_dir != z):
-		#print('process_input')
-		#print(input_dir)
-		#print('multiplayer id ',multiplayer.get_unique_id())
-		#print('moving ',name)
-		pass
+func server_move(d,mode):
 
-	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	var direction = (transform.basis * Vector3(d.x, 0, d.y)).normalized()*mode
+
 	if direction:
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
