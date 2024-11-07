@@ -12,7 +12,7 @@ signal health_changed(health_value)
 @export var health = 3
 @export var player_id:String
 
-const SPEED = 10.0
+const SPEED = 5.0
 const JUMP_VELOCITY = 10.0
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
