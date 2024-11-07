@@ -1,10 +1,5 @@
 extends Node3D
 
-#@onready var signals=$/root/Game/Signals
-#@onready var j=preload("res://JSON.cs")
-
-#@onready var signals=load("res://Signals.cs").new()
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.
@@ -25,7 +20,6 @@ func save():
 
 func load(node_data):
 	name=node_data["name"]
-	#transform=Dictionary_to_Transform3D(node_data["transform"])
 	transform=JSON3D.DictionaryToTransform3D(node_data["transform"])
 
 func generate_terrain():
@@ -43,6 +37,4 @@ func generate_terrain():
 	#mesh=a_mesh
 
 func _on_area_3d_body_entered(body: Node3D) -> void:
-	print(body.name,' entered ', name)
 	Signals.PlayerZoned.emit(body.name,name)
-	pass # Replace with function body.

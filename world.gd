@@ -9,10 +9,12 @@ extends Node
 @onready var serverCamera=$CameraPivot/ServerCamera3D
 @onready var Players=$Players
 @onready var world=$"."
+@onready var Chunks=$Chunks
 @export var turn_number=1:
 	set = update_turn_number
 
 const Player = preload("res://player.tscn")
+const Chunk = preload("res://chunk.tscn")
 const PORT = 9999
 var enet_peer = ENetMultiplayerPeer.new()
 var turn_start=0
@@ -20,6 +22,26 @@ var turn_start=0
 var player_id:String
 
 #var sf= SurfaceTool.new()
+func _on_player_zoned(_player_id, chunk_id):
+	#print("_on_player_zoned",_player_id,chunk_id)
+	var chunk_json=JSON.parse_string(chunk_id)
+	#return
+	#print(chunk_json)
+	for x in range(-1,1+1):
+		for z in range(-1,1+1):
+			var adj_x=chunk_json[0]+x
+			var adj_y=chunk_json[1]+0
+			var adj_z=chunk_json[2]+z
+			var adj_chunk_name="[%s,%s,%s]" %[adj_x,adj_y,adj_z]
+			#print('adj_chunk_name:',adj_chunk_name)
+			var adj_chunk=Chunks.get_node_or_null(adj_chunk_name)
+			if !adj_chunk:
+				var new_chunk=Chunk.instantiate()
+				new_chunk.position=Vector3(adj_x*60,adj_y*60,adj_z*60)
+				new_chunk.name=adj_chunk_name
+				Chunks.add_child(new_chunk)
+				#print('added new chunk')
+	pass
 
 func save():
 	var save_dict = {
@@ -123,9 +145,7 @@ func load_game():
 		get_node_or_null(node_data["parent"]).add_child(node)
 		print('added ',node.name)
 
-func _on_player_zoned(_player_id, chunk_id):
-	print("_on_player_zoned",_player_id,chunk_id)
-	pass
+
 
 func _ready():
 

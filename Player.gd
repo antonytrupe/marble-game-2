@@ -8,7 +8,6 @@ signal health_changed(health_value)
 @onready var raycast = $Camera3D/RayCast3D
 @onready var chatTextEdit:TextEdit=$/root/Game/UI/HUD/ChatInput
 @onready var world=$/root/Game
-#@onready var JSON3D=$/root/Game/JSON
 
 @export var health = 3
 @export var player_id:String
