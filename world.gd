@@ -131,10 +131,11 @@ func load_game():
 		#TODO check if the node is in the tree already
 		var node=get_node_or_null(node_data.parent+'/'+node_data.name)
 		if !node:
-			print('new node')
+			#print('new node')
 			node = load(node_data["filename"]).instantiate()
 		else:
-			print('found node')
+			#print('found node')
+			pass
 		# Check the node has a save function.
 		if !node.has_method("load"):
 			print("persistent node '%s' is missing a load() function, skipped" % node.name)
@@ -143,15 +144,11 @@ func load_game():
 		#var ms=$MultiplayerSynchronizer
 		#ms.set_visibility_for()
 		get_node_or_null(node_data["parent"]).add_child(node)
-		print('added ',node.name)
-
-
+		#print('added ',node.name)
 
 func _ready():
-
 	#var signals=load("res://Signals.cs").new()
 	Signals.PlayerZoned.connect(_on_player_zoned)
-
 
 	var arguments = {}
 	for argument in OS.get_cmdline_user_args():
