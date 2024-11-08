@@ -8,6 +8,7 @@ signal health_changed(health_value)
 @onready var raycast = $Camera3D/RayCast3D
 @onready var chatTextEdit:TextEdit=$/root/Game/UI/HUD/ChatInput
 @onready var game=$/root/Game
+@onready var ChatBubbles=$ChatBubbles
 
 @export var health = 3
 @export var player_id:String
@@ -68,9 +69,9 @@ func _unhandled_input(event):
 			Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE)):
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			if multiplayer.is_server():
-				_rotate(-event.relative.x)
+				server_rotate(-event.relative.x)
 			else:
-				_rotate.rpc_id(1,-event.relative.x)
+				server_rotate.rpc_id(1,-event.relative.x)
 			camera.rotate_x(-event.relative.y * .005)
 			camera.rotation.x = clamp(camera.rotation.x, -PI/2, PI/2)
 		else:
@@ -95,26 +96,51 @@ func _unhandled_input(event):
 			chatTextEdit.hide()
 			chatTextEdit.release_focus()
 			print(chatTextEdit.text)
-			chat.rpc_id(1,chatTextEdit.text)
+			server_chat.rpc_id(1,chatTextEdit.text)
 			chatTextEdit.text=""
 			chatMode=false
 		pass
 
 #this is the function that runs on the server that any peer can call
 @rpc("any_peer")
-func chat(message):
-	sendChat.rpc(message)
+func server_crouch(message):
+	if !multiplayer.is_server():
+		print('someone trying to call server_chat')
+		return
+	client_crouch.rpc(message)
 
 #this the function that runs on all the peers that only the server can call
 @rpc("authority","call_local")
-func sendChat(message):
-	print('sendChat',message)
+func client_crouch(message):
+	if multiplayer.get_remote_sender_id()!=1:
+		print('someone else trying to call sendChat')
+		return
+	print('client_chat:',message)
+	anim_player.play("crouch")
+
+#this is the function that runs on the server that any peer can call
+@rpc("any_peer")
+func server_chat(message):
+	if !multiplayer.is_server():
+		print('someone trying to call server_chat')
+		return
+	client_chat.rpc(message)
+
+#this the function that runs on all the peers that only the server can call
+@rpc("authority","call_local")
+func client_chat(message):
+	if multiplayer.get_remote_sender_id()!=1:
+		print('someone else trying to call sendChat')
+		return
+	print('client_chat:',message)
 	var bubble = load('res://ChatBubble.tscn').instantiate()
 	bubble.text=message
-	add_child(bubble)
+	ChatBubbles.add_child(bubble)
 
 @rpc("any_peer")
-func _rotate(value):
+func server_rotate(value):
+	if !multiplayer.is_server():
+		return
 	rotate_y(value * .005)
 
 func shoot():
@@ -150,15 +176,26 @@ func _physics_process(delta):
 	if Input.is_action_pressed("run"):
 		#print('running')
 		mode=2
+	elif Input.is_action_pressed("crouch"):
+		mode=0.5
 
 	if game and player_id==game.player_id and !chatMode:
-	#if multiplayer.get_unique_id()==str(name).to_int():
+
+		if Input.is_action_pressed("crouch") and anim_player.current_animation!="crouch":
+			#anim_player.play("crouch")
+			#print('play crouch',player_id,game.player_id)
+			pass
+		elif !Input.is_action_pressed("crouch") and anim_player.current_animation!="RESET":
+			#anim_player.play("RESET")
+			#print('play reset')
+			pass
+
 		# Handle Jump.
 		if Input.is_action_just_pressed("jump") and is_on_floor():
 			if multiplayer.is_server():
-				jump()
+				server_jump()
 			else:
-				jump.rpc_id(1)
+				server_jump.rpc_id(1)
 
 		if multiplayer.is_server():
 			server_move(input_dir,mode)
@@ -176,12 +213,15 @@ func _physics_process(delta):
 	move_and_slide()
 
 @rpc("any_peer")
-func jump():
+func server_jump():
+	if !multiplayer.is_server():
+		return
 	velocity.y = JUMP_VELOCITY
 
 @rpc("any_peer")
 func server_move(d,mode):
-
+	if !multiplayer.is_server():
+		return
 	var direction = (transform.basis * Vector3(d.x, 0, d.y)).normalized()*mode
 
 	if direction:
