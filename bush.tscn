@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://damvmfs7dqebu"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_jq53d"]
+radius = 2.0
+height = 2.0
+is_hemisphere = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7km43"]
+albedo_color = Color(0.128272, 0.388059, 0.135242, 1)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_eg6vj"]
+margin = 0.2
+radius = 2.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_x5o7w"]
+radius = 2.2
+
+[node name="Node3D" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_jq53d")
+surface_material_override/0 = SubResource("StandardMaterial3D_7km43")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("SphereShape3D_eg6vj")
+
+[node name="Area3D" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("SphereShape3D_x5o7w")
