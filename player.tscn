@@ -1,96 +1,159 @@
-[gd_scene load_steps=17 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=18 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_2v3wm"]
 [ext_resource type="PackedScene" uid="uid://cf1dcxwv6bvl3" path="res://models/Pistol.glb" id="2_4esil"]
 [ext_resource type="Texture2D" uid="uid://vwob30tkwej4" path="res://addons/kenney_particle_pack/star_06.png" id="3_27dhu"]
 
-[sub_resource type="SphereMesh" id="SphereMesh_joqsn"]
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_h6xeb"]
+resource_local_to_scene = true
+height = 5.0
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_45myb"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_x3s4a"]
+resource_local_to_scene = true
+height = 5.0
 
-[sub_resource type="Animation" id="Animation_jhgv2"]
-length = 0.001
-
-[sub_resource type="Animation" id="Animation_knepc"]
-resource_name = "idle"
-length = 3.0
-loop_mode = 1
+[sub_resource type="Animation" id="Animation_4kr5r"]
+length = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Pistol:rotation")
+tracks/0/path = NodePath("MeshInstance3D:mesh:height")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 1.5),
-"transitions": PackedFloat32Array(-2, -2),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(0, 0, 0), Vector3(-0.122103, 0, 0)]
+"values": [5.0]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Pistol:position")
+tracks/1/path = NodePath("MeshInstance3D:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 1.5),
-"transitions": PackedFloat32Array(-2, -2),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(0.5, 0.75, -0.5), Vector3(0.5, 1, -0.5)]
+"values": [Vector3(0, 2.5, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CollisionShape3D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 2.5, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("CollisionShape3D:shape:height")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [5.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Camera3D:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 5, -0.4)]
 }
 
-[sub_resource type="Animation" id="Animation_qcgne"]
-resource_name = "move"
-loop_mode = 1
-step = 0.25
+[sub_resource type="Animation" id="Animation_nf8hi"]
+resource_name = "crouch"
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Pistol:position")
+tracks/0/path = NodePath("MeshInstance3D:mesh:height")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.25, 0.5, 0.75),
-"transitions": PackedFloat32Array(0.5, 2, 0.5, 2),
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector3(0.5, 0.75, -0.5), Vector3(0.456, 0.785, -0.5), Vector3(0.5, 0.75, -0.5), Vector3(0.556, 0.801, -0.5)]
-}
-
-[sub_resource type="Animation" id="Animation_efeb8"]
-resource_name = "shoot"
-length = 0.4
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Pistol:rotation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.4),
-"transitions": PackedFloat32Array(0.5, 1),
-"update": 0,
-"values": [Vector3(0.454152, 0, 0), Vector3(0, 0, 0)]
+"values": [5.0, 2.5]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Pistol:position")
+tracks/1/path = NodePath("MeshInstance3D:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.4),
-"transitions": PackedFloat32Array(0.5, 1),
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector3(0.5, 0.814, -0.5), Vector3(0.5, 0.75, -0.5)]
+"values": [Vector3(0, 2.5, 0), Vector3(0, 1.25, 0)]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CollisionShape3D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 2.5, 0), Vector3(0, 1.25, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("CollisionShape3D:shape:height")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [5.0, 2.5]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Camera3D:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 5, -0.4), Vector3(0, 2.5, -0.4)]
+}
+
+[sub_resource type="Animation" id="Animation_ndk56"]
+resource_name = "hustle"
+
+[sub_resource type="Animation" id="Animation_7phpo"]
+resource_name = "sneak"
+
+[sub_resource type="Animation" id="Animation_qtyr7"]
+resource_name = "walk"
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_p6wdk"]
 _data = {
-"RESET": SubResource("Animation_jhgv2"),
-"idle": SubResource("Animation_knepc"),
-"move": SubResource("Animation_qcgne"),
-"shoot": SubResource("Animation_efeb8")
+"RESET": SubResource("Animation_4kr5r"),
+"crouch": SubResource("Animation_nf8hi"),
+"hustle": SubResource("Animation_ndk56"),
+"sneak": SubResource("Animation_7phpo"),
+"walk": SubResource("Animation_qtyr7")
 }
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_hn37q"]
@@ -102,10 +165,19 @@ properties/1/spawn = true
 properties/1/replication_mode = 1
 properties/2/path = NodePath(".:health")
 properties/2/spawn = true
-properties/2/replication_mode = 1
+properties/2/replication_mode = 2
 properties/3/path = NodePath(".:player_id")
 properties/3/spawn = true
-properties/3/replication_mode = 1
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:velocity")
+properties/4/spawn = true
+properties/4/replication_mode = 1
+properties/5/path = NodePath(".:mode")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath(".:speed")
+properties/6/spawn = true
+properties/6/replication_mode = 1
 
 [sub_resource type="Gradient" id="Gradient_cfnn0"]
 offsets = PackedFloat32Array(0, 0.141221, 1)
@@ -137,19 +209,20 @@ size = Vector2(0.5, 0.5)
 orientation = 2
 
 [node name="Player" type="CharacterBody3D" groups=["Persist"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 collision_layer = 2
 collision_mask = 3
 script = ExtResource("1_2v3wm")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("SphereMesh_joqsn")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+mesh = SubResource("CapsuleMesh_h6xeb")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("SphereShape3D_45myb")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+shape = SubResource("CapsuleShape3D_x3s4a")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 5, -0.4)
 
 [node name="RayCast3D" type="RayCast3D" parent="Camera3D"]
 transform = Transform3D(1, 0, 0, 0, 0.984808, -0.173648, 0, 0.173648, 0.984808, 0.5, -0.897984, -0.666052)
@@ -160,14 +233,14 @@ collision_mask = 2
 libraries = {
 "": SubResource("AnimationLibrary_p6wdk")
 }
-autoplay = "idle"
 playback_default_blend_time = 0.05
+blend_times = [&"RESET", &"RESET", 0.5, &"RESET", &"crouch", 0.5, &"RESET", &"hustle", 0.1, &"RESET", &"sneak", 0.1, &"RESET", &"walk", 0.1, &"crouch", &"RESET", 0.5, &"crouch", &"crouch", 0.5, &"crouch", &"hustle", 0.1, &"crouch", &"sneak", 0.1, &"crouch", &"walk", 0.1]
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_hn37q")
 
 [node name="Pistol" parent="." instance=ExtResource("2_4esil")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, -0.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.75, -0.5)
 visible = false
 
 [node name="MuzzleFlash" type="GPUParticles3D" parent="Pistol"]
@@ -179,5 +252,8 @@ one_shot = true
 local_coords = true
 process_material = SubResource("ParticleProcessMaterial_uu53b")
 draw_pass_1 = SubResource("PlaneMesh_b2g4i")
+
+[node name="ChatBubbles" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.1, 0)
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

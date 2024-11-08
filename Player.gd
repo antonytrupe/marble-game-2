@@ -7,17 +7,51 @@ signal health_changed(health_value)
 @onready var muzzle_flash = $Pistol/MuzzleFlash
 @onready var raycast = $Camera3D/RayCast3D
 @onready var chatTextEdit:TextEdit=$/root/Game/UI/HUD/ChatInput
-@onready var world=$/root/Game
+@onready var game=$/root/Game
+@onready var ChatBubbles=$ChatBubbles
 
 @export var health = 3
 @export var player_id:String
+##how fast to go
+@export var mode:MODE=MODE.HUSTLE:
+	set= update_mode
+@export var speed=30.0
 
-const SPEED = 10.0
-const JUMP_VELOCITY = 10.0
+enum MODE {
+	##half the walk distance
+	##usually 15ft/round
+	CROUCH=1,
+	##single move action
+	##usually 30ft/round
+	WALK=2,
+	##this is the double move action
+	##usually 60ft/round
+	HUSTLE =4,
+	##not used?
+	RUN=6}
+
+const SPEED_MULTIPLIER = (1.0/24.0)
+const JUMP_VELOCITY = 14.0
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = 20.0
 var chatMode=false
+
+func update_mode(new_mode):
+	print('client got new mode:',new_mode)
+	#TODO animations and stuff
+	if mode!=new_mode:
+		if new_mode==MODE.CROUCH:
+			anim_player.play("crouch")
+		else:
+			anim_player.play("RESET")
+	#if anim_player.current_animation == "shoot":
+		#pass
+	#elif input_dir != Vector2.ZERO and is_on_floor():
+		#anim_player.play("move")
+	#else:
+		#anim_player.play("idle")
+	mode=new_mode
 
 func load(node_data):
 	#print('player load')
@@ -51,7 +85,7 @@ func _enter_tree():
 	pass
 
 func _ready():
-	if player_id and player_id==world.player_id:
+	if player_id and player_id==game.player_id:
 		#print('me')
 		camera.current = true
 	else:
@@ -60,7 +94,7 @@ func _ready():
 
 func _unhandled_input(event):
 	#print('_unhandled_input')
-	if world and player_id!=world.player_id:
+	if game and player_id!=game.player_id:
 		return
 
 	if event is InputEventMouseMotion:
@@ -68,17 +102,13 @@ func _unhandled_input(event):
 			Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE)):
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			if multiplayer.is_server():
-				_rotate(-event.relative.x)
+				server_rotate(-event.relative.x)
 			else:
-				_rotate.rpc_id(1,-event.relative.x)
+				server_rotate.rpc_id(1,-event.relative.x)
 			camera.rotate_x(-event.relative.y * .005)
 			camera.rotation.x = clamp(camera.rotation.x, -PI/2, PI/2)
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-
-	if Input.is_action_just_pressed("shoot") and anim_player.current_animation != "shoot":
-		#shoot()
-		pass
 
 	if Input.is_action_just_pressed("quit") and chatMode:
 		#don't let this event bubble up
@@ -95,26 +125,92 @@ func _unhandled_input(event):
 			chatTextEdit.hide()
 			chatTextEdit.release_focus()
 			print(chatTextEdit.text)
-			chat.rpc_id(1,chatTextEdit.text)
+			server_chat.rpc_id(1,chatTextEdit.text)
 			chatTextEdit.text=""
 			chatMode=false
 		pass
 
+func _physics_process(delta):
+
+	# Add the gravity.
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+
+	if game and player_id==game.player_id and !chatMode:
+
+		#TODO check just_press/just_release, or is_pressed?
+		if Input.is_action_just_pressed("crouch"):
+			if multiplayer.is_server():
+				server_mode(MODE.CROUCH)
+			else:
+				server_mode.rpc_id(1,MODE.CROUCH)
+		if Input.is_action_just_released("crouch"):
+			if multiplayer.is_server():
+				server_mode(MODE.WALK)
+			else:
+				server_mode.rpc_id(1,MODE.WALK)
+
+		if Input.is_action_just_pressed("run"):
+			if multiplayer.is_server():
+				server_mode(MODE.HUSTLE)
+			else:
+				server_mode.rpc_id(1,MODE.HUSTLE)
+		if Input.is_action_just_released("run"):
+			if multiplayer.is_server():
+				server_mode(MODE.WALK)
+			else:
+				server_mode.rpc_id(1,MODE.WALK)
+
+		# Handle Jump.
+		if Input.is_action_just_pressed("jump") and is_on_floor():
+			if multiplayer.is_server():
+				server_jump()
+			else:
+				server_jump.rpc_id(1)
+	# Get the input direction and handle the movement/deceleration.
+	# As good practice, you should replace UI actions with custom gameplay actions.
+		var input_dir = Input.get_vector("left", "right", "up", "down")
+
+		if multiplayer.is_server():
+			server_move(input_dir)
+		else:
+			#print('calling process_input')
+			server_move.rpc_id(1,input_dir)
+
+	move_and_slide()
+
 #this is the function that runs on the server that any peer can call
 @rpc("any_peer")
-func chat(message):
-	sendChat.rpc(message)
+func server_mode(new_mode:MODE):
+	if !multiplayer.is_server():
+		print('someone trying to call server_mode')
+		return
+	print('server_mode updating mode')
+	mode=new_mode
+
+#this is the function that runs on the server that any peer can call
+@rpc("any_peer","call_remote","reliable",1)
+func server_chat(message):
+	if !multiplayer.is_server():
+		print('someone trying to call server_chat')
+		return
+	client_chat.rpc(message)
 
 #this the function that runs on all the peers that only the server can call
-@rpc("authority","call_local")
-func sendChat(message):
-	print('sendChat',message)
+@rpc("authority","call_local","reliable",1)
+func client_chat(message):
+	if multiplayer.get_remote_sender_id()!=1:
+		print('someone else trying to call sendChat')
+		return
+	print('client_chat:',message)
 	var bubble = load('res://ChatBubble.tscn').instantiate()
 	bubble.text=message
-	add_child(bubble)
+	ChatBubbles.add_child(bubble)
 
 @rpc("any_peer")
-func _rotate(value):
+func server_rotate(value):
+	if !multiplayer.is_server():
+		return
 	rotate_y(value * .005)
 
 func shoot():
@@ -134,62 +230,27 @@ func check_for_hit():
 		print('hit player ',hit_player)
 		hit_player.receive_damage()
 
-func _physics_process(delta):
-	#TODO
-	#if not is_multiplayer_authority(): return
-
-	# Add the gravity.
-	if not is_on_floor():
-		velocity.y -= gravity * delta
-
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
-	var input_dir = Input.get_vector("left", "right", "up", "down")
-	if world and player_id==world.player_id and !chatMode:
-	#if multiplayer.get_unique_id()==str(name).to_int():
-		# Handle Jump.
-		if Input.is_action_just_pressed("jump") and is_on_floor():
-			if multiplayer.is_server():
-				jump()
-			else:
-				jump.rpc_id(1)
-
-		if multiplayer.is_server():
-			process_input(input_dir)
-		else:
-			#print('calling process_input')
-			process_input.rpc_id(1,input_dir)
-
-	if anim_player.current_animation == "shoot":
-		pass
-	elif input_dir != Vector2.ZERO and is_on_floor():
-		anim_player.play("move")
-	else:
-		anim_player.play("idle")
-
-	move_and_slide()
-
 @rpc("any_peer")
-func jump():
+func server_jump():
+	if !multiplayer.is_server():
+		return
 	velocity.y = JUMP_VELOCITY
 
+#this is the function that runs on the server that any peer can call
 @rpc("any_peer")
-func process_input(input_dir):
-	var z=  Vector2(0,0)
-	if(input_dir != z):
-		#print('process_input')
-		#print(input_dir)
-		#print('multiplayer id ',multiplayer.get_unique_id())
-		#print('moving ',name)
-		pass
+func server_move(d):
+	if !multiplayer.is_server():
+		print('server_move not from server')
+		return
+	var direction = (transform.basis * Vector3(d.x, 0, d.y)).normalized()
 
-	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	#m*SPEED_MULTIPLIER*speed
 	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
+		velocity.x = direction.x * mode*SPEED_MULTIPLIER*speed
+		velocity.z = direction.z *mode*SPEED_MULTIPLIER*speed
 	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
+		velocity.x = move_toward(velocity.x, 0, mode*SPEED_MULTIPLIER*speed)
+		velocity.z = move_toward(velocity.z, 0, mode*SPEED_MULTIPLIER*speed)
 
 @rpc("any_peer","call_local")
 func play_shoot_effects():
