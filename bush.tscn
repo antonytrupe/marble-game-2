@@ -1,32 +1,80 @@
-[gd_scene load_steps=5 format=3 uid="uid://damvmfs7dqebu"]
+[gd_scene load_steps=7 format=3 uid="uid://damvmfs7dqebu"]
+
+[ext_resource type="Script" path="res://bush.gd" id="1_l15ch"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_jq53d"]
 radius = 2.0
-height = 2.0
-is_hemisphere = true
+height = 4.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7km43"]
 albedo_color = Color(0.128272, 0.388059, 0.135242, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_yxfc3"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bj3r6"]
+albedo_color = Color(0.529947, 0.0159607, 1.44392e-07, 1)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_eg6vj"]
 margin = 0.2
 radius = 2.0
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_x5o7w"]
-radius = 2.2
-
 [node name="Node3D" type="Node3D"]
+script = ExtResource("1_l15ch")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="BushMeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 mesh = SubResource("SphereMesh_jq53d")
 surface_material_override/0 = SubResource("StandardMaterial3D_7km43")
 
+[node name="BerryMeshInstance3D1" type="MeshInstance3D" parent="BushMeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.70465, 1.14673, 0)
+mesh = SubResource("SphereMesh_yxfc3")
+surface_material_override/0 = SubResource("StandardMaterial3D_bj3r6")
+
+[node name="BerryMeshInstance3D2" type="MeshInstance3D" parent="BushMeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.34844, 1.14673, -1.08351)
+mesh = SubResource("SphereMesh_yxfc3")
+surface_material_override/0 = SubResource("StandardMaterial3D_bj3r6")
+
+[node name="BerryMeshInstance3D3" type="MeshInstance3D" parent="BushMeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.68719, 1.19579, 0)
+mesh = SubResource("SphereMesh_yxfc3")
+surface_material_override/0 = SubResource("StandardMaterial3D_bj3r6")
+
+[node name="BerryMeshInstance3D4" type="MeshInstance3D" parent="BushMeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.117649, 1.14673, -1.69713)
+mesh = SubResource("SphereMesh_yxfc3")
+surface_material_override/0 = SubResource("StandardMaterial3D_bj3r6")
+
+[node name="BerryMeshInstance3D5" type="MeshInstance3D" parent="BushMeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.28094, 1.14673, 1.20766)
+mesh = SubResource("SphereMesh_yxfc3")
+surface_material_override/0 = SubResource("StandardMaterial3D_bj3r6")
+
+[node name="BerryMeshInstance3D6" type="MeshInstance3D" parent="BushMeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.117649, 1.14673, 1.71341)
+mesh = SubResource("SphereMesh_yxfc3")
+surface_material_override/0 = SubResource("StandardMaterial3D_bj3r6")
+
+[node name="BerryMeshInstance3D7" type="MeshInstance3D" parent="BushMeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.21808, 1.93867, -0.49546)
+mesh = SubResource("SphereMesh_yxfc3")
+surface_material_override/0 = SubResource("StandardMaterial3D_bj3r6")
+
+[node name="BerryMeshInstance3D8" type="MeshInstance3D" parent="BushMeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.03271, 1.4444, -0.9861)
+mesh = SubResource("SphereMesh_yxfc3")
+surface_material_override/0 = SubResource("StandardMaterial3D_bj3r6")
+
+[node name="BerryMeshInstance3D9" type="MeshInstance3D" parent="BushMeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.670163, 1.73066, 0.932746)
+mesh = SubResource("SphereMesh_yxfc3")
+surface_material_override/0 = SubResource("StandardMaterial3D_bj3r6")
+
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
 shape = SubResource("SphereShape3D_eg6vj")
-
-[node name="Area3D" type="Area3D" parent="."]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
-shape = SubResource("SphereShape3D_x5o7w")
