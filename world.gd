@@ -150,6 +150,20 @@ func _ready():
 	#var signals=load("res://Signals.cs").new()
 	Signals.PlayerZoned.connect(_on_player_zoned)
 
+	var config = ConfigFile.new()
+	# Load data from a file.
+	#var err = config.load("user://config.cfg")
+	var err = config.load("res://config.cfg")
+
+	# If the file didn't load, ignore it.
+	if err != OK:
+		print('error reading config file')
+
+	var config_player_id=config.get_value('default','player_id')
+	print(config_player_id)
+	var config_remote_ip=config.get_value('default','remote_ip')
+	print(config_remote_ip)
+
 	var arguments = {}
 	for argument in OS.get_cmdline_user_args():
 		if argument.contains("="):

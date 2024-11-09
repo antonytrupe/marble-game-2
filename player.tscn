@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=17 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_2v3wm"]
 [ext_resource type="PackedScene" uid="uid://cf1dcxwv6bvl3" path="res://models/Pistol.glb" id="2_4esil"]
@@ -85,7 +85,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, 1),
+"transitions": PackedFloat32Array(1, -2),
 "update": 0,
 "values": [5.0, 2.5]
 }
@@ -97,7 +97,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, 1),
+"transitions": PackedFloat32Array(1, -2),
 "update": 0,
 "values": [Vector3(0, 2.5, 0), Vector3(0, 1.25, 0)]
 }
@@ -109,7 +109,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, 1),
+"transitions": PackedFloat32Array(1, -2),
 "update": 0,
 "values": [Vector3(0, 2.5, 0), Vector3(0, 1.25, 0)]
 }
@@ -121,7 +121,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, 1),
+"transitions": PackedFloat32Array(1, -2),
 "update": 0,
 "values": [5.0, 2.5]
 }
@@ -133,16 +133,13 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, 1),
+"transitions": PackedFloat32Array(1, -2),
 "update": 0,
 "values": [Vector3(0, 5, -0.4), Vector3(0, 2.5, -0.4)]
 }
 
 [sub_resource type="Animation" id="Animation_ndk56"]
 resource_name = "hustle"
-
-[sub_resource type="Animation" id="Animation_7phpo"]
-resource_name = "sneak"
 
 [sub_resource type="Animation" id="Animation_qtyr7"]
 resource_name = "walk"
@@ -152,7 +149,6 @@ _data = {
 "RESET": SubResource("Animation_4kr5r"),
 "crouch": SubResource("Animation_nf8hi"),
 "hustle": SubResource("Animation_ndk56"),
-"sneak": SubResource("Animation_7phpo"),
 "walk": SubResource("Animation_qtyr7")
 }
 
@@ -223,11 +219,7 @@ shape = SubResource("CapsuleShape3D_x3s4a")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 5, -0.4)
-
-[node name="RayCast3D" type="RayCast3D" parent="Camera3D"]
-transform = Transform3D(1, 0, 0, 0, 0.984808, -0.173648, 0, 0.173648, 0.984808, 0.5, -0.897984, -0.666052)
-target_position = Vector3(0, 0, -50)
-collision_mask = 2
+far = 600.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
