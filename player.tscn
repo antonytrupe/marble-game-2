@@ -1,8 +1,6 @@
-[gd_scene load_steps=20 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=13 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_2v3wm"]
-[ext_resource type="PackedScene" uid="uid://cf1dcxwv6bvl3" path="res://models/Pistol.glb" id="2_4esil"]
-[ext_resource type="Texture2D" uid="uid://vwob30tkwej4" path="res://addons/kenney_particle_pack/star_06.png" id="3_27dhu"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_h6xeb"]
 resource_local_to_scene = true
@@ -65,38 +63,38 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("CameraPivot/Camera3D:position")
+tracks/4/path = NodePath("LeftArm:position")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(0, 5, -0.4)]
+"values": [Vector3(-1, 3.5, 0)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("LeftArm:position")
+tracks/5/path = NodePath("RightArm:position")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(-1, 3.5, 0)]
+"values": [Vector3(1, 3.5, 0)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("RightArm:position")
+tracks/6/path = NodePath("CameraPivot:position")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(1, 3.5, 0)]
+"values": [Vector3(0, 5, -0.4)]
 }
 
 [sub_resource type="Animation" id="Animation_nf8hi"]
@@ -152,38 +150,38 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("CameraPivot/Camera3D:position")
+tracks/4/path = NodePath("LeftArm:position")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, -2),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector3(0, 5, -0.4), Vector3(0, 2.5, -0.4)]
+"values": [Vector3(-1, 3.5, 0), Vector3(-1, 1.25, 0)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("LeftArm:position")
+tracks/5/path = NodePath("RightArm:position")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector3(-1, 3.5, 0), Vector3(-1, 1.25, 0)]
+"values": [Vector3(1, 3.5, 0), Vector3(1, 1.25, 0)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("RightArm:position")
+tracks/6/path = NodePath("CameraPivot:position")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector3(1, 3.5, 0), Vector3(1, 1.25, 0)]
+"values": [Vector3(0, 5, -0.4), Vector3(0, 2.5, -0.4)]
 }
 
 [sub_resource type="Animation" id="Animation_ndk56"]
@@ -223,35 +221,6 @@ properties/6/path = NodePath(".:speed")
 properties/6/spawn = true
 properties/6/replication_mode = 1
 
-[sub_resource type="Gradient" id="Gradient_cfnn0"]
-offsets = PackedFloat32Array(0, 0.141221, 1)
-colors = PackedColorArray(0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_is51c"]
-gradient = SubResource("Gradient_cfnn0")
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_uu53b"]
-angle_min = 45.0
-angle_max = 45.0
-gravity = Vector3(0, 0, 0)
-color_ramp = SubResource("GradientTexture1D_is51c")
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4smqo"]
-transparency = 1
-shading_mode = 0
-vertex_color_use_as_albedo = true
-albedo_color = Color(1, 0.960784, 0.670588, 1)
-albedo_texture = ExtResource("3_27dhu")
-billboard_mode = 3
-particles_anim_h_frames = 1
-particles_anim_v_frames = 1
-particles_anim_loop = false
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_b2g4i"]
-material = SubResource("StandardMaterial3D_4smqo")
-size = Vector2(0.5, 0.5)
-orientation = 2
-
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_wv48c"]
 radius = 0.2
 
@@ -264,7 +233,7 @@ height = 1.0
 
 [node name="Player" type="CharacterBody3D" groups=["Persist"]]
 collision_layer = 2
-collision_mask = 3
+collision_mask = 15
 script = ExtResource("1_2v3wm")
 
 [node name="Body" type="MeshInstance3D" parent="."]
@@ -284,20 +253,6 @@ blend_times = [&"RESET", &"RESET", 0.5, &"RESET", &"crouch", 0.5, &"RESET", &"hu
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_hn37q")
-
-[node name="Pistol" parent="." instance=ExtResource("2_4esil")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.75, -0.5)
-visible = false
-
-[node name="MuzzleFlash" type="GPUParticles3D" parent="Pistol"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0588368, -0.313209)
-emitting = false
-amount = 1
-lifetime = 0.25
-one_shot = true
-local_coords = true
-process_material = SubResource("ParticleProcessMaterial_uu53b")
-draw_pass_1 = SubResource("PlaneMesh_b2g4i")
 
 [node name="ChatBubbles" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.1, 0)
@@ -322,10 +277,11 @@ mesh = SubResource("CapsuleMesh_g2b3s")
 transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 5, -0.4)
 
 [node name="Camera3D" type="Camera3D" parent="CameraPivot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -0.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 far = 600.0
 
 [node name="RayCast3D" type="RayCast3D" parent="CameraPivot"]
 target_position = Vector3(0, 0, -300)
+collision_mask = 14
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
