@@ -2,10 +2,12 @@ extends CharacterBody3D
 
 signal health_changed(health_value)
 
-@onready var camera = $Camera3D
+@onready var camera = $CameraPivot/Camera3D
+@onready var cameraPivot = $CameraPivot
+
 @onready var anim_player =  $AnimationPlayer
 @onready var muzzle_flash = $Pistol/MuzzleFlash
-@onready var raycast = $Camera3D/RayCast3D
+#@onready var raycast = $Camera3D/RayCast3D
 @onready var chatTextEdit:TextEdit=$/root/Game/UI/HUD/ChatInput
 @onready var game=$/root/Game
 @onready var ChatBubbles=$ChatBubbles
@@ -105,8 +107,8 @@ func _unhandled_input(event):
 				server_rotate(-event.relative.x)
 			else:
 				server_rotate.rpc_id(1,-event.relative.x)
-			camera.rotate_x(-event.relative.y * .005)
-			camera.rotation.x = clamp(camera.rotation.x, -PI/2, PI/2)
+			cameraPivot.rotate_x(-event.relative.y * .005)
+			cameraPivot.rotation.x = clamp(cameraPivot.rotation.x, -PI/2, PI/2)
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
@@ -213,22 +215,22 @@ func server_rotate(value):
 		return
 	rotate_y(value * .005)
 
-func shoot():
-	print('shoot ',multiplayer.get_unique_id())
-	play_shoot_effects.rpc()
+#func shoot():
+	#print('shoot ',multiplayer.get_unique_id())
+	#play_shoot_effects.rpc()
+#
+	#if multiplayer.is_server():
+		#check_for_hit()
+	#else:
+		#check_for_hit.rpc_id(1)
 
-	if multiplayer.is_server():
-		check_for_hit()
-	else:
-		check_for_hit.rpc_id(1)
-
-@rpc("any_peer")
-func check_for_hit():
-	print('check_for_hit ',multiplayer.get_unique_id())
-	if raycast.is_colliding():
-		var hit_player = raycast.get_collider()
-		print('hit player ',hit_player)
-		hit_player.receive_damage()
+#@rpc("any_peer")
+#func check_for_hit():
+	#print('check_for_hit ',multiplayer.get_unique_id())
+	#if raycast.is_colliding():
+		#var hit_player = raycast.get_collider()
+		#print('hit player ',hit_player)
+		#hit_player.receive_damage()
 
 @rpc("any_peer")
 func server_jump():

@@ -173,7 +173,7 @@ mesh = SubResource("PlaneMesh_jysef")
 [node name="Flora" type="Node3D" parent="."]
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Flora"]
-_spawnable_scenes = PackedStringArray("res://bush.tscn")
+_spawnable_scenes = PackedStringArray("res://bush.tscn", "res://tree.tscn")
 spawn_path = NodePath("..")
 
 [node name="Bush1" parent="Flora" instance=ExtResource("3_u0r5y")]
@@ -191,10 +191,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3342, 0, 15.3781)
 [node name="Bush5" parent="Flora" instance=ExtResource("3_u0r5y")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.02497, 0, -4.95647)
 
-[node name="Node3D" parent="Flora" instance=ExtResource("4_wywi7")]
+[node name="Tree1" parent="Flora" instance=ExtResource("4_wywi7")]
 transform = Transform3D(0.862469, 0, -0.506109, 0, 1, 0, 0.506109, 0, 0.862469, 2.53348, 0, 12.1065)
 
-[node name="Node3D2" parent="Flora" instance=ExtResource("4_wywi7")]
+[node name="Tree2" parent="Flora" instance=ExtResource("4_wywi7")]
 transform = Transform3D(0.924971, 0, 0.380037, 0, 1, 0, -0.380037, 0, 0.924971, 11.1828, 0, 7.49215)
 
 [node name="Fauna" type="Node3D" parent="."]
