@@ -140,7 +140,8 @@ func _physics_process(delta):
 
 	if game and player_id==game.player_id and !chatMode:
 
-		#TODO check just_press/just_release, or is_pressed?
+		# TODO check just_press/just_release, or is_pressed?
+		# crouch
 		if Input.is_action_just_pressed("crouch"):
 			if multiplayer.is_server():
 				server_mode(MODE.CROUCH)
@@ -152,6 +153,7 @@ func _physics_process(delta):
 			else:
 				server_mode.rpc_id(1,MODE.WALK)
 
+		# run
 		if Input.is_action_just_pressed("run"):
 			if multiplayer.is_server():
 				server_mode(MODE.HUSTLE)
@@ -163,12 +165,18 @@ func _physics_process(delta):
 			else:
 				server_mode.rpc_id(1,MODE.WALK)
 
-		# Handle Jump.
+		# Jump
 		if Input.is_action_just_pressed("jump") and is_on_floor():
 			if multiplayer.is_server():
 				server_jump()
 			else:
 				server_jump.rpc_id(1)
+
+		if Input.is_action_just_pressed("action"):
+			if multiplayer.is_server():
+				server_action()
+			else:
+				server_action.rpc_id(1)
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 		var input_dir = Input.get_vector("left", "right", "up", "down")
@@ -231,6 +239,12 @@ func server_rotate(value):
 		#var hit_player = raycast.get_collider()
 		#print('hit player ',hit_player)
 		#hit_player.receive_damage()
+
+@rpc("any_peer")
+func server_action():
+	if !multiplayer.is_server():
+		return
+	print('server_action')
 
 @rpc("any_peer")
 func server_jump():
