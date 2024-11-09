@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=20 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_2v3wm"]
 [ext_resource type="PackedScene" uid="uid://cf1dcxwv6bvl3" path="res://models/Pistol.glb" id="2_4esil"]
@@ -17,7 +17,7 @@ length = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MeshInstance3D:mesh:height")
+tracks/0/path = NodePath("Body:mesh:height")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -29,7 +29,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("MeshInstance3D:position")
+tracks/1/path = NodePath("Body:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -74,13 +74,37 @@ tracks/4/keys = {
 "update": 0,
 "values": [Vector3(0, 5, -0.4)]
 }
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("LeftArm:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-1, 3.5, 0)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("RightArm:position")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(1, 3.5, 0)]
+}
 
 [sub_resource type="Animation" id="Animation_nf8hi"]
 resource_name = "crouch"
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MeshInstance3D:mesh:height")
+tracks/0/path = NodePath("Body:mesh:height")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -92,7 +116,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("MeshInstance3D:position")
+tracks/1/path = NodePath("Body:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -136,6 +160,30 @@ tracks/4/keys = {
 "transitions": PackedFloat32Array(1, -2),
 "update": 0,
 "values": [Vector3(0, 5, -0.4), Vector3(0, 2.5, -0.4)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("LeftArm:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(-1, 3.5, 0), Vector3(-1, 1.25, 0)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("RightArm:position")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(1, 3.5, 0), Vector3(1, 1.25, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_ndk56"]
@@ -204,12 +252,22 @@ material = SubResource("StandardMaterial3D_4smqo")
 size = Vector2(0.5, 0.5)
 orientation = 2
 
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_wv48c"]
+radius = 0.2
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_ip383"]
+radius = 0.2
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_g2b3s"]
+radius = 0.2
+height = 1.0
+
 [node name="Player" type="CharacterBody3D" groups=["Persist"]]
 collision_layer = 2
 collision_mask = 3
 script = ExtResource("1_2v3wm")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="Body" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
 mesh = SubResource("CapsuleMesh_h6xeb")
 
@@ -226,7 +284,7 @@ libraries = {
 "": SubResource("AnimationLibrary_p6wdk")
 }
 playback_default_blend_time = 0.05
-blend_times = [&"RESET", &"RESET", 0.5, &"RESET", &"crouch", 0.5, &"RESET", &"hustle", 0.1, &"RESET", &"sneak", 0.1, &"RESET", &"walk", 0.1, &"crouch", &"RESET", 0.5, &"crouch", &"crouch", 0.5, &"crouch", &"hustle", 0.1, &"crouch", &"sneak", 0.1, &"crouch", &"walk", 0.1]
+blend_times = [&"RESET", &"RESET", 0.5, &"RESET", &"crouch", 0.5, &"RESET", &"hustle", 0.1, &"RESET", &"walk", 0.1, &"crouch", &"RESET", 0.5, &"crouch", &"crouch", 0.5, &"crouch", &"hustle", 0.1, &"crouch", &"walk", 0.1]
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_hn37q")
@@ -247,5 +305,21 @@ draw_pass_1 = SubResource("PlaneMesh_b2g4i")
 
 [node name="ChatBubbles" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.1, 0)
+
+[node name="LeftArm" type="MeshInstance3D" parent="."]
+transform = Transform3D(-0.573576, -0.819152, 0, 0.819152, -0.573576, 0, 0, 0, 1, -1, 3.5, 0)
+mesh = SubResource("CapsuleMesh_wv48c")
+
+[node name="RightArm" type="MeshInstance3D" parent="."]
+transform = Transform3D(-0.573576, 0.819152, 0, -0.819152, -0.573576, 0, 0, 0, 1, 1, 3.5, 0)
+mesh = SubResource("CapsuleMesh_ip383")
+
+[node name="RightFoot" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.91069e-15, -4.37114e-08, 1, -1, -4.37114e-08, 0, 4.37114e-08, -1, -4.37114e-08, 0.25, 0.2, -0.3)
+mesh = SubResource("CapsuleMesh_g2b3s")
+
+[node name="LeftFoot" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.91069e-15, -4.37114e-08, 1, -1, -4.37114e-08, 0, 4.37114e-08, -1, -4.37114e-08, -0.25, 0.2, -0.3)
+mesh = SubResource("CapsuleMesh_g2b3s")
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
