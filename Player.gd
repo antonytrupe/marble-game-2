@@ -4,10 +4,10 @@ signal health_changed(health_value)
 
 @onready var camera = $CameraPivot/Camera3D
 @onready var cameraPivot = $CameraPivot
+@onready var raycast = $CameraPivot/RayCast3D
 
 @onready var anim_player =  $AnimationPlayer
 @onready var muzzle_flash = $Pistol/MuzzleFlash
-#@onready var raycast = $Camera3D/RayCast3D
 @onready var chatTextEdit:TextEdit=$/root/Game/UI/HUD/ChatInput
 @onready var game=$/root/Game
 @onready var ChatBubbles=$ChatBubbles
@@ -245,6 +245,12 @@ func server_action():
 	if !multiplayer.is_server():
 		return
 	print('server_action')
+	if raycast.is_colliding():
+		var bush = raycast.get_collider()
+		print('hit something ',bush.name)
+		if bush.has_method('pickBerry'):
+			print('picking berry')
+			bush.pickBerry()
 
 @rpc("any_peer")
 func server_jump():

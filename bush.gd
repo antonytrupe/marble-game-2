@@ -1,6 +1,10 @@
 extends Node3D
 
-var berries=9
+@export
+var berries=9:
+	set(value):
+		berries=value
+		setup()
 
 @onready var b=[$BushMeshInstance3D/BerryMeshInstance3D1,
 	$BushMeshInstance3D/BerryMeshInstance3D2,
@@ -17,15 +21,15 @@ func pickBerry():
 	if berries:
 		b[berries-1].hide()
 		berries=berries-1
+		print(berries)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	setup()
+
+func setup():
 	for i in range(0,9):
 		if i<berries:
 			b[i].show()
 		else:
 			b[i].hide()
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass

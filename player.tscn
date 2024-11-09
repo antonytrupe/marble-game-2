@@ -264,7 +264,7 @@ height = 1.0
 
 [node name="Player" type="CharacterBody3D" groups=["Persist"]]
 collision_layer = 2
-collision_mask = 3
+collision_mask = 15
 script = ExtResource("1_2v3wm")
 
 [node name="Body" type="MeshInstance3D" parent="."]
@@ -327,5 +327,6 @@ far = 600.0
 
 [node name="RayCast3D" type="RayCast3D" parent="CameraPivot"]
 target_position = Vector3(0, 0, -300)
+collision_mask = 14
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
