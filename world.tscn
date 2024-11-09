@@ -193,7 +193,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.02497, 0, -4.95647)
 [node name="Fauna" type="Node3D" parent="."]
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Fauna"]
-_spawnable_scenes = PackedStringArray("<null>")
 spawn_path = NodePath("..")
 
 [connection signal="pressed" from="UI/MainMenu/MarginContainer/VBoxContainer/HostButton" to="." method="_on_host_button_pressed"]
