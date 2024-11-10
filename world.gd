@@ -143,7 +143,8 @@ func load_game():
 		node.call("load",node_data)
 		#var ms=$MultiplayerSynchronizer
 		#ms.set_visibility_for()
-		get_node_or_null(node_data["parent"]).add_child(node)
+		if !node.get_parent():
+			get_node_or_null(node_data["parent"]).add_child(node)
 		#print('added ',node.name)
 
 func _ready():
