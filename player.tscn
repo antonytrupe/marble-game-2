@@ -277,10 +277,10 @@ mesh = SubResource("CapsuleMesh_g2b3s")
 transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 5, -0.4)
 
 [node name="Camera3D" type="Camera3D" parent="CameraPivot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 far = 600.0
 
-[node name="RayCast3D" type="RayCast3D" parent="CameraPivot"]
+[node name="RayCast3D" type="RayCast3D" parent="CameraPivot/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 target_position = Vector3(0, 0, -300)
 collision_mask = 14
 
