@@ -10,6 +10,7 @@ signal health_changed(health_value)
 @onready var chatTextEdit:TextEdit=$/root/Game/UI/HUD/ChatInput
 @onready var game=$/root/Game
 @onready var inventory=$Inventory
+#@onready var area=$Area3D
 @export var health = 3
 @export var player_id:String
 ##how fast to go
@@ -56,7 +57,6 @@ func update_mode(new_mode):
 	mode=new_mode
 
 func load(node_data):
-	#print('player load')
 	name=node_data["name"]
 	player_id=node_data["player_id"]
 	transform=JSON3D.DictionaryToTransform3D(node_data["transform"])
@@ -93,15 +93,24 @@ func _ready():
 		#print('someone else')
 		pass
 
+func request_long_rest():
+	print('request_long_rest')
+	#var chunks=area.get_overlapping_areas()
+
+	#print(chunks)
+	pass
+
 func _unhandled_input(event):
 	#print('_unhandled_input')
 	if game and player_id!=game.player_id:
 		return
 
+	if Input.is_action_just_pressed("long_rest"):
+		print('long rest')
+		request_long_rest()
+
 	if Input.is_action_just_pressed("inventory"):
-		#print('quit')
 		inventory.visible=!inventory.visible
-		#inventory.show()
 
 	if event is InputEventMouseMotion:
 		if(Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or\
