@@ -1,15 +1,34 @@
 extends Node3D
 
-@export var birth_date=0
-@export var extra_age=0
+@onready var label=$Label3D
+@onready var game=$"../.."
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
+@export var birth_date=0:
+	set=set_birth_date
+@export var extra_age=0:
+	set=set_extra_age
+var calculated_age:
+	get=calculate_age
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass
+func set_birth_date(value):
+	birth_date=value
+
+
+func set_extra_age(value):
+	extra_age=value
+
+
+func calculate_age():
+	return game.server_age+extra_age+Time.get_ticks_msec()-birth_date
+
+
+func server_request_long_rest():
+	print('chunk request long rest')
+	if !multiplayer.is_server():
+		print('someone trying to call request_long_rest')
+		return
+	extra_age=extra_age+1000*60*60*8
+
 
 func save():
 	var save_dict = {
@@ -23,6 +42,7 @@ func save():
 	}
 	return save_dict
 
+
 func load(node_data):
 	name=node_data["name"]
 	transform=JSON3D.DictionaryToTransform3D(node_data["transform"])
@@ -30,6 +50,7 @@ func load(node_data):
 		birth_date=node_data.birth_date
 	if "extra_age" in node_data:
 		extra_age=node_data.extra_age
+
 
 func generate_terrain():
 	var _a_mesh:ArrayMesh
@@ -45,5 +66,13 @@ func generate_terrain():
 	_a_mesh=surftool.commit()
 	#mesh=a_mesh
 
+
 func _on_area_3d_body_entered(body: Node3D) -> void:
 	Signals.PlayerZoned.emit(body.name,name)
+
+
+func _process(_delta):
+	label.text=\
+		"birth date:"+str(birth_date)+"\n"+\
+		"extra age:"+str(extra_age)+"\n"+\
+		"calculated age:"+str(calculated_age)+"\n"

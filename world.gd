@@ -1,7 +1,6 @@
 extends Node
 
 @onready var main_menu = $UI/MainMenu
-#@onready var address_entry = $UI/MainMenu/MarginContainer/VBoxContainer/AddressEntry
 @onready var hud = $UI/HUD
 @onready var health_bar = $UI/HUD/HealthBar
 @onready var turnNumberLabel=$UI/HUD/TurnTimer/TurnNumber
@@ -20,9 +19,17 @@ var enet_peer = ENetMultiplayerPeer.new()
 var turn_start=0
 @export var server_age=0
 var player_id:String
+# This will contain player info for every player,
+# with the keys being each player's unique IDs.
+var players = {}
 
 #var sf= SurfaceTool.new()
 func _on_player_zoned(_player_id, chunk_id):
+
+	if !multiplayer.is_server():
+		#print('_on_player_zoned not from server')
+		return
+
 	#print("_on_player_zoned",_player_id,chunk_id)
 	var chunk_json=JSON.parse_string(chunk_id)
 	#return
@@ -39,6 +46,7 @@ func _on_player_zoned(_player_id, chunk_id):
 				var new_chunk=Chunk.instantiate()
 				new_chunk.position=Vector3(adj_x*60,adj_y*60,adj_z*60)
 				new_chunk.name=adj_chunk_name
+				new_chunk.birth_date=Time.get_ticks_msec()+server_age
 				Chunks.add_child(new_chunk)
 				#print('added new chunk')
 	pass
@@ -80,25 +88,13 @@ func save_game():
 	#save_file.close()
 	save_file.flush()
 	DirAccess.copy_absolute(save_file.get_path_absolute(),'user://savegame_'+str(Time.get_ticks_msec()+server_age)+'.save')
-	#var backup = FileAccess.open('user://savegame_'+str(Time.get_ticks_msec()+server_age)+'.save', FileAccess.WRITE)
-	#backup.store_string(save_file.get_as_text())
-	#save_file.close()
-	#backup.close()
+
 
 func load_game():
 	#print('load_game')
 	if not FileAccess.file_exists("user://savegame.save"):
-		#print('save not found')
+		print('save not found')
 		return # Error! We don't have a save to load.
-
-	# We need to revert the game state so we're not cloning objects
-	# during loading. This will vary wildly depending on the needs of a
-	# project, so take care with this step.
-	# For our example, we will accomplish this by deleting saveable objects.
-	#var save_nodes = get_tree().get_nodes_in_group("Persist")
-	#for i in save_nodes:
-		#i.queue_free()
-
 
 	# Load the file line by line and process that dictionary to restore
 	# the object it represents.
@@ -252,9 +248,13 @@ func _on_connected_to_server():
 	#print('_on_connected_to_server')
 	game.register_player.rpc_id(1,player_id)
 
-# This will contain player info for every player,
-# with the keys being each player's unique IDs.
-var players = {}
+
+@rpc("authority","call_local","reliable")
+func send_server_age(_server_age):
+	if multiplayer.get_remote_sender_id()!=1:
+		print('someone else trying to call send_server_age')
+		return
+	server_age=_server_age
 
 func add_player(_peer_id,_player_id):
 	#first check if this player already has a node
@@ -266,11 +266,13 @@ func add_player(_peer_id,_player_id):
 		#TODO make sure player isn't colliding with existing player
 		Players.add_child(player)
 
+
 @rpc("any_peer", "reliable")
 func register_player(new_player_info):
 	var peer_id = multiplayer.get_remote_sender_id()
 	players[peer_id] = new_player_info
 	add_player(peer_id,new_player_info)
+	send_server_age.rpc_id(peer_id,Time.get_ticks_msec()+server_age)
 
 func remove_player(peer_id):
 	var player = get_node_or_null(str(peer_id))

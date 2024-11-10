@@ -4,13 +4,13 @@ signal health_changed(health_value)
 
 @onready var ChatBubbles=$ChatBubbles
 @onready var cameraPivot = $CameraPivot
-@onready var camera = $CameraPivot/Camera3D
-@onready var raycast = $CameraPivot/Camera3D/RayCast3D
+@onready var camera = %Camera3D
+@onready var raycast =%RayCast3D
 @onready var anim_player =  $AnimationPlayer
 @onready var chatTextEdit:TextEdit=$/root/Game/UI/HUD/ChatInput
 @onready var game=$/root/Game
 @onready var inventory=$Inventory
-#@onready var area=$Area3D
+@onready var area=$Area3D
 @export var health = 3
 @export var player_id:String
 ##how fast to go
@@ -93,12 +93,6 @@ func _ready():
 		#print('someone else')
 		pass
 
-func request_long_rest():
-	print('request_long_rest')
-	#var chunks=area.get_overlapping_areas()
-
-	#print(chunks)
-	pass
 
 func _unhandled_input(event):
 	#print('_unhandled_input')
@@ -107,7 +101,11 @@ func _unhandled_input(event):
 
 	if Input.is_action_just_pressed("long_rest"):
 		print('long rest')
-		request_long_rest()
+
+		if multiplayer.is_server():
+			server_request_long_rest()
+		else:
+			server_request_long_rest.rpc_id(1)
 
 	if Input.is_action_just_pressed("inventory"):
 		inventory.visible=!inventory.visible
@@ -145,8 +143,8 @@ func _unhandled_input(event):
 			chatMode=false
 		pass
 
-func _physics_process(delta):
 
+func _physics_process(delta):
 	# Add the gravity.
 	if not is_on_floor():
 		velocity.y -= gravity * delta
@@ -210,6 +208,21 @@ func server_mode(new_mode:MODE):
 		return
 	print('server_mode updating mode')
 	mode=new_mode
+
+
+@rpc("any_peer")
+func server_request_long_rest():
+	print('request_long_rest')
+	if !multiplayer.is_server():
+		print('someone trying to call server_request_long_rest')
+		return
+	var chunks=area.get_overlapping_areas()
+
+	print(chunks)
+	for chunk in chunks:
+		chunk.request_long_rest()
+	pass
+
 
 #this is the function that runs on the server that any peer can call
 @rpc("any_peer","call_remote","reliable",1)
