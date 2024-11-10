@@ -1,7 +1,7 @@
 extends Node
 
 @onready var main_menu = $UI/MainMenu
-@onready var address_entry = $UI/MainMenu/MarginContainer/VBoxContainer/AddressEntry
+#@onready var address_entry = $UI/MainMenu/MarginContainer/VBoxContainer/AddressEntry
 @onready var hud = $UI/HUD
 @onready var health_bar = $UI/HUD/HealthBar
 @onready var turnNumberLabel=$UI/HUD/TurnTimer/TurnNumber
@@ -150,19 +150,21 @@ func _ready():
 	#var signals=load("res://Signals.cs").new()
 	Signals.PlayerZoned.connect(_on_player_zoned)
 
-	var config = ConfigFile.new()
+	var configFile = ConfigFile.new()
 	# Load data from a file.
 	#var err = config.load("user://config.cfg")
-	var err = config.load("res://config.cfg")
+	var err = configFile.load("res://config.cfg")
 
 	# If the file didn't load, ignore it.
 	if err != OK:
 		print('error reading config file')
 
-	var config_player_id=config.get_value('default','player_id')
-	print(config_player_id)
-	var config_remote_ip=config.get_value('default','remote_ip')
-	print(config_remote_ip)
+	var config={}
+	config.player_id=configFile.get_value('default','player_id',null)
+	config.remote_ip=configFile.get_value('default','remote_ip',null)
+	config.server=configFile.get_value('default','server',false)
+
+	print("config:",config)
 
 	var arguments = {}
 	for argument in OS.get_cmdline_user_args():
@@ -174,17 +176,21 @@ func _ready():
 			# with the value set to an empty string.
 			arguments[argument.trim_prefix("--")] = ""
 
-	print(arguments)
-	if arguments.has("server"):
+	print("arguments:",arguments)
+	config.merge(arguments,true)
+
+	print("merged:",config)
+
+	if config.server:
 		start_server()
 		main_menu.hide()
 		hud.show()
 		health_bar.hide()
 		serverCamera.show()
 		serverCamera.current=true
-	elif arguments.has("player_id"):
-		player_id=arguments['player_id']
-		_on_join_button_pressed()
+	elif config.has("player_id") :
+		player_id=config['player_id']
+		_on_join_button_pressed(config.remote_ip)
 
 func _process(_delta):
 	var now=Time.get_ticks_msec()
@@ -230,11 +236,12 @@ func server_disconnected():
 	#print('server_disconnected')
 	get_tree().quit()
 
-func _on_join_button_pressed():
+func _on_join_button_pressed(ip_address):
+	print(ip_address)
 	main_menu.hide()
 	hud.show()
 
-	enet_peer.create_client(address_entry.text, PORT)
+	enet_peer.create_client(ip_address, PORT)
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.server_disconnected.connect(server_disconnected)
 	multiplayer.multiplayer_peer = enet_peer
