@@ -15,45 +15,19 @@ grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="GridContainer" type="GridContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-columns = 3
 
-[node name="Label" type="Label" parent="GridContainer"]
+[node name="GridContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
-text = "dsdsd"
+size_flags_vertical = 0
 
-[node name="Label2" type="Label" parent="GridContainer"]
+[node name="Label" type="Label" parent="MarginContainer/GridContainer"]
 layout_mode = 2
-text = "dsdsd"
+size_flags_horizontal = 0
+text = "Berries"
 
-[node name="Label3" type="Label" parent="GridContainer"]
+[node name="Label2" type="Label" parent="MarginContainer/GridContainer"]
 layout_mode = 2
-text = "dsdsd"
-
-[node name="Label4" type="Label" parent="GridContainer"]
-layout_mode = 2
-text = "dsdsd"
-
-[node name="Label5" type="Label" parent="GridContainer"]
-layout_mode = 2
-text = "dsdsd"
-
-[node name="Label6" type="Label" parent="GridContainer"]
-layout_mode = 2
-text = "dsdsd"
-
-[node name="Label7" type="Label" parent="GridContainer"]
-layout_mode = 2
-text = "dsdsd"
-
-[node name="Label8" type="Label" parent="GridContainer"]
-layout_mode = 2
-text = "dsdsd"
-
-[node name="Label9" type="Label" parent="GridContainer"]
-layout_mode = 2
-text = "dsdsd"
+size_flags_horizontal = 0
+text = "Water"

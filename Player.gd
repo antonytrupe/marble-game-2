@@ -9,7 +9,7 @@ signal health_changed(health_value)
 @onready var anim_player =  $AnimationPlayer
 @onready var chatTextEdit:TextEdit=$/root/Game/UI/HUD/ChatInput
 @onready var game=$/root/Game
-
+@onready var inventory=$Inventory
 @export var health = 3
 @export var player_id:String
 ##how fast to go
@@ -96,6 +96,11 @@ func _unhandled_input(event):
 	#print('_unhandled_input')
 	if game and player_id!=game.player_id:
 		return
+
+	if Input.is_action_just_pressed("inventory"):
+		#print('quit')
+		inventory.visible=!inventory.visible
+		#inventory.show()
 
 	if event is InputEventMouseMotion:
 		if(Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or\

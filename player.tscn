@@ -1,6 +1,7 @@
-[gd_scene load_steps=13 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=14 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_2v3wm"]
+[ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://inventory.tscn" id="2_vrrxi"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_h6xeb"]
 resource_local_to_scene = true
@@ -280,8 +281,10 @@ transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 
 far = 600.0
 
 [node name="RayCast3D" type="RayCast3D" parent="CameraPivot/Camera3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 target_position = Vector3(0, 0, -300)
 collision_mask = 14
+
+[node name="Inventory" parent="." instance=ExtResource("2_vrrxi")]
+visible = false
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
