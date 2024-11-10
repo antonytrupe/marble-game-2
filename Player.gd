@@ -2,15 +2,13 @@ extends CharacterBody3D
 
 signal health_changed(health_value)
 
-@onready var camera = $CameraPivot/Camera3D
+@onready var ChatBubbles=$ChatBubbles
 @onready var cameraPivot = $CameraPivot
-@onready var raycast = $CameraPivot/RayCast3D
-
+@onready var camera = $CameraPivot/Camera3D
+@onready var raycast = $CameraPivot/Camera3D/RayCast3D
 @onready var anim_player =  $AnimationPlayer
-@onready var muzzle_flash = $Pistol/MuzzleFlash
 @onready var chatTextEdit:TextEdit=$/root/Game/UI/HUD/ChatInput
 @onready var game=$/root/Game
-@onready var ChatBubbles=$ChatBubbles
 
 @export var health = 3
 @export var player_id:String
@@ -274,12 +272,12 @@ func server_move(d):
 		velocity.x = move_toward(velocity.x, 0, mode*SPEED_MULTIPLIER*speed)
 		velocity.z = move_toward(velocity.z, 0, mode*SPEED_MULTIPLIER*speed)
 
-@rpc("any_peer","call_local")
-func play_shoot_effects():
-	anim_player.stop()
-	anim_player.play("shoot")
-	muzzle_flash.restart()
-	muzzle_flash.emitting = true
+#@rpc("any_peer","call_local")
+#func play_shoot_effects():
+	#anim_player.stop()
+	#anim_player.play("shoot")
+	#muzzle_flash.restart()
+	#muzzle_flash.emitting = true
 
 @rpc("authority")
 func receive_damage():
