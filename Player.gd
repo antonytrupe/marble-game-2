@@ -16,6 +16,8 @@ signal health_changed(health_value)
 @export var mode:MODE=MODE.HUSTLE:
 	set= update_mode
 @export var speed=30.0
+@export var birth_date=0
+@export var extra_age=0
 
 enum MODE {
 	##half the walk distance
@@ -58,6 +60,10 @@ func load(node_data):
 	name=node_data["name"]
 	player_id=node_data["player_id"]
 	transform=JSON3D.DictionaryToTransform3D(node_data["transform"])
+	if "birth_date" in node_data:
+		birth_date=node_data.birth_date
+	if "extra_age" in node_data:
+		extra_age=node_data.extra_age
 	#TODO figure out camera rotation
 	#print(rotation)
 	#print(camera)
@@ -68,16 +74,11 @@ func save():
 		"filename" : get_scene_file_path(),
 		"name":name,
 		"parent" : get_parent().get_path(),
-		#"path": get_path(),
-		"player_id":player_id,
+ 		"player_id":player_id,
 		"transform": JSON3D.Transform3DtoDictionary(transform),
 		"health": health,
-		#"attack" : attack,
-		#"defense" : defense,
-		#"current_health" : current_health,
-		#"max_health" : max_health,
-		#"damage" : damage,
-		#"regen" : regen,
+		"birth_date":birth_date,
+		"extra_age":extra_age,
 	}
 	return save_dict
 

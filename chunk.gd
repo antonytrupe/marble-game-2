@@ -1,5 +1,8 @@
 extends Node3D
 
+@export var birth_date=0
+@export var extra_age=0
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.
@@ -15,12 +18,18 @@ func save():
 		"parent" : get_parent().get_path(),
 		#"path": get_path(),
 		"transform": JSON3D.Transform3DtoDictionary(transform),
+		"birth_date":birth_date,
+		"extra_age":extra_age,
 	}
 	return save_dict
 
 func load(node_data):
 	name=node_data["name"]
 	transform=JSON3D.DictionaryToTransform3D(node_data["transform"])
+	if "birth_date" in node_data:
+		birth_date=node_data.birth_date
+	if "extra_age" in node_data:
+		extra_age=node_data.extra_age
 
 func generate_terrain():
 	var _a_mesh:ArrayMesh
