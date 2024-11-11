@@ -10,6 +10,7 @@ extends Node3D
 var calculated_age:
 	get = calculate_age
 
+
 func set_birth_date(value):
 	birth_date = value
 
@@ -23,9 +24,9 @@ func calculate_age():
 
 
 func server_request_long_rest():
-	print('chunk request long rest')
+	print("chunk request long rest")
 	if !multiplayer.is_server():
-		print('someone trying to call request_long_rest')
+		print("someone trying to call request_long_rest")
 		return
 	extra_age = extra_age + 1000 * 60 * 60 * 8
 
@@ -72,7 +73,4 @@ func _on_area_3d_body_entered(body: Node3D) -> void:
 
 
 func _process(_delta):
-	label.text = \
-		"birth date:" + str(birth_date) + "\n" + \
-		"extra age:" + str(extra_age) + "\n" + \
-		"calculated age:" + str(calculated_age) + "\n"
+	label.text = "birth date:" + str(birth_date) + "\n" + "extra age:" + str(extra_age) + "\n" + "calculated age:" + str(calculated_age) + "\n"

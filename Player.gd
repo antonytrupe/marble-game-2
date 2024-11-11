@@ -31,14 +31,16 @@ enum MODE {
 	##usually 60ft/round
 	HUSTLE = 4,
 	##not used?
-	RUN = 6}
+	RUN = 6,
+}
 
-const SPEED_MULTIPLIER = (1.0 / 24.0)
+const SPEED_MULTIPLIER = 1.0 / 24.0
 const JUMP_VELOCITY = 14.0
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = 20.0
 var chatMode = false
+
 
 func update_mode(new_mode):
 	#print('client got new mode:',new_mode)
@@ -49,12 +51,13 @@ func update_mode(new_mode):
 		else:
 			anim_player.play("RESET")
 	#if anim_player.current_animation == "shoot":
-		#pass
+	#pass
 	#elif input_dir != Vector2.ZERO and is_on_floor():
-		#anim_player.play("move")
+	#anim_player.play("move")
 	#else:
-		#anim_player.play("idle")
+	#anim_player.play("idle")
 	mode = new_mode
+
 
 func load(node_data):
 	name = node_data["name"]
@@ -69,12 +72,13 @@ func load(node_data):
 	#print(camera)
 	#camera.rotation=rotation
 
+
 func save():
 	var save_dict = {
 		"filename": get_scene_file_path(),
 		"name": name,
 		"parent": get_parent().get_path(),
- 		"player_id": player_id,
+		"player_id": player_id,
 		"transform": JSON3D.Transform3DtoDictionary(transform),
 		"health": health,
 		"birth_date": birth_date,
@@ -82,8 +86,10 @@ func save():
 	}
 	return save_dict
 
+
 func _enter_tree():
 	pass
+
 
 func _ready():
 	if player_id and player_id == game.player_id:
@@ -100,7 +106,7 @@ func _unhandled_input(event):
 		return
 
 	if Input.is_action_just_pressed("long_rest"):
-		print('long rest')
+		print("long rest")
 
 		if multiplayer.is_server():
 			server_request_long_rest()
@@ -111,8 +117,7 @@ func _unhandled_input(event):
 		inventory.visible = !inventory.visible
 
 	if event is InputEventMouseMotion:
-		if (Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or \
-			Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE)):
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE):
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			if multiplayer.is_server():
 				server_rotate(-event.relative.x)
@@ -130,7 +135,7 @@ func _unhandled_input(event):
 		chatTextEdit.release_focus()
 		chatMode = false
 	if Input.is_action_just_pressed("chat"):
-		if (!chatMode):
+		if !chatMode:
 			chatTextEdit.show()
 			chatTextEdit.grab_focus()
 			chatMode = true
@@ -150,7 +155,6 @@ func _physics_process(delta):
 		velocity.y -= gravity * delta
 
 	if game and player_id == game.player_id and !chatMode:
-
 		# TODO check just_press/just_release, or is_pressed?
 		# crouch
 		if Input.is_action_just_pressed("crouch"):
@@ -188,8 +192,8 @@ func _physics_process(delta):
 				server_action()
 			else:
 				server_action.rpc_id(1)
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
+		# Get the input direction and handle the movement/deceleration.
+		# As good practice, you should replace UI actions with custom gameplay actions.
 		var input_dir = Input.get_vector("left", "right", "up", "down")
 
 		if multiplayer.is_server():
@@ -200,11 +204,12 @@ func _physics_process(delta):
 
 	move_and_slide()
 
+
 #this is the function that runs on the server that any peer can call
 @rpc("any_peer")
 func server_mode(new_mode: MODE):
 	if !multiplayer.is_server():
-		print('someone trying to call server_mode')
+		print("someone trying to call server_mode")
 		return
 	#print('server_mode updating mode')
 	mode = new_mode
@@ -212,9 +217,9 @@ func server_mode(new_mode: MODE):
 
 @rpc("any_peer")
 func server_request_long_rest():
-	print('request_long_rest')
+	print("request_long_rest")
 	if !multiplayer.is_server():
-		print('someone trying to call server_request_long_rest')
+		print("someone trying to call server_request_long_rest")
 		return
 	var chunks = area.get_overlapping_areas()
 
@@ -228,20 +233,22 @@ func server_request_long_rest():
 @rpc("any_peer", "call_remote", "reliable", 1)
 func server_chat(message):
 	if !multiplayer.is_server():
-		print('someone trying to call server_chat')
+		print("someone trying to call server_chat")
 		return
 	client_chat.rpc(message)
+
 
 #this the function that runs on all the peers that only the server can call
 @rpc("authority", "call_local", "reliable", 1)
 func client_chat(message):
 	if multiplayer.get_remote_sender_id() != 1:
-		print('someone else trying to call sendChat')
+		print("someone else trying to call sendChat")
 		return
-	print('client_chat:', message)
-	var bubble = load('res://ChatBubble.tscn').instantiate()
+	print("client_chat:", message)
+	var bubble = load("res://ChatBubble.tscn").instantiate()
 	bubble.text = message
 	ChatBubbles.add_child(bubble)
+
 
 @rpc("any_peer")
 func server_rotate(value):
@@ -249,34 +256,36 @@ func server_rotate(value):
 		return
 	rotate_y(value * .005)
 
+
 #func shoot():
-	#print('shoot ',multiplayer.get_unique_id())
-	#play_shoot_effects.rpc()
+#print('shoot ',multiplayer.get_unique_id())
+#play_shoot_effects.rpc()
 #
-	#if multiplayer.is_server():
-		#check_for_hit()
-	#else:
-		#check_for_hit.rpc_id(1)
+#if multiplayer.is_server():
+#check_for_hit()
+#else:
+#check_for_hit.rpc_id(1)
 
 #@rpc("any_peer")
 #func check_for_hit():
-	#print('check_for_hit ',multiplayer.get_unique_id())
-	#if raycast.is_colliding():
-		#var hit_player = raycast.get_collider()
-		#print('hit player ',hit_player)
-		#hit_player.receive_damage()
+#print('check_for_hit ',multiplayer.get_unique_id())
+#if raycast.is_colliding():
+#var hit_player = raycast.get_collider()
+#print('hit player ',hit_player)
+#hit_player.receive_damage()
 
 @rpc("any_peer")
 func server_action():
 	if !multiplayer.is_server():
 		return
-	print('server_action')
+	print("server_action")
 	if raycast.is_colliding():
 		var bush = raycast.get_collider()
-		print('hit something ', bush.name)
-		if bush.has_method('pickBerry'):
-			print('picking berry')
+		print("hit something ", bush.name)
+		if bush.has_method("pickBerry"):
+			print("picking berry")
 			bush.pickBerry()
+
 
 @rpc("any_peer")
 func server_jump():
@@ -284,11 +293,12 @@ func server_jump():
 		return
 	velocity.y = JUMP_VELOCITY
 
+
 #this is the function that runs on the server that any peer can call
 @rpc("any_peer")
 func server_move(d):
 	if !multiplayer.is_server():
-		print('server_move not from server')
+		print("server_move not from server")
 		return
 	var direction = (transform.basis * Vector3(d.x, 0, d.y)).normalized()
 
@@ -300,21 +310,23 @@ func server_move(d):
 		velocity.x = move_toward(velocity.x, 0, mode * SPEED_MULTIPLIER * speed)
 		velocity.z = move_toward(velocity.z, 0, mode * SPEED_MULTIPLIER * speed)
 
+
 #@rpc("any_peer","call_local")
 #func play_shoot_effects():
-	#anim_player.stop()
-	#anim_player.play("shoot")
-	#muzzle_flash.restart()
-	#muzzle_flash.emitting = true
+#anim_player.stop()
+#anim_player.play("shoot")
+#muzzle_flash.restart()
+#muzzle_flash.emitting = true
 
 @rpc("authority")
 func receive_damage():
-	print('receive_damage', multiplayer.get_unique_id())
+	print("receive_damage", multiplayer.get_unique_id())
 	health -= 1
 	if health <= 0:
 		health = 3
 		position = Vector3.ZERO + Vector3(0, .5, 0)
 	health_changed.emit(health)
+
 
 func _on_animation_player_animation_finished(anim_name):
 	if anim_name == "shoot":
