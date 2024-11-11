@@ -3,11 +3,11 @@ extends Node3D
 @onready var label = $Label3D
 @onready var game = $"../.."
 
-@export var birth_date = 0:
+@export var birth_date: int = 0:
 	set = set_birth_date
-@export var extra_age = 0:
+@export var extra_age: int = 0:
 	set = set_extra_age
-var calculated_age:
+var calculated_age: int:
 	get = calculate_age
 
 
@@ -73,4 +73,11 @@ func _on_area_3d_body_entered(body: Node3D) -> void:
 
 
 func _process(_delta):
-	label.text = "birth date:" + str(birth_date) + "\n" + "extra age:" + str(extra_age) + "\n" + "calculated age:" + str(calculated_age) + "\n"
+	#label.text = "birth date:" + str(birth_date) + "\n" + "extra age:" + str(extra_age) + "\n" + "calculated age:" + str(calculated_age) + "\n"
+	var years = calculated_age / (1000 * 60 * 60 * 24 * 30 * 360)
+	var months = (calculated_age / (1000 * 60 * 60 * 24 * 30)) % 360
+	var days = (calculated_age / (1000 * 60 * 60 * 24)) % 30
+	var hours = (calculated_age / (1000 * 60 * 60)) % 24
+	var minutes = (calculated_age / (1000 * 60)) % 60
+	var seconds = (calculated_age / 1000) % 60
+	label.text = "%s years, %s months, %s days, %s:%s:%s" % [years, months, days, hours, minutes, seconds]
