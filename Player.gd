@@ -41,7 +41,7 @@ var gravity = 20.0
 var chatMode=false
 
 func update_mode(new_mode):
-	print('client got new mode:',new_mode)
+	#print('client got new mode:',new_mode)
 	#TODO animations and stuff
 	if mode!=new_mode:
 		if new_mode==MODE.CROUCH:
@@ -206,7 +206,7 @@ func server_mode(new_mode:MODE):
 	if !multiplayer.is_server():
 		print('someone trying to call server_mode')
 		return
-	print('server_mode updating mode')
+	#print('server_mode updating mode')
 	mode=new_mode
 
 

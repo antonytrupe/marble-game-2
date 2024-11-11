@@ -61,10 +61,10 @@ func save():
 	return save_dict
 
 func save_game():
-	print('save_game')
+	#print('save_game')
 	var save_file = FileAccess.open('user://savegame.save', FileAccess.WRITE)
 	#var save_file = FileAccess.open('user://savegame_'+str(Time.get_ticks_msec())+'.save', FileAccess.WRITE)
-	print(save_file.get_path_absolute())
+	print('saved ',save_file.get_path_absolute())
 	var save_nodes = get_tree().get_nodes_in_group("Persist")
 	for node in save_nodes:
 		# Check the node is an instanced scene so it can be instanced again during load.
@@ -234,7 +234,7 @@ func server_disconnected():
 	get_tree().quit()
 
 func _on_join_button_pressed(ip_address):
-	print(ip_address)
+	print('joining ',ip_address)
 	main_menu.hide()
 	hud.show()
 
