@@ -210,14 +210,17 @@ func _process(_delta):
 		var newTurnNumber = (now + server_age) / (6 * 1000) + 1
 		if turn_number != newTurnNumber:
 			turn_number = newTurnNumber
+
 	else:
 		turnTimer.value = (now - turn_start) % 6000
 
 
 func update_turn_number(value):
+	print("world update_turn_number")
 	turn_number = value
 	turnNumberLabel.text = "turn " + str(value)
 	turn_start = Time.get_ticks_msec()
+	Signals.NewTurn.emit(turn_number)
 
 
 func _unhandled_input(_event):

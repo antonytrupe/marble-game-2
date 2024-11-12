@@ -12,10 +12,11 @@ signal health_changed(health_value)
 @onready var inventory = $Inventory
 @onready var area = $Area3D
 @onready var characterSheet = $CharacterSheet
+@onready var actionsUI = %ActionsUI
 @export var health = 3
 @export var player_id: String
 ##how fast to go
-@export var mode: MODE = MODE.HUSTLE:
+@export var mode: MOVE.MODE = MOVE.MODE.WALK:
 	set = update_mode
 @export var speed = 30.0
 @export var birth_date: int = 0:
@@ -25,6 +26,29 @@ signal health_changed(health_value)
 var calculated_age: int:
 	get = calculate_age
 
+@export var actions = {"move": null, "action": null}:
+	set = set_actions
+
+var reset_actions = null:
+	set = _reset_actions
+
+
+# use reset_actions to clear this and skip internal logic
+func set_actions(value: Dictionary):
+	#print("player set_actions ", value)
+
+	actions.action = value.action
+	# only update move if we went faster
+	if value.move != null and (actions.move == null or value.move > actions.move):
+		actions.move = value.move
+	Signals.Actions.emit(player_id, actions)
+
+
+func _reset_actions(_value):
+	#print("player _reset_actions")
+	actions = {"move": null, "action": null}
+	print('player _reset_actions ',actions)
+	Signals.Actions.emit(player_id, actions)
 
 func set_birth_date(value):
 	birth_date = value
@@ -38,20 +62,6 @@ func calculate_age():
 	return game.server_age + extra_age + Time.get_ticks_msec() - birth_date
 
 
-enum MODE {
-	##half the walk distance
-	##usually 15ft/round
-	CROUCH = 1,
-	##single move action
-	##usually 30ft/round
-	WALK = 2,
-	##this is the double move action
-	##usually 60ft/round
-	HUSTLE = 4,
-	##not used?
-	RUN = 6,
-}
-
 const SPEED_MULTIPLIER = 1.0 / 24.0
 const JUMP_VELOCITY = 14.0
 
@@ -64,7 +74,7 @@ func update_mode(new_mode):
 	#print('client got new mode:',new_mode)
 	#TODO animations and stuff
 	if mode != new_mode:
-		if new_mode == MODE.CROUCH:
+		if new_mode == MOVE.MODE.CROUCH:
 			anim_player.play("crouch")
 		else:
 			anim_player.play("RESET")
@@ -86,9 +96,6 @@ func load(node_data):
 	if "extra_age" in node_data:
 		extra_age = node_data.extra_age
 	#TODO figure out camera rotation
-	#print(rotation)
-	#print(camera)
-	#camera.rotation=rotation
 
 
 func save():
@@ -105,27 +112,26 @@ func save():
 	return save_dict
 
 
-func _enter_tree():
-	pass
+func _on_new_turn(_turn_id):
+	#print("player _on_new_turn ", turn_id)
+	reset_actions = null
 
 
 func _ready():
+	actionsUI.player_id = player_id
+	Signals.NewTurn.connect(_on_new_turn)
 	if player_id and player_id == game.player_id:
-		#print('me')
 		camera.current = true
+		actionsUI.show()
 	else:
-		#print('someone else')
 		pass
 
 
 func _unhandled_input(event):
-	#print('_unhandled_input')
 	if game and player_id != game.player_id:
 		return
 
 	if Input.is_action_just_pressed("long_rest"):
-		print("long rest")
-
 		if multiplayer.is_server():
 			server_request_long_rest()
 		else:
@@ -170,7 +176,7 @@ func _unhandled_input(event):
 		pass
 
 
-func _process(delta):
+func _process(_delta):
 	characterSheet.age = calculated_age
 
 
@@ -184,26 +190,26 @@ func _physics_process(delta):
 		# crouch
 		if Input.is_action_just_pressed("crouch"):
 			if multiplayer.is_server():
-				server_mode(MODE.CROUCH)
+				server_mode(MOVE.MODE.CROUCH)
 			else:
-				server_mode.rpc_id(1, MODE.CROUCH)
+				server_mode.rpc_id(1, MOVE.MODE.CROUCH)
 		if Input.is_action_just_released("crouch"):
 			if multiplayer.is_server():
-				server_mode(MODE.WALK)
+				server_mode(MOVE.MODE.WALK)
 			else:
-				server_mode.rpc_id(1, MODE.WALK)
+				server_mode.rpc_id(1, MOVE.MODE.WALK)
 
 		# run
 		if Input.is_action_just_pressed("run"):
 			if multiplayer.is_server():
-				server_mode(MODE.HUSTLE)
+				server_mode(MOVE.MODE.HUSTLE)
 			else:
-				server_mode.rpc_id(1, MODE.HUSTLE)
+				server_mode.rpc_id(1, MOVE.MODE.HUSTLE)
 		if Input.is_action_just_released("run"):
 			if multiplayer.is_server():
-				server_mode(MODE.WALK)
+				server_mode(MOVE.MODE.WALK)
 			else:
-				server_mode.rpc_id(1, MODE.WALK)
+				server_mode.rpc_id(1, MOVE.MODE.WALK)
 
 		# Jump
 		if Input.is_action_just_pressed("jump") and is_on_floor():
@@ -218,13 +224,11 @@ func _physics_process(delta):
 			else:
 				server_action.rpc_id(1)
 		# Get the input direction and handle the movement/deceleration.
-		# As good practice, you should replace UI actions with custom gameplay actions.
 		var input_dir = Input.get_vector("left", "right", "up", "down")
 
 		if multiplayer.is_server():
 			server_move(input_dir)
 		else:
-			#print('calling process_input')
 			server_move.rpc_id(1, input_dir)
 
 	move_and_slide()
@@ -232,7 +236,7 @@ func _physics_process(delta):
 
 #this is the function that runs on the server that any peer can call
 @rpc("any_peer")
-func server_mode(new_mode: MODE):
+func server_mode(new_mode: MOVE.MODE):
 	if !multiplayer.is_server():
 		print("someone trying to call server_mode")
 		return
@@ -252,7 +256,6 @@ func server_request_long_rest():
 
 	var chunks = area.get_overlapping_areas()
 
-	print(chunks)
 	for chunk in chunks:
 		chunk.request_long_rest()
 	pass
@@ -273,7 +276,6 @@ func client_chat(message):
 	if multiplayer.get_remote_sender_id() != 1:
 		print("someone else trying to call sendChat")
 		return
-	print("client_chat:", message)
 	var bubble = load("res://ChatBubble.tscn").instantiate()
 	bubble.text = message
 	ChatBubbles.add_child(bubble)
@@ -338,14 +340,11 @@ func server_move(d):
 	else:
 		velocity.x = move_toward(velocity.x, 0, mode * SPEED_MULTIPLIER * speed)
 		velocity.z = move_toward(velocity.z, 0, mode * SPEED_MULTIPLIER * speed)
+	if !is_zero_approx(velocity.x) or !is_zero_approx(velocity.z):
+		actions.move = mode
+		if [MOVE.MODE.HUSTLE, MOVE.MODE.RUN].has(mode):
+			actions.action = mode
 
-
-#@rpc("any_peer","call_local")
-#func play_shoot_effects():
-#anim_player.stop()
-#anim_player.play("shoot")
-#muzzle_flash.restart()
-#muzzle_flash.emitting = true
 
 @rpc("authority")
 func receive_damage():

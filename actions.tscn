@@ -1,0 +1,49 @@
+[gd_scene load_steps=2 format=3 uid="uid://d35hxvmomxu3p"]
+
+[ext_resource type="Script" path="res://actions.gd" id="1_nl127"]
+
+[node name="ActionsUI" type="CanvasLayer"]
+script = ExtResource("1_nl127")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -258.0
+offset_bottom = 97.0
+grow_horizontal = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 0
+
+[node name="GridContainer" type="GridContainer" parent="Control/MarginContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="MovementLabel" type="Label" parent="Control/MarginContainer/GridContainer"]
+layout_mode = 2
+text = "Movement"
+
+[node name="MovementStatus" type="Label" parent="Control/MarginContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "No Movement Yet"
+
+[node name="ActionLabel" type="Label" parent="Control/MarginContainer/GridContainer"]
+layout_mode = 2
+text = "Action 1"
+
+[node name="ActionStatus" type="Label" parent="Control/MarginContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "No Action Yet"

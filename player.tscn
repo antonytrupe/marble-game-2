@@ -1,8 +1,9 @@
-[gd_scene load_steps=15 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=16 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_2v3wm"]
 [ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://inventory.tscn" id="2_vrrxi"]
 [ext_resource type="PackedScene" uid="uid://dyx3xv5lckl7h" path="res://character_sheet.tscn" id="3_eahd0"]
+[ext_resource type="PackedScene" uid="uid://d35hxvmomxu3p" path="res://actions.tscn" id="4_72q5g"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_x3s4a"]
 resource_local_to_scene = true
@@ -221,13 +222,16 @@ properties/5/spawn = true
 properties/5/replication_mode = 2
 properties/6/path = NodePath(".:speed")
 properties/6/spawn = true
-properties/6/replication_mode = 1
+properties/6/replication_mode = 2
 properties/7/path = NodePath(".:birth_date")
 properties/7/spawn = true
-properties/7/replication_mode = 1
+properties/7/replication_mode = 2
 properties/8/path = NodePath(".:extra_age")
 properties/8/spawn = true
-properties/8/replication_mode = 1
+properties/8/replication_mode = 2
+properties/9/path = NodePath(".:actions")
+properties/9/spawn = true
+properties/9/replication_mode = 2
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_wv48c"]
 radius = 0.2
@@ -301,9 +305,15 @@ target_position = Vector3(0, 0, -300)
 collision_mask = 14
 
 [node name="Inventory" parent="." instance=ExtResource("2_vrrxi")]
+unique_name_in_owner = true
 visible = false
 
 [node name="CharacterSheet" parent="." instance=ExtResource("3_eahd0")]
+unique_name_in_owner = true
+visible = false
+
+[node name="ActionsUI" parent="." instance=ExtResource("4_72q5g")]
+unique_name_in_owner = true
 visible = false
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

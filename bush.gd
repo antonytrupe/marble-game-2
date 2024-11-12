@@ -5,6 +5,8 @@ extends Node3D
 		berries = value
 		setup()
 
+var rng = RandomNumberGenerator.new()
+
 @onready var b = [
 	$BushMeshInstance3D/BerryMeshInstance3D1,
 	$BushMeshInstance3D/BerryMeshInstance3D2,
@@ -36,3 +38,11 @@ func setup():
 			b[i].show()
 		else:
 			b[i].hide()
+
+
+func _process(_delta):
+	if multiplayer.is_server():
+		if berries < 9:
+			if rng.randi_range(0,10000)<=1:
+				print('spawn a berry')
+				berries=berries+1
