@@ -10,6 +10,7 @@ extends Node
 @onready var game = $"."
 @onready var sun = %Sun
 @onready var Chunks = $Chunks
+@onready var worldTime = %WorldTime
 @export var turn_number = 1:
 	set = update_turn_number
 @export var server_age = 0
@@ -198,6 +199,9 @@ func _ready():
 
 func _process(_delta):
 	var now = Time.get_ticks_msec()
+
+	var age = GameTime.get_age_parts(calculated_age)
+	worldTime.text = "%d years, %d months, %d days, %02d:%02d:%02d" % [age.years, age.months, age.days, age.hours, age.minutes, age.seconds]
 
 	sun.rotation.x = -PI / 8
 

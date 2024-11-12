@@ -143,6 +143,14 @@ grow_horizontal = 2
 grow_vertical = 0
 script = ExtResource("3_3e53o")
 
+[node name="WorldTime" type="Label" parent="UI/HUD"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 581.0
+offset_top = 129.0
+offset_right = 722.0
+offset_bottom = 169.0
+
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_vl0i4")
 
@@ -160,7 +168,7 @@ environment = SubResource("Environment_cqcki")
 
 [node name="Sun" type="DirectionalLight3D" parent="DayNightCycle"]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -0.982287, 0.187381, 0, -0.187381, -0.982287, 0, 0, 0)
 layers = 0
 shadow_enabled = true
 
