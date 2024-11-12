@@ -11,14 +11,32 @@ signal health_changed(health_value)
 @onready var game = $/root/Game
 @onready var inventory = $Inventory
 @onready var area = $Area3D
+@onready var characterSheet = $CharacterSheet
 @export var health = 3
 @export var player_id: String
 ##how fast to go
 @export var mode: MODE = MODE.HUSTLE:
 	set = update_mode
 @export var speed = 30.0
-@export var birth_date = 0
-@export var extra_age = 0
+@export var birth_date: int = 0:
+	set = set_birth_date
+@export var extra_age: int = 0:
+	set = set_extra_age
+var calculated_age: int:
+	get = calculate_age
+
+
+func set_birth_date(value):
+	birth_date = value
+
+
+func set_extra_age(value):
+	extra_age = value
+
+
+func calculate_age():
+	return game.server_age + extra_age + Time.get_ticks_msec() - birth_date
+
 
 enum MODE {
 	##half the walk distance
@@ -116,6 +134,9 @@ func _unhandled_input(event):
 	if Input.is_action_just_pressed("inventory"):
 		inventory.visible = !inventory.visible
 
+	if Input.is_action_just_pressed("character_sheet"):
+		characterSheet.visible = !characterSheet.visible
+
 	if event is InputEventMouseMotion:
 		if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE):
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -147,6 +168,10 @@ func _unhandled_input(event):
 			chatTextEdit.text = ""
 			chatMode = false
 		pass
+
+
+func _process(delta):
+	characterSheet.age = calculated_age
 
 
 func _physics_process(delta):
@@ -221,6 +246,10 @@ func server_request_long_rest():
 	if !multiplayer.is_server():
 		print("someone trying to call server_request_long_rest")
 		return
+
+	#TODO
+	extra_age = extra_age + 1000 * 60 * 60 * 8
+
 	var chunks = area.get_overlapping_areas()
 
 	print(chunks)
