@@ -1,8 +1,9 @@
-[gd_scene load_steps=12 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=15 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_6tkge"]
 [ext_resource type="Script" path="res://chat_input.gd" id="3_3e53o"]
 [ext_resource type="PackedScene" uid="uid://cgfpsf73dbmvb" path="res://chunk.tscn" id="3_pdr6q"]
+[ext_resource type="Script" path="res://day_night_cycle.gd" id="3_qlg17"]
 [ext_resource type="PackedScene" uid="uid://damvmfs7dqebu" path="res://bush.tscn" id="3_u0r5y"]
 [ext_resource type="PackedScene" uid="uid://c1e46m2pfqiji" path="res://tree.tscn" id="4_wywi7"]
 
@@ -17,21 +18,25 @@ properties/0/path = NodePath(".:turn_number")
 properties/0/spawn = true
 properties/0/replication_mode = 2
 
-[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_pnarc"]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jat3s"]
+sky_top_color = Color(0.242901, 0.450387, 0.729387, 1)
+sky_horizon_color = Color(0.647059, 0.654902, 0.670588, 1)
+ground_curve = 0.0828214
 
-[sub_resource type="Environment" id="Environment_svs1a"]
-fog_density = 0.001
-volumetric_fog_density = 0.0
+[sub_resource type="Sky" id="Sky_bq4b2"]
+sky_material = SubResource("ProceduralSkyMaterial_jat3s")
+
+[sub_resource type="Environment" id="Environment_cqcki"]
+background_mode = 2
+sky = SubResource("Sky_bq4b2")
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_pnarc"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_jysef"]
 size = Vector2(30, 2)
 
 [node name="Game" type="Node" groups=["Persist"]]
 script = ExtResource("1_6tkge")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
-shadow_enabled = true
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -147,13 +152,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 200, 0)
 [node name="ServerCamera3D" type="Camera3D" parent="CameraPivot"]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
 
+[node name="DayNightCycle" type="Node3D" parent="."]
+script = ExtResource("3_qlg17")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="DayNightCycle"]
+environment = SubResource("Environment_cqcki")
+
+[node name="Sun" type="DirectionalLight3D" parent="DayNightCycle"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+layers = 0
+shadow_enabled = true
+
 [node name="FloorStaticBody" type="StaticBody3D" parent="."]
 
 [node name="FloorCollisionShape3D" type="CollisionShape3D" parent="FloorStaticBody"]
 shape = SubResource("WorldBoundaryShape3D_pnarc")
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_svs1a")
 
 [node name="Chunks" type="Node3D" parent="."]
 

@@ -8,20 +8,28 @@ extends Node
 @onready var serverCamera = $CameraPivot/ServerCamera3D
 @onready var Players = $Players
 @onready var game = $"."
+@onready var sun = %Sun
 @onready var Chunks = $Chunks
 @export var turn_number = 1:
 	set = update_turn_number
+@export var server_age = 0
+
+var calculated_age: int:
+	get = calculate_age
 
 const Player = preload("res://player.tscn")
 const Chunk = preload("res://chunk.tscn")
 const PORT = 9999
 var enet_peer = ENetMultiplayerPeer.new()
 var turn_start = 0
-@export var server_age = 0
 var player_id: String
 # This will contain player info for every player,
 # with the keys being each player's unique IDs.
 var players = {}
+
+
+func calculate_age():
+	return server_age + Time.get_ticks_msec()
 
 
 #var sf= SurfaceTool.new()
@@ -190,6 +198,8 @@ func _ready():
 
 func _process(_delta):
 	var now = Time.get_ticks_msec()
+
+	sun.rotation.x = -PI / 8
 
 	if multiplayer.is_server():
 		turnTimer.value = (now + server_age) % 6000
