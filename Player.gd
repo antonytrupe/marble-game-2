@@ -133,9 +133,15 @@ func _unhandled_input(event):
 
 	if Input.is_action_just_pressed("long_rest"):
 		if multiplayer.is_server():
-			server_request_long_rest()
+			server_request_rest(8)
 		else:
-			server_request_long_rest.rpc_id(1)
+			server_request_rest.rpc_id(1,8)
+
+	if Input.is_action_just_pressed("short_rest"):
+		if multiplayer.is_server():
+			server_request_rest(1)
+		else:
+			server_request_rest.rpc_id(1,1)
 
 	if Input.is_action_just_pressed("inventory"):
 		inventory.visible = !inventory.visible
@@ -245,19 +251,19 @@ func server_mode(new_mode: MOVE.MODE):
 
 
 @rpc("any_peer")
-func server_request_long_rest():
-	print("request_long_rest")
+func server_request_rest(hours:int):
+	print("server_request_rest")
 	if !multiplayer.is_server():
-		print("someone trying to call server_request_long_rest")
+		print("someone trying to call server_request_rest")
 		return
 
 	#TODO
-	extra_age = extra_age + 1000 * 60 * 60 * 8
+	extra_age = extra_age + 1000 * 60 * 60 * hours
 
-	var chunks = area.get_overlapping_areas()
+	var chunkAreas = area.get_overlapping_areas()
 
-	for chunk in chunks:
-		chunk.request_long_rest()
+	for chunkArea in chunkAreas:
+		chunkArea.request_rest(hours)
 	pass
 
 

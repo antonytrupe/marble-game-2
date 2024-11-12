@@ -3,5 +3,5 @@ extends Area3D
 @onready var chunk = $".."
 
 
-func request_long_rest():
-	chunk.server_request_long_rest()
+func request_rest(hours:int):
+	chunk.server_request_rest(hours)
