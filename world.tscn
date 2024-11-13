@@ -187,28 +187,18 @@ spawn_path = NodePath("..")
 
 [node name="Bush1" parent="Flora" instance=ExtResource("3_u0r5y")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.839271, 0, 5.12605)
-collision_layer = 4
-collision_mask = 0
 
 [node name="Bush2" parent="Flora" instance=ExtResource("3_u0r5y")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.57794, 0, -1.10696)
-collision_layer = 4
-collision_mask = 0
 
 [node name="Bush3" parent="Flora" instance=ExtResource("3_u0r5y")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5915, 0, 8.92817)
-collision_layer = 4
-collision_mask = 0
 
 [node name="Bush4" parent="Flora" instance=ExtResource("3_u0r5y")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3342, 0, 15.3781)
-collision_layer = 4
-collision_mask = 0
 
 [node name="Bush5" parent="Flora" instance=ExtResource("3_u0r5y")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.02497, 0, -4.95647)
-collision_layer = 4
-collision_mask = 0
 
 [node name="Tree1" parent="Flora" instance=ExtResource("4_wywi7")]
 transform = Transform3D(0.862469, 0, -0.506109, 0, 1, 0, 0.506109, 0, 0.862469, 2.53348, 0, 12.1065)
