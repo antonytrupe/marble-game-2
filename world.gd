@@ -35,11 +35,11 @@ func calculate_age():
 
 
 func _on_player_zoned(player: MarbleCharacter, chunk: Node3D):
-	print("_on_player_zoned", player.name, chunk.name)
+	#print("_on_player_zoned", player.name, chunk.name)
 	if player_id == player.name:
 		#get all the chunks the player is overlapping
 		var chunks = player.get_zones()
-		print(chunks)
+		#print(chunks)
 		dayNightCycle.chunks = chunks
 
 	if !multiplayer.is_server():
@@ -157,9 +157,16 @@ func load_game():
 		#print('added ',node.name)
 
 
+func _on_time_warp(hours: float, chunks: Array[Chunk]):
+	print("_on_time_warp")
+	for chunk in chunks:
+		chunk.server_request_rest(hours)
+
+
 func _ready():
 	#var signals=load("res://Signals.cs").new()
 	Signals.PlayerZoned.connect(_on_player_zoned)
+	Signals.TimeWarp.connect(_on_time_warp)
 
 	var configFile = ConfigFile.new()
 	# Load data from a file.

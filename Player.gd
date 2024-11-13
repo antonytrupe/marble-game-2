@@ -259,20 +259,18 @@ func server_mode(new_mode: MOVE.MODE):
 
 
 @rpc("any_peer")
-func server_request_rest(hours: int):
+func server_request_rest(hours: float):
 	print("server_request_rest")
 	if !multiplayer.is_server():
 		print("someone trying to call server_request_rest")
 		return
 
-	#TODO
 	extra_age = extra_age + 1000 * 60 * 60 * hours
 
-	var chunkAreas = area3D.get_overlapping_areas()
+	# emit an even for the world/game node to handle
+	Signals.TimeWarp.emit(hours,get_zones())
 
-	for chunkArea in chunkAreas:
-		chunkArea.request_rest(hours)
-	pass
+
 
 
 #this is the function that runs on the server that any peer can call
