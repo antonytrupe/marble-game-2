@@ -157,10 +157,18 @@ func load_game():
 		#print('added ',node.name)
 
 
-func _on_time_warp(hours: float, chunks: Array[Chunk]):
+func get_chunk_cirle(center: Array[Chunk], ring: int):
+	#TODO get adjacent chunks
+	pass
+
+
+func _on_time_warp(minutes: int, chunks: Array[Chunk]):
 	print("_on_time_warp")
+	var visitedChunks = chunks
 	for chunk in chunks:
-		chunk.server_request_rest(hours)
+		chunk.server_request_rest(minutes)
+
+	#TODO time warp adjacent chunks
 
 
 func _ready():

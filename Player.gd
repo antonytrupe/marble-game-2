@@ -140,16 +140,18 @@ func _unhandled_input(event):
 		return
 
 	if Input.is_action_just_pressed("long_rest"):
+		var minutes = 8 * 60
 		if multiplayer.is_server():
-			server_request_rest(8)
+			server_request_rest(minutes)
 		else:
-			server_request_rest.rpc_id(1, 8)
+			server_request_rest.rpc_id(1, minutes)
 
 	if Input.is_action_just_pressed("short_rest"):
+		var minutes = 60
 		if multiplayer.is_server():
-			server_request_rest(1)
+			server_request_rest(minutes)
 		else:
-			server_request_rest.rpc_id(1, 1)
+			server_request_rest.rpc_id(1, minutes)
 
 	if Input.is_action_just_pressed("inventory"):
 		inventory.visible = !inventory.visible
@@ -259,18 +261,16 @@ func server_mode(new_mode: MOVE.MODE):
 
 
 @rpc("any_peer")
-func server_request_rest(hours: float):
+func server_request_rest(minutes: int):
 	print("server_request_rest")
 	if !multiplayer.is_server():
 		print("someone trying to call server_request_rest")
 		return
 
-	extra_age = extra_age + 1000 * 60 * 60 * hours
+	extra_age = extra_age + 1000 * 60 * minutes
 
 	# emit an even for the world/game node to handle
-	Signals.TimeWarp.emit(hours,get_zones())
-
-
+	Signals.TimeWarp.emit(minutes, get_zones())
 
 
 #this is the function that runs on the server that any peer can call

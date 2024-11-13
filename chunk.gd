@@ -24,12 +24,12 @@ func calculate_age():
 	return game.server_age + extra_age + Time.get_ticks_msec() - birth_date
 
 
-func server_request_rest(hours: float):
+func server_request_rest(minutes: int):
 	print("chunk request long rest")
 	if !multiplayer.is_server():
 		print("someone trying to call server_request_rest")
 		return
-	extra_age = extra_age + 1000 * 60 * 60 * hours
+	extra_age = extra_age + 1000 * 60 * minutes
 
 
 func save():

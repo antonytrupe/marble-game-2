@@ -15,5 +15,5 @@ public partial class Signals : Node
 	public delegate void ActionsEventHandler(int player_id, Dictionary actions);
 
 	[Signal]
-	public delegate void TimeWarpEventHandler(float hours, Array<Node3D> chunks);
+	public delegate void TimeWarpEventHandler(int minutes, Array<Node3D> chunks);
 }
