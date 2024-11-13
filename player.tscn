@@ -101,6 +101,30 @@ tracks/6/keys = {
 "update": 0,
 "values": [Vector3(0, 1.72855, -0.120747)]
 }
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Area3D/CollisionShape3D:shape:height")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.7]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Area3D/CollisionShape3D:position")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0.85, 0)]
+}
 
 [sub_resource type="Animation" id="Animation_nf8hi"]
 resource_name = "crouch"
@@ -114,7 +138,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, -2),
 "update": 0,
-"values": [5.0, 2.5]
+"values": [1.7, 0.85]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -126,7 +150,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, -2),
 "update": 0,
-"values": [Vector3(0, 2.5, 0), Vector3(0, 1.25, 0)]
+"values": [Vector3(0, 0.85, 0), Vector3(0, 0.425, 0)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -138,7 +162,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, -2),
 "update": 0,
-"values": [5.0, 2.5]
+"values": [5.0, 0.85]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -150,7 +174,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, -2),
 "update": 0,
-"values": [Vector3(0, 2.5, 0), Vector3(0, 1.25, 0)]
+"values": [Vector3(0, 0.85, 0), Vector3(0, 0.425, 0)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -162,7 +186,7 @@ tracks/4/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector3(-1, 3.5, 0), Vector3(-1, 1.25, 0)]
+"values": [Vector3(-0.3, 1.2, 0), Vector3(-0.3, 0.46, 0)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
@@ -174,7 +198,7 @@ tracks/5/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector3(1, 3.5, 0), Vector3(1, 1.25, 0)]
+"values": [Vector3(0.3, 1.2, 0), Vector3(0.3, 0.459705, 0)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
@@ -187,6 +211,30 @@ tracks/6/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector3(0, 5, -0.4), Vector3(0, 2.5, -0.4)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Area3D/CollisionShape3D:shape:height")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.7, 0.85]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Area3D/CollisionShape3D:position")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0.85, 0), Vector3(0, 0.425, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_ndk56"]
@@ -250,6 +298,21 @@ height = 0.5
 radius = 0.1
 height = 0.4
 
+[sub_resource type="Animation" id="Animation_pm1fk"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0, 0, 0, 0)]
+}
+
 [sub_resource type="Animation" id="Animation_77lh1"]
 resource_name = "fade"
 length = 2.0
@@ -264,21 +327,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
-}
-
-[sub_resource type="Animation" id="Animation_pm1fk"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:color")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(0, 0, 0, 0)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_auoph"]
