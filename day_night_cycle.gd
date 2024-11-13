@@ -44,25 +44,17 @@ func _ready() -> void:
 
 func getVectorFromHour(hour: int):
 	var radians = hour / 24.0 * 2.0 * PI + PI / 2.0
-	#print("radians:", radians)
 	var v = Vector2.from_angle(radians)
 	return v
 
 
 func _process(_delta: float) -> void:
-	#print(fposmod(sun.rotation.x, PI * 2))
 	if chunks.size() == 0:
 		return
 	var total = Vector2(0.0, 0.0)
-	#print("chunk count:", chunks.size())
 	for c in chunks:
-		#var c = chunks[0]
-		#convert to
 		var hour = GameTime.get_age_parts(c.calculated_age).hours
-		#var radians = hour / 24.0 * 2.0 * PI + PI / 2.0
-		#print("radians:", radians)
 		var v = getVectorFromHour(hour)
-		#print("vector:", v)
 		total = total + v
 
 	#0 is sunset
@@ -71,17 +63,14 @@ func _process(_delta: float) -> void:
 	#pi*3/2 is noon
 	#pi*2 is sunset
 	#offset by a quarter circle to get midnight to be down
-	#print("total:", total)
 	var end: float = fposmod(total.angle(), PI * 2)
-	#TODO lerp
-	#print("sun.rotation.x %f" % sun.rotation.x)
 	var start = fposmod(sun.rotation.x, PI * 2)
-	#print("fposmod sun.rotation.x %f" % start)
 
+	#.001 is a little slow
 	var _lerp = lerp_angle(start, end, .001)
 	#print("start:%f end:%f lerp:%f" % [start, end, _lerp])
 	if is_equal_approx(_lerp, end):
-		_lerp=end
+		_lerp = end
 	else:
 		pass
 		#print("lerping")

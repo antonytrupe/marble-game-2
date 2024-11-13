@@ -12,6 +12,8 @@ class_name MarbleCharacter
 @onready var area3D = $Area3D
 @onready var characterSheet = $CharacterSheet
 @onready var actionsUI = %ActionsUI
+@onready var fade_anim = %AnimationPlayer
+
 @export var health = 3
 @export var player_id: String
 ##how fast to go
@@ -133,6 +135,11 @@ func _ready():
 		actionsUI.show()
 	else:
 		pass
+
+
+@rpc("authority")
+func play_fade():
+	fade_anim.play("fade")
 
 
 func _unhandled_input(event):

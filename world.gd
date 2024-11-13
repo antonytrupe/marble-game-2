@@ -2,13 +2,12 @@ extends Node
 
 @onready var main_menu = $UI/MainMenu
 @onready var hud = $UI/HUD
-@onready var health_bar = $UI/HUD/HealthBar
+#@onready var health_bar = $UI/HUD/HealthBar
 @onready var turnNumberLabel = $UI/HUD/TurnTimer/TurnNumber
 @onready var turnTimer = $UI/HUD/TurnTimer
 @onready var serverCamera = $CameraPivot/ServerCamera3D
 @onready var Players = $Players
 @onready var game = $"."
-#@onready var sun = %Sun
 @onready var Chunks = $Chunks
 @onready var worldTime = %WorldTimeLabel
 @onready var dayNightCycle = $DayNightCycle
@@ -157,14 +156,15 @@ func load_game():
 		#print('added ',node.name)
 
 
-func get_chunk_cirle(center: Array[Chunk], ring: int):
+func get_chunk_cirle(_center: Array[Chunk], _ring: int):
 	#TODO get adjacent chunks
 	pass
 
 
 func _on_time_warp(minutes: int, chunks: Array[Chunk]):
 	print("_on_time_warp")
-	var visitedChunks = chunks
+
+	var _visitedChunks = chunks
 	for chunk in chunks:
 		chunk.server_request_rest(minutes)
 
@@ -211,7 +211,7 @@ func _ready():
 		start_server()
 		main_menu.hide()
 		hud.show()
-		health_bar.hide()
+		#health_bar.hide()
 		serverCamera.show()
 		serverCamera.current = true
 	elif config.has("player_id"):
@@ -324,5 +324,6 @@ func remove_player(peer_id):
 		player.queue_free()
 
 
-func update_health_bar(health_value):
-	health_bar.value = health_value
+func update_health_bar(_health_value):
+	#health_bar.value = health_value
+	pass

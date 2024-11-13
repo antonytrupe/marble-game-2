@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=19 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_2v3wm"]
 [ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://inventory.tscn" id="2_vrrxi"]
@@ -243,6 +243,43 @@ radius = 0.2
 radius = 0.2
 height = 1.0
 
+[sub_resource type="Animation" id="Animation_77lh1"]
+resource_name = "fade"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-0.2, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_pm1fk"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0, 0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_auoph"]
+_data = {
+"RESET": SubResource("Animation_pm1fk"),
+"fade": SubResource("Animation_77lh1")
+}
+
 [node name="Player" type="CharacterBody3D" groups=["Persist"]]
 collision_layer = 2
 collision_mask = 15
@@ -315,5 +352,21 @@ visible = false
 [node name="ActionsUI" parent="." instance=ExtResource("4_72q5g")]
 unique_name_in_owner = true
 visible = false
+
+[node name="ColorRect" type="ColorRect" parent="."]
+z_index = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="ColorRect"]
+unique_name_in_owner = true
+libraries = {
+"": SubResource("AnimationLibrary_auoph")
+}
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
