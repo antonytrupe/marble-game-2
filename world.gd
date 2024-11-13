@@ -103,7 +103,6 @@ func save_game():
 
 
 func load_game():
-	#print('load_game')
 	if not FileAccess.file_exists("user://savegame.save"):
 		print("save not found")
 		return  # Error! We don't have a save to load.
@@ -121,7 +120,6 @@ func load_game():
 	if json.data.has("server_age"):
 		game.server_age = int(json.data["server_age"])
 	#process player nodes
-	#print('looking for players')
 	while save_file.get_position() < save_file.get_length():
 		var json_string = save_file.get_line()
 
@@ -133,27 +131,21 @@ func load_game():
 
 		# Get the data from the JSON object.
 		var node_data = json.data
-		#print('loading ',node_data["player_id"])
 
 		# Firstly, we need to create the object and add it to the tree
 		#TODO check if the node is in the tree already
 		var node = get_node_or_null(node_data.parent + "/" + node_data.name)
 		if !node:
-			#print('new node')
 			node = load(node_data["filename"]).instantiate()
 		else:
-			#print('found node')
 			pass
 		# Check the node has a save function.
 		if !node.has_method("load"):
 			print("persistent node '%s' is missing a load() function, skipped" % node.name)
 			continue
 		node.call("load", node_data)
-		#var ms=$MultiplayerSynchronizer
-		#ms.set_visibility_for()
 		if !node.get_parent():
 			get_node_or_null(node_data["parent"]).add_child(node)
-		#print('added ',node.name)
 
 
 func get_chunk_cirle(_center: Array[Chunk], _ring: int):
@@ -162,7 +154,7 @@ func get_chunk_cirle(_center: Array[Chunk], _ring: int):
 
 
 func _on_time_warp(minutes: int, chunks: Array[Chunk]):
-	print("_on_time_warp")
+	#print("_on_time_warp")
 
 	var _visitedChunks = chunks
 	for chunk in chunks:
@@ -236,7 +228,6 @@ func _process(_delta):
 
 
 func update_turn_number(value):
-	#print("world update_turn_number")
 	turn_number = value
 	turnNumberLabel.text = "turn " + str(value)
 	turn_start = Time.get_ticks_msec()
@@ -244,11 +235,8 @@ func update_turn_number(value):
 
 
 func _unhandled_input(_event):
-	#print('_unhandled_input')
 	if Input.is_action_just_pressed("quit"):
-		#print('quit')
 		if multiplayer.is_server():
-			print("server save")
 			save_game()
 		get_tree().quit()
 
@@ -261,16 +249,12 @@ func _on_host_button_pressed():
 
 
 func start_server():
-	#print('start_server')
 	enet_peer.create_server(PORT)
 	multiplayer.multiplayer_peer = enet_peer
-	#multiplayer.peer_connected.connect(add_player)
-	#multiplayer.peer_disconnected.connect(remove_player)
 	load_game()
 
 
 func server_disconnected():
-	#print('server_disconnected')
 	get_tree().quit()
 
 
@@ -283,11 +267,9 @@ func _on_join_button_pressed(ip_address):
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.server_disconnected.connect(server_disconnected)
 	multiplayer.multiplayer_peer = enet_peer
-	#print(player_id)
 
 
 func _on_connected_to_server():
-	#print('_on_connected_to_server')
 	game.register_player.rpc_id(1, player_id)
 
 

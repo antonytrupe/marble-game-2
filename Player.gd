@@ -28,7 +28,7 @@ var calculated_age: int:
 	get = calculate_age
 
 @export var actions = {"move": null, "action": null}:
-	set = set_actions
+	set = _set_action
 
 const SPEED_MULTIPLIER = 1.0 / 24.0
 const JUMP_VELOCITY = 5.0
@@ -37,26 +37,27 @@ const JUMP_VELOCITY = 5.0
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chatMode = false
 
-var reset_actions = null:
-	set = _reset_actions
+
+#setter, don't call directly
+func _set_action(value):
+	actions = value
+	Signals.Actions.emit(player_id, actions)
 
 
 # use reset_actions to clear this and skip internal logic
-func set_actions(value: Dictionary):
+func set_action(value: Dictionary):
 	#print("player set_actions ", value)
 
-	actions.action = value.action
+	if value.has("action") and value.action:
+		actions.action = value.action
 	# only update move if we went faster
-	if value.move != null and (actions.move == null or value.move > actions.move):
+	if value.has("move") and (actions.move == null or value.move > actions.move):
 		actions.move = value.move
-	Signals.Actions.emit(player_id, actions)
 
 
-func _reset_actions(_value):
-	#print("player _reset_actions")
+func reset_actions():
+	#print("reset actions to ", {"move": null, "action": null})
 	actions = {"move": null, "action": null}
-	#print("player _reset_actions ", actions)
-	Signals.Actions.emit(player_id, actions)
 
 
 func get_zones() -> Array[Chunk]:
@@ -123,7 +124,7 @@ func save():
 
 func _on_new_turn(_turn_id):
 	#print("player _on_new_turn ", turn_id)
-	reset_actions = null
+	reset_actions()
 
 
 func _ready():
@@ -261,7 +262,9 @@ func server_mode(new_mode: MOVE.MODE):
 		print("someone trying to call server_mode")
 		return
 	#print('server_mode updating mode')
-	mode = new_mode
+	#if we've used an action, no hustling/running
+	if !actions.action or [MOVE.MODE.CROUCH, MOVE.MODE.WALK].has(new_mode):
+		mode = new_mode
 
 
 @rpc("any_peer")
@@ -328,12 +331,19 @@ func server_action():
 	if !multiplayer.is_server():
 		return
 	print("server_action")
+
 	if raycast.is_colliding():
 		var bush = raycast.get_collider()
 		print("hit something ", bush.name)
 		if bush.has_method("pick_berry"):
-			print("picking berry")
+			var action = "pick_berry"
+			# make actions.action always a string
+			if actions.action != null and actions.action != action:
+				#print("trying to do a second action")
+				return
+			#print("picking berry")
 			bush.pick_berry()
+			set_action({"action": "pick_berry"})
 
 
 @rpc("any_peer")
@@ -359,9 +369,9 @@ func server_move(d):
 		velocity.x = move_toward(velocity.x, 0, mode * SPEED_MULTIPLIER * speed)
 		velocity.z = move_toward(velocity.z, 0, mode * SPEED_MULTIPLIER * speed)
 	if !is_zero_approx(velocity.x) or !is_zero_approx(velocity.z):
-		actions.move = mode
-		if [MOVE.MODE.HUSTLE, MOVE.MODE.RUN].has(mode):
-			actions.action = mode
+		set_action({"move": mode})
+		if mode in [MOVE.MODE.HUSTLE, MOVE.MODE.RUN]:
+			set_action({"action": MOVE.STRINGS[mode]})
 
 
 @rpc("authority")
