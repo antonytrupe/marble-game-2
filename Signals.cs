@@ -6,7 +6,7 @@ using System.Reflection;
 public partial class Signals : Node
 {
 	[Signal]
-	public delegate void PlayerZonedEventHandler(string player_id, string chunk_id);
+	public delegate void PlayerZonedEventHandler(CharacterBody3D player_id, Node3D chunk_id);
 
 	[Signal]
 	public delegate void NewTurnEventHandler(int turn_id);

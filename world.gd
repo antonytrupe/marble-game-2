@@ -8,9 +8,10 @@ extends Node
 @onready var serverCamera = $CameraPivot/ServerCamera3D
 @onready var Players = $Players
 @onready var game = $"."
-@onready var sun = %Sun
+#@onready var sun = %Sun
 @onready var Chunks = $Chunks
-@onready var worldTime = %WorldTime
+@onready var worldTime = %WorldTimeLabel
+@onready var dayNightCycle = $DayNightCycle
 @export var turn_number = 1:
 	set = update_turn_number
 @export var server_age = 0
@@ -19,7 +20,7 @@ var calculated_age: int:
 	get = calculate_age
 
 const Player = preload("res://player.tscn")
-const Chunk = preload("res://chunk.tscn")
+const ChunkScene = preload("res://chunk.tscn")
 const PORT = 9999
 var enet_peer = ENetMultiplayerPeer.new()
 var turn_start = 0
@@ -33,14 +34,19 @@ func calculate_age():
 	return server_age + Time.get_ticks_msec()
 
 
-#var sf= SurfaceTool.new()
-func _on_player_zoned(_player_id, chunk_id):
+func _on_player_zoned(player: MarbleCharacter, chunk: Node3D):
+	print("_on_player_zoned", player.name, chunk.name)
+	if player_id == player.name:
+		#get all the chunks the player is overlapping
+		var chunks = player.get_zones()
+		print(chunks)
+		dayNightCycle.chunks = chunks
+
 	if !multiplayer.is_server():
 		#print('_on_player_zoned not from server')
 		return
 
-	#print("_on_player_zoned",_player_id,chunk_id)
-	var chunk_json = JSON.parse_string(chunk_id)
+	var chunk_json = JSON.parse_string(chunk.name)
 	#return
 	#print(chunk_json)
 	for x in range(-1, 1 + 1):
@@ -52,10 +58,11 @@ func _on_player_zoned(_player_id, chunk_id):
 			#print('adj_chunk_name:',adj_chunk_name)
 			var adj_chunk = Chunks.get_node_or_null(adj_chunk_name)
 			if !adj_chunk:
-				var new_chunk = Chunk.instantiate()
+				var new_chunk = ChunkScene.instantiate()
 				new_chunk.position = Vector3(adj_x * 60, adj_y * 60, adj_z * 60)
 				new_chunk.name = adj_chunk_name
 				new_chunk.birth_date = Time.get_ticks_msec() + server_age
+				#new_chunk.extra_age=
 				Chunks.add_child(new_chunk)
 				#print('added new chunk')
 	pass
@@ -203,8 +210,6 @@ func _process(_delta):
 	var age = GameTime.get_age_parts(calculated_age)
 	worldTime.text = "%d years, %d months, %d days, %02d:%02d:%02d" % [age.years, age.months, age.days, age.hours, age.minutes, age.seconds]
 
-	sun.rotation.x = -PI / 8
-
 	if multiplayer.is_server():
 		turnTimer.value = (now + server_age) % 6000
 		var newTurnNumber = (now + server_age) / (6 * 1000) + 1
@@ -216,7 +221,7 @@ func _process(_delta):
 
 
 func update_turn_number(value):
-	print("world update_turn_number")
+	#print("world update_turn_number")
 	turn_number = value
 	turnNumberLabel.text = "turn " + str(value)
 	turn_start = Time.get_ticks_msec()

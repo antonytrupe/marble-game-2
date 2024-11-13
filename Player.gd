@@ -1,6 +1,5 @@
 extends CharacterBody3D
-
-signal health_changed(health_value)
+class_name MarbleCharacter
 
 @onready var ChatBubbles = $ChatBubbles
 @onready var cameraPivot = $CameraPivot
@@ -10,7 +9,7 @@ signal health_changed(health_value)
 @onready var chatTextEdit: TextEdit = $/root/Game/UI/HUD/ChatInput
 @onready var game = $/root/Game
 @onready var inventory = $Inventory
-@onready var area = $Area3D
+@onready var area3D = $Area3D
 @onready var characterSheet = $CharacterSheet
 @onready var actionsUI = %ActionsUI
 @export var health = 3
@@ -33,6 +32,14 @@ var reset_actions = null:
 	set = _reset_actions
 
 
+func get_zones() -> Array[Chunk]:
+	var areas = area3D.get_overlapping_areas()
+	var chunks: Array[Chunk] = []
+	for area: Area3D in areas:
+		chunks.append(area.get_parent())
+	return chunks
+
+
 # use reset_actions to clear this and skip internal logic
 func set_actions(value: Dictionary):
 	#print("player set_actions ", value)
@@ -47,8 +54,9 @@ func set_actions(value: Dictionary):
 func _reset_actions(_value):
 	#print("player _reset_actions")
 	actions = {"move": null, "action": null}
-	print('player _reset_actions ',actions)
+	#print("player _reset_actions ", actions)
 	Signals.Actions.emit(player_id, actions)
+
 
 func set_birth_date(value):
 	birth_date = value
@@ -135,13 +143,13 @@ func _unhandled_input(event):
 		if multiplayer.is_server():
 			server_request_rest(8)
 		else:
-			server_request_rest.rpc_id(1,8)
+			server_request_rest.rpc_id(1, 8)
 
 	if Input.is_action_just_pressed("short_rest"):
 		if multiplayer.is_server():
 			server_request_rest(1)
 		else:
-			server_request_rest.rpc_id(1,1)
+			server_request_rest.rpc_id(1, 1)
 
 	if Input.is_action_just_pressed("inventory"):
 		inventory.visible = !inventory.visible
@@ -251,7 +259,7 @@ func server_mode(new_mode: MOVE.MODE):
 
 
 @rpc("any_peer")
-func server_request_rest(hours:int):
+func server_request_rest(hours: int):
 	print("server_request_rest")
 	if !multiplayer.is_server():
 		print("someone trying to call server_request_rest")
@@ -260,7 +268,7 @@ func server_request_rest(hours:int):
 	#TODO
 	extra_age = extra_age + 1000 * 60 * 60 * hours
 
-	var chunkAreas = area.get_overlapping_areas()
+	var chunkAreas = area3D.get_overlapping_areas()
 
 	for chunkArea in chunkAreas:
 		chunkArea.request_rest(hours)
@@ -359,7 +367,7 @@ func receive_damage():
 	if health <= 0:
 		health = 3
 		position = Vector3.ZERO + Vector3(0, .5, 0)
-	health_changed.emit(health)
+	#health_changed.emit(health)
 
 
 func _on_animation_player_animation_finished(anim_name):

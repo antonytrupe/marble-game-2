@@ -1,4 +1,5 @@
 extends Node3D
+class_name Chunk
 
 @onready var label = $Label3D
 @onready var game = $"../.."
@@ -23,7 +24,7 @@ func calculate_age():
 	return game.server_age + extra_age + Time.get_ticks_msec() - birth_date
 
 
-func server_request_rest(hours:int):
+func server_request_rest(hours: int):
 	print("chunk request long rest")
 	if !multiplayer.is_server():
 		print("someone trying to call server_request_rest")
@@ -68,11 +69,16 @@ func generate_terrain():
 	#mesh=a_mesh
 
 
-func _on_area_3d_body_entered(body: Node3D) -> void:
-	Signals.PlayerZoned.emit(body.name, name)
+func _on_area_3d_body_entered(playerArea: CharacterBody3D) -> void:
+	print(self)
+	Signals.PlayerZoned.emit(playerArea, self)
 
 
 func _process(_delta):
 	#label.text = "birth date:" + str(birth_date) + "\n" + "extra age:" + str(extra_age) + "\n" + "calculated age:" + str(calculated_age) + "\n"
 	var age = GameTime.get_age_parts(calculated_age)
 	label.text = "%d years, %d months, %d days, %02d:%02d:%02d" % [age.years, age.months, age.days, age.hours, age.minutes, age.seconds]
+
+
+func _on_chunk_area_3d_body_exited(playerArea: CharacterBody3D) -> void:
+	Signals.PlayerZoned.emit(playerArea, self)

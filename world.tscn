@@ -143,7 +143,7 @@ grow_horizontal = 2
 grow_vertical = 0
 script = ExtResource("3_3e53o")
 
-[node name="WorldTime" type="Label" parent="UI/HUD"]
+[node name="WorldTimeLabel" type="Label" parent="UI/HUD"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 581.0
@@ -168,7 +168,7 @@ environment = SubResource("Environment_cqcki")
 
 [node name="Sun" type="DirectionalLight3D" parent="DayNightCycle"]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, -0.982287, 0.187381, 0, -0.187381, -0.982287, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -0.707107, 0.707106, 0, -0.707106, -0.707107, 0, 0, 0)
 layers = 0
 shadow_enabled = true
 
@@ -184,6 +184,7 @@ _spawnable_scenes = PackedStringArray("res://chunk.tscn")
 spawn_path = NodePath("..")
 
 [node name="[0,0,0]" parent="Chunks" instance=ExtResource("3_pdr6q")]
+unique_name_in_owner = true
 
 [node name="Players" type="Node3D" parent="."]
 
