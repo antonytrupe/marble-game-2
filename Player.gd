@@ -30,16 +30,15 @@ var calculated_age: int:
 @export var actions = {"move": null, "action": null}:
 	set = set_actions
 
+const SPEED_MULTIPLIER = 1.0 / 24.0
+const JUMP_VELOCITY = 5.0
+
+# Get the gravity from the project settings to be synced with RigidBody nodes.
+var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
+var chatMode = false
+
 var reset_actions = null:
 	set = _reset_actions
-
-
-func get_zones() -> Array[Chunk]:
-	var areas = area3D.get_overlapping_areas()
-	var chunks: Array[Chunk] = []
-	for area: Area3D in areas:
-		chunks.append(area.get_parent())
-	return chunks
 
 
 # use reset_actions to clear this and skip internal logic
@@ -60,6 +59,14 @@ func _reset_actions(_value):
 	Signals.Actions.emit(player_id, actions)
 
 
+func get_zones() -> Array[Chunk]:
+	var areas = area3D.get_overlapping_areas()
+	var chunks: Array[Chunk] = []
+	for area: Area3D in areas:
+		chunks.append(area.get_parent())
+	return chunks
+
+
 func set_birth_date(value):
 	birth_date = value
 
@@ -70,14 +77,6 @@ func set_extra_age(value):
 
 func calculate_age():
 	return game.server_age + extra_age + Time.get_ticks_msec() - birth_date
-
-
-const SPEED_MULTIPLIER = 1.0 / 24.0
-const JUMP_VELOCITY = 14.0
-
-# Get the gravity from the project settings to be synced with RigidBody nodes.
-var gravity = 20.0
-var chatMode = false
 
 
 func update_mode(new_mode):

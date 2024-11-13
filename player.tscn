@@ -7,11 +7,13 @@
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_x3s4a"]
 resource_local_to_scene = true
-height = 5.0
+radius = 0.17
+height = 1.7
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_h6xeb"]
 resource_local_to_scene = true
-height = 5.0
+radius = 0.17
+height = 1.7
 
 [sub_resource type="Animation" id="Animation_4kr5r"]
 length = 0.1
@@ -25,7 +27,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [5.0]
+"values": [1.7]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -37,7 +39,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(0, 2.5, 0)]
+"values": [Vector3(0, 0.85, 0)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -49,7 +51,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [5.0]
+"values": [1.7]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -61,7 +63,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(0, 2.5, 0)]
+"values": [Vector3(0, 0.85, 0)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -73,7 +75,7 @@ tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(-1, 3.5, 0)]
+"values": [Vector3(-0.3, 1.2, 0)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
@@ -85,7 +87,7 @@ tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(1, 3.5, 0)]
+"values": [Vector3(0.3, 1.2, 0)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
@@ -97,7 +99,7 @@ tracks/6/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(0, 5, -0.4)]
+"values": [Vector3(0, 1.72855, -0.120747)]
 }
 
 [sub_resource type="Animation" id="Animation_nf8hi"]
@@ -237,14 +239,16 @@ properties/10/spawn = true
 properties/10/replication_mode = 2
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_wv48c"]
-radius = 0.2
+radius = 0.1
+height = 0.5
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_ip383"]
-radius = 0.2
+radius = 0.1
+height = 0.5
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_g2b3s"]
-radius = 0.2
-height = 1.0
+radius = 0.1
+height = 0.4
 
 [sub_resource type="Animation" id="Animation_77lh1"]
 resource_name = "fade"
@@ -289,18 +293,18 @@ collision_mask = 15
 script = ExtResource("1_2v3wm")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
 shape = SubResource("CapsuleShape3D_x3s4a")
 
 [node name="Body" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
 mesh = SubResource("CapsuleMesh_h6xeb")
 
 [node name="Area3D" type="Area3D" parent="."]
 collision_layer = 2
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
 shape = SubResource("CapsuleShape3D_x3s4a")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
@@ -317,23 +321,23 @@ replication_config = SubResource("SceneReplicationConfig_hn37q")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.1, 0)
 
 [node name="LeftArm" type="MeshInstance3D" parent="."]
-transform = Transform3D(-0.573576, -0.819152, 0, 0.819152, -0.573576, 0, 0, 0, 1, -1, 3.5, 0)
+transform = Transform3D(-0.573576, -0.819152, 0, 0.819152, -0.573576, 0, 0, 0, 1, -0.3, 1.2, 0)
 mesh = SubResource("CapsuleMesh_wv48c")
 
 [node name="RightArm" type="MeshInstance3D" parent="."]
-transform = Transform3D(-0.573576, 0.819152, 0, -0.819152, -0.573576, 0, 0, 0, 1, 1, 3.5, 0)
+transform = Transform3D(-0.573576, 0.819152, 0, -0.819152, -0.573576, 0, 0, 0, 1, 0.3, 1.2, 0)
 mesh = SubResource("CapsuleMesh_ip383")
 
 [node name="RightFoot" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.91069e-15, -4.37114e-08, 1, -1, -4.37114e-08, 0, 4.37114e-08, -1, -4.37114e-08, 0.25, 0.2, -0.3)
+transform = Transform3D(1.91069e-15, -4.37114e-08, 1, -1, -4.37114e-08, 0, 4.37114e-08, -1, -4.37114e-08, 0.12, 0.1, -0.1)
 mesh = SubResource("CapsuleMesh_g2b3s")
 
 [node name="LeftFoot" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.91069e-15, -4.37114e-08, 1, -1, -4.37114e-08, 0, 4.37114e-08, -1, -4.37114e-08, -0.25, 0.2, -0.3)
+transform = Transform3D(1.91069e-15, -4.37114e-08, 1, -1, -4.37114e-08, 0, 4.37114e-08, -1, -4.37114e-08, -0.12, 0.1, -0.1)
 mesh = SubResource("CapsuleMesh_g2b3s")
 
 [node name="CameraPivot" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 5, -0.4)
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 1.72855, -0.120747)
 
 [node name="Camera3D" type="Camera3D" parent="CameraPivot"]
 unique_name_in_owner = true
