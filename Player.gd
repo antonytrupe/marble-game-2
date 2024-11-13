@@ -331,9 +331,9 @@ func server_action():
 	if raycast.is_colliding():
 		var bush = raycast.get_collider()
 		print("hit something ", bush.name)
-		if bush.has_method("pickBerry"):
+		if bush.has_method("pick_berry"):
 			print("picking berry")
-			bush.pickBerry()
+			bush.pick_berry()
 
 
 @rpc("any_peer")

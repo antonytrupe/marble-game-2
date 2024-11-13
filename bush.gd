@@ -20,7 +20,7 @@ var rng = RandomNumberGenerator.new()
 ]
 
 
-func pickBerry():
+func pick_berry():
 	if berries:
 		b[berries - 1].hide()
 		berries = berries - 1
