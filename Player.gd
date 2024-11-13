@@ -170,11 +170,9 @@ func _unhandled_input(event):
 		if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE):
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			if multiplayer.is_server():
-				server_rotate(-event.relative.x)
+				server_rotate(event.relative)
 			else:
-				server_rotate.rpc_id(1, -event.relative.x)
-			cameraPivot.rotate_x(-event.relative.y * .005)
-			cameraPivot.rotation.x = clamp(cameraPivot.rotation.x, -PI / 2, PI / 2)
+				server_rotate.rpc_id(1, event.relative)
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
@@ -301,10 +299,12 @@ func client_chat(message):
 
 
 @rpc("any_peer")
-func server_rotate(value):
+func server_rotate(value: Vector2):
 	if !multiplayer.is_server():
 		return
-	rotate_y(value * .005)
+	rotate_y(-value.x * .005)
+	cameraPivot.rotate_x(-value.y * .005)
+	cameraPivot.rotation.x = clamp(cameraPivot.rotation.x, -PI / 2, PI / 2)
 
 
 #func shoot():
