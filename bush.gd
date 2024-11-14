@@ -24,7 +24,13 @@ func pick_berry():
 	if berries:
 		b[berries - 1].hide()
 		berries = berries - 1
-		print(berries)
+		#print(GlobalRandom.Items.berry)
+		var a = {berry = GlobalRandom.Items.berry}
+		a.berry.count = 1
+		#print(a)
+		return a
+	else:
+		return {}
 
 
 # Called when the node enters the scene tree for the first time.
@@ -43,6 +49,6 @@ func setup():
 func _process(_delta):
 	if multiplayer.is_server():
 		if berries < 9:
-			if rng.randi_range(0,10000)<=1:
-				print('spawn a berry')
-				berries=berries+1
+			if rng.randi_range(0, 1000) <= 1:
+				print("spawn a berry")
+				berries = berries + 1

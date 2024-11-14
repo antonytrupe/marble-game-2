@@ -8,7 +8,7 @@ class_name MarbleCharacter
 @onready var anim_player = $AnimationPlayer
 @onready var chatTextEdit: TextEdit = $/root/Game/UI/HUD/ChatInput
 @onready var game = $/root/Game
-@onready var inventory = $Inventory
+@onready var inventoryUI = %InventoryUI
 @onready var area3D = $Area3D
 @onready var characterSheet = $CharacterSheet
 @onready var actionsUI = %ActionsUI
@@ -30,12 +30,21 @@ var calculated_age: int:
 @export var actions = {"move": null, "action": null}:
 	set = _set_action
 
+@export var inventory: Dictionary:
+	set = _set_inventory
+
 const SPEED_MULTIPLIER = 1.0 / 24.0
 const JUMP_VELOCITY = 5.0
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chatMode = false
+
+
+func _set_inventory(value: Dictionary):
+	inventory = value
+	if inventoryUI:
+		inventoryUI.inventory = inventory
 
 
 #setter, don't call directly
@@ -131,6 +140,7 @@ func _on_new_turn(_turn_id):
 
 func _ready():
 	actionsUI.player_id = player_id
+	#inventoryUI.inventory = inventory
 	Signals.NewTurn.connect(_on_new_turn)
 	if player_id and player_id == game.player_id:
 		camera.current = true
@@ -163,7 +173,7 @@ func _unhandled_input(event):
 			server_request_rest.rpc_id(1, minutes)
 
 	if Input.is_action_just_pressed("inventory"):
-		inventory.visible = !inventory.visible
+		inventoryUI.visible = !inventoryUI.visible
 
 	if Input.is_action_just_pressed("character_sheet"):
 		characterSheet.visible = !characterSheet.visible
@@ -332,11 +342,11 @@ func server_rotate(value: Vector2):
 func server_action():
 	if !multiplayer.is_server():
 		return
-	print("server_action")
+	#print("server_action")
 
 	if raycast.is_colliding():
 		var bush = raycast.get_collider()
-		print("hit something ", bush.name)
+		#print("hit something ", bush.name)
 		if bush.has_method("pick_berry"):
 			var action = "pick_berry"
 			# make actions.action always a string
@@ -344,8 +354,18 @@ func server_action():
 				#print("trying to do a second action")
 				return
 			#print("picking berry")
-			bush.pick_berry()
+			var loot = bush.pick_berry()
+			#print(loot)
+			add_to_inventory(loot)
 			set_action({"action": "pick_berry"})
+
+
+func add_to_inventory(loot: Dictionary):
+	for item_name in loot:
+		if !inventory.has(item_name):
+			inventory[item_name] = {count = 0}
+		var item = loot[item_name]
+		inventory[item_name].count += item.count
 
 
 @rpc("any_peer")

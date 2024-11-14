@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://b1q2vj4f542ay"]
+[gd_scene load_steps=2 format=3 uid="uid://b1q2vj4f542ay"]
+
+[ext_resource type="Script" path="res://inventory.gd" id="1_0oxwt"]
 
 [node name="Node2D" type="PanelContainer"]
 anchors_preset = 8
@@ -14,20 +16,36 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+script = ExtResource("1_0oxwt")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="GridContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
+size_flags_horizontal = 0
 size_flags_vertical = 0
+mouse_filter = 2
 
-[node name="Label" type="Label" parent="MarginContainer/GridContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/GridContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="MarginContainer/GridContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Berries"
 
-[node name="Label2" type="Label" parent="MarginContainer/GridContainer"]
+[node name="BerriesCount" type="Label" parent="MarginContainer/GridContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/GridContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label2" type="Label" parent="MarginContainer/GridContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Water"

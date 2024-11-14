@@ -4,4 +4,4 @@ extends StaticBody3D
 
 
 func pick_berry():
-	root.pick_berry()
+	return root.pick_berry()

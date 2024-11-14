@@ -21,6 +21,7 @@ Signals="*res://Signals.cs"
 JSON3D="*res://JSON3D.cs"
 GameTime="*res://game_time.gd"
 MOVE="*res://move_modes.gd"
+GlobalRandom="*res://global_random.gd"
 
 [debug]
 
