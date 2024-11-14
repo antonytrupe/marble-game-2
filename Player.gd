@@ -86,6 +86,8 @@ func update_mode(new_mode):
 	if mode != new_mode:
 		if new_mode == MOVE.MODE.CROUCH:
 			anim_player.play("crouch")
+		elif mode == MOVE.MODE.CROUCH:
+			anim_player.play_backwards("crouch")
 		else:
 			anim_player.play("RESET")
 	#if anim_player.current_animation == "shoot":

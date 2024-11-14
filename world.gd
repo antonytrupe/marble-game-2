@@ -2,9 +2,8 @@ extends Node
 
 @onready var main_menu = $UI/MainMenu
 @onready var hud = $UI/HUD
-#@onready var health_bar = $UI/HUD/HealthBar
-@onready var turnNumberLabel = $UI/HUD/TurnTimer/TurnNumber
-@onready var turnTimer = $UI/HUD/TurnTimer
+@onready var turnNumberLabel = %TurnNumber
+@onready var turnTimer = %TurnTimer
 @onready var serverCamera = $CameraPivot/ServerCamera3D
 @onready var Players = $Players
 @onready var game = $"."
