@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=14 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_6tkge"]
 [ext_resource type="Script" path="res://chat_input.gd" id="3_3e53o"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://day_night_cycle.gd" id="3_qlg17"]
 [ext_resource type="PackedScene" uid="uid://damvmfs7dqebu" path="res://bush/bush.tscn" id="3_u0r5y"]
 [ext_resource type="PackedScene" uid="uid://c1e46m2pfqiji" path="res://tree/tree.tscn" id="4_wywi7"]
+[ext_resource type="PackedScene" uid="uid://d2hkj68j5lp3w" path="res://acorn/acorn.gltf" id="7_0w8ut"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_vl0i4"]
 properties/0/path = NodePath(".:turn_number")
@@ -206,7 +207,6 @@ mesh = SubResource("PlaneMesh_jysef")
 [node name="Flora" type="Node3D" parent="."]
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Flora"]
-_spawnable_scenes = PackedStringArray("res://bush.tscn", "res://tree.tscn")
 spawn_path = NodePath("..")
 
 [node name="Bush1" parent="Flora" instance=ExtResource("3_u0r5y")]
@@ -225,10 +225,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3342, 0, 15.3781)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.02497, 0, -4.95647)
 
 [node name="Tree1" parent="Flora" instance=ExtResource("4_wywi7")]
-transform = Transform3D(0.862469, 0, -0.506109, 0, 1, 0, 0.506109, 0, 0.862469, 2.53348, 0, 12.1065)
+transform = Transform3D(0.995136, 0, -0.0985093, 0, 1, 0, 0.0985093, 0, 0.995136, 6.24032, 0, 12.1065)
+
+[node name="Acorn" parent="Flora/Tree1" instance=ExtResource("7_0w8ut")]
+transform = Transform3D(1, 0, -2.98023e-08, 0, 1, 0, 2.98023e-08, 0, 1, -1.26158, 8.27468, -2.14988)
 
 [node name="Tree2" parent="Flora" instance=ExtResource("4_wywi7")]
-transform = Transform3D(0.924971, 0, 0.380037, 0, 1, 0, -0.380037, 0, 0.924971, 11.1828, 0, 7.49215)
+transform = Transform3D(0.680879, 0, 0.732396, 0, 1, 0, -0.732396, 0, 0.680879, 11.1828, 0, 7.49215)
 
 [node name="Fauna" type="Node3D" parent="."]
 
