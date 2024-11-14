@@ -1,7 +1,7 @@
 [gd_scene load_steps=25 format=3 uid="uid://damvmfs7dqebu"]
 
-[ext_resource type="Script" path="res://bush.gd" id="1_l15ch"]
-[ext_resource type="Script" path="res://bush_staticbody.gd" id="2_pamrd"]
+[ext_resource type="Script" path="res://bush/bush.gd" id="1_mtdqb"]
+[ext_resource type="Script" path="res://bush/bush_staticbody.gd" id="2_ggt4o"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_vjxuo"]
 radius = 1.0
@@ -83,7 +83,7 @@ properties/0/spawn = true
 properties/0/replication_mode = 2
 
 [node name="Node3D" type="Node3D"]
-script = ExtResource("1_l15ch")
+script = ExtResource("1_mtdqb")
 
 [node name="BushMeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.49961, 0)
@@ -139,7 +139,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_v7oee")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 collision_layer = 4
 collision_mask = 0
-script = ExtResource("2_pamrd")
+script = ExtResource("2_ggt4o")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.372366, 0)

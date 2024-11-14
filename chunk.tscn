@@ -1,8 +1,8 @@
 [gd_scene load_steps=9 format=3 uid="uid://cgfpsf73dbmvb"]
 
 [ext_resource type="Script" path="res://chunk.gd" id="1_icme5"]
-[ext_resource type="PackedScene" uid="uid://c1e46m2pfqiji" path="res://tree.tscn" id="3_22xvf"]
-[ext_resource type="PackedScene" uid="uid://damvmfs7dqebu" path="res://bush.tscn" id="4_rew7m"]
+[ext_resource type="PackedScene" uid="uid://c1e46m2pfqiji" path="res://tree/tree.tscn" id="3_22xvf"]
+[ext_resource type="PackedScene" uid="uid://damvmfs7dqebu" path="res://bush/bush.tscn" id="4_rew7m"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_asbb7"]
 size = Vector2(60, 60)

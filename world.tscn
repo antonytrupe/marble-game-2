@@ -4,8 +4,8 @@
 [ext_resource type="Script" path="res://chat_input.gd" id="3_3e53o"]
 [ext_resource type="PackedScene" uid="uid://cgfpsf73dbmvb" path="res://chunk.tscn" id="3_pdr6q"]
 [ext_resource type="Script" path="res://day_night_cycle.gd" id="3_qlg17"]
-[ext_resource type="PackedScene" uid="uid://damvmfs7dqebu" path="res://bush.tscn" id="3_u0r5y"]
-[ext_resource type="PackedScene" uid="uid://c1e46m2pfqiji" path="res://tree.tscn" id="4_wywi7"]
+[ext_resource type="PackedScene" uid="uid://damvmfs7dqebu" path="res://bush/bush.tscn" id="3_u0r5y"]
+[ext_resource type="PackedScene" uid="uid://c1e46m2pfqiji" path="res://tree/tree.tscn" id="4_wywi7"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_vl0i4"]
 properties/0/path = NodePath(".:turn_number")
