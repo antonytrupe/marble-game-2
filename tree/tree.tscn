@@ -1,4 +1,6 @@
-[gd_scene load_steps=7 format=3 uid="uid://c1e46m2pfqiji"]
+[gd_scene load_steps=8 format=3 uid="uid://c1e46m2pfqiji"]
+
+[ext_resource type="Script" path="res://tree/tree.gd" id="1_2omd0"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_an22n"]
 top_radius = 0.8
@@ -13,8 +15,8 @@ albedo_color = Color(0.0784314, 0.301961, 0.160784, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_7felh"]
 material = SubResource("StandardMaterial3D_7gadc")
-radius = 2.0
-height = 4.0
+radius = 3.0
+height = 6.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_entft"]
 albedo_color = Color(0.0797826, 0.302502, 0.161847, 1)
@@ -24,6 +26,8 @@ height = 10.0
 radius = 1.0
 
 [node name="Tree" type="Node3D"]
+transform = Transform3D(0.042829, 0, 0.0903641, 0, 0.1, 0, -0.0903641, 0, 0.042829, 0, 0, 0)
+script = ExtResource("1_2omd0")
 
 [node name="Trunk" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
@@ -31,24 +35,24 @@ mesh = SubResource("CylinderMesh_an22n")
 surface_material_override/0 = SubResource("StandardMaterial3D_staie")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Trunk"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 6, 0)
 mesh = SubResource("SphereMesh_7felh")
 surface_material_override/0 = SubResource("StandardMaterial3D_entft")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="Trunk"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.22784, 6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 6, 0)
 mesh = SubResource("SphereMesh_7felh")
 
 [node name="MeshInstance3D3" type="MeshInstance3D" parent="Trunk"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0845339, 6, 1.95742)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 2.5)
 mesh = SubResource("SphereMesh_7felh")
 
 [node name="MeshInstance3D4" type="MeshInstance3D" parent="Trunk"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.328325, 6, -1.59631)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -2.5)
 mesh = SubResource("SphereMesh_7felh")
 
 [node name="MeshInstance3D5" type="MeshInstance3D" parent="Trunk"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.071116, 7.58078, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
 mesh = SubResource("SphereMesh_7felh")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
