@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Marble Game"
-run/main_scene="res://world.tscn"
+run/main_scene="res://game.tscn"
 config/features=PackedStringArray("4.3", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -43,7 +43,9 @@ enabled=PackedStringArray("res://addons/gdscript_formatter/plugin.cfg", "res://a
 
 [global_group]
 
-Persist=""
+flora=""
+persist=""
+fauna=""
 
 [input]
 
