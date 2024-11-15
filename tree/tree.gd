@@ -2,7 +2,7 @@
 extends Node3D
 
 #10 years
-@export var maturity: int = 1000 * 60 * 60 * 24 * 360 * (10 * .01)
+@export var maturity: int = 1000 * 60 * 60 * 24 * 360 * (10 * .001)
 
 @export var birth_date: int = 0:
 	set = set_birth_date
@@ -15,9 +15,9 @@ var calculated_age: int:
 	get = calculate_age
 
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass  # Replace with function body.
+func time_warp(minutes):
+	print('tree time_warp')
+	extra_age = extra_age + 1000 * 60 * minutes
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

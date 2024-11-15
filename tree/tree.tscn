@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://c1e46m2pfqiji"]
+[gd_scene load_steps=9 format=3 uid="uid://c1e46m2pfqiji"]
 
 [ext_resource type="Script" path="res://tree/tree.gd" id="1_2omd0"]
 
@@ -25,8 +25,18 @@ albedo_color = Color(0.0797826, 0.302502, 0.161847, 1)
 height = 10.0
 radius = 1.0
 
-[node name="Tree" type="Node3D"]
-transform = Transform3D(0.042829, 0, 0.0903641, 0, 0.1, 0, -0.0903641, 0, 0.042829, 0, 0, 0)
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_cbetc"]
+properties/0/path = NodePath(".:maturity")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:birth_date")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:extra_age")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+
+[node name="Tree" type="Node3D" groups=["flora", "persist"]]
 script = ExtResource("1_2omd0")
 
 [node name="Trunk" type="MeshInstance3D" parent="."]
@@ -57,6 +67,17 @@ mesh = SubResource("SphereMesh_7felh")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+[node name="TrunkCollision" type="CollisionShape3D" parent="StaticBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
 shape = SubResource("CylinderShape3D_k6sc6")
+
+[node name="Area3D" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="TrunkCollision" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("CylinderShape3D_k6sc6")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_cbetc")

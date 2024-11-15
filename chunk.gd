@@ -37,11 +37,14 @@ func get_players():
 	return playerScanner.get_overlapping_bodies()
 
 
-func get_flora_fauna() -> Array[Chunk]:
+func get_flora_fauna() -> Array[Node3D]:
 	var areas = floraFaunaScanner.get_overlapping_areas()
-	var entities: Array[Chunk] = []
+	var entities: Array[Node3D] = []
 	for area: Area3D in areas:
 		entities.append(area.get_parent())
+
+	#print("flora_fauna:", entities)
+
 	return entities
 
 
@@ -53,7 +56,8 @@ func time_warp(minutes: int):
 
 	# TODO get everythng else in this chunk and time warp it
 	var flora_fauna = get_flora_fauna()
-	print(flora_fauna)
+	for f in flora_fauna:
+		f.time_warp(minutes)
 
 	# tell all the players there was a timewarp
 	var players = get_players()
