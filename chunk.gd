@@ -1,15 +1,24 @@
 extends Node3D
 class_name Chunk
 
-@onready var label = $Label3D
-@onready var world = $"/root/Game/World"
-
 @export var birth_date: int = 0:
 	set = set_birth_date
 @export var extra_age: int = 0:
 	set = set_extra_age
+
+@onready var label = $Label3D
+@onready var world = $"/root/Game/World"
+@onready var floraFaunaScanner = %FloraFaunaScanner
+@onready var playerScanner = %PlayerScanner
+
 var calculated_age: int:
 	get = calculate_age
+
+
+func _process(_delta):
+	#label.text = "birth date:" + str(birth_date) + "\n" + "extra age:" + str(extra_age) + "\n" + "calculated age:" + str(calculated_age) + "\n"
+	var age = GameTime.get_age_parts(calculated_age)
+	label.text = "%d years, %d months, %d days, %02d:%02d:%02d" % [age.years, age.months, age.days, age.hours, age.minutes, age.seconds]
 
 
 func set_birth_date(value):
@@ -25,16 +34,28 @@ func calculate_age():
 
 
 func get_players():
-	return $ChunkArea3D.get_overlapping_bodies()
+	return playerScanner.get_overlapping_bodies()
 
 
-func server_request_rest(minutes: int):
-	#print("chunk server_request_rest")
+func get_flora_fauna() -> Array[Chunk]:
+	var areas = floraFaunaScanner.get_overlapping_areas()
+	var entities: Array[Chunk] = []
+	for area: Area3D in areas:
+		entities.append(area.get_parent())
+	return entities
+
+
+func time_warp(minutes: int):
 	if !multiplayer.is_server():
-		print("someone trying to call server_request_rest")
+		print("someone trying to call time_warp")
 		return
 	extra_age = extra_age + 1000 * 60 * minutes
-	#TODO tell all the players there was a timewarp
+
+	# TODO get everythng else in this chunk and time warp it
+	var flora_fauna = get_flora_fauna()
+	print(flora_fauna)
+
+	# tell all the players there was a timewarp
 	var players = get_players()
 	for p in players:
 		p.play_fade.rpc()
@@ -72,16 +93,11 @@ func generate_terrain():
 	#mesh=a_mesh
 
 
-func _on_area_3d_body_entered(playerArea: CharacterBody3D) -> void:
-	#print(self)
-	Signals.PlayerZoned.emit(playerArea, self)
+func _on_area_3d_body_entered(playerArea: Node3D) -> void:
+	if playerArea is CharacterBody3D:
+		Signals.PlayerZoned.emit(playerArea, self)
 
 
-func _process(_delta):
-	#label.text = "birth date:" + str(birth_date) + "\n" + "extra age:" + str(extra_age) + "\n" + "calculated age:" + str(calculated_age) + "\n"
-	var age = GameTime.get_age_parts(calculated_age)
-	label.text = "%d years, %d months, %d days, %02d:%02d:%02d" % [age.years, age.months, age.days, age.hours, age.minutes, age.seconds]
-
-
-func _on_chunk_area_3d_body_exited(playerArea: CharacterBody3D) -> void:
-	Signals.PlayerZoned.emit(playerArea, self)
+func _on_chunk_area_3d_body_exited(playerArea: Node3D) -> void:
+	if playerArea is CharacterBody3D:
+		Signals.PlayerZoned.emit(playerArea, self)

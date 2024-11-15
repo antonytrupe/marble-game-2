@@ -173,32 +173,26 @@ func load(node_data):
 
 
 func save_game():
-	#print('save_game')
 	var save_file = FileAccess.open("user://savegame.save", FileAccess.WRITE)
-	#var save_file = FileAccess.open('user://savegame_'+str(Time.get_ticks_msec())+'.save', FileAccess.WRITE)
 
 	var save_nodes = get_tree().get_nodes_in_group("persist")
 	for node in save_nodes:
-		# Check the node is an instanced scene so it can be instanced again during load.
-		#if node.scene_file_path.is_empty():
-		#print("persistent node '%s' is not an instanced scene, skipped" % node.name)
-		#continue
-
 		# Check the node has a save function.
 		if !node.has_method("save"):
 			print("persistent node '%s' is missing a save() function, skipped" % node.name)
 			continue
 
 		# Call the node's save function.
-		var node_data = node.call("save")
+		var node_data: Dictionary = node.call("save")
 
-		node_data.filename = node.get_scene_file_path()
-		node_data.class = node.get_class()
 		node_data.name = node.name
 		node_data.parent = node.get_parent().get_path()
+		node_data.class = node.get_class()
+		node_data.filename = node.get_scene_file_path()
 
 		# JSON provides a static method to serialized JSON string.
-		var json_string = JSON.stringify(node_data)
+		var json_string = JSON.stringify(node_data, "", false)
+		#var json_string = JSON.stringify(node_data,"\t",false)
 
 		# Store the save dictionary as a new line in the save file.
 		save_file.store_line(json_string)
@@ -213,19 +207,9 @@ func load_game():
 		print("save not found")
 		return  # Error! We don't have a save to load.
 
-	# Load the file line by line and process that dictionary to restore
-	# the object it represents.
 	var save_file = FileAccess.open("user://savegame.save", FileAccess.READ)
-	#process world node
-	#var world_line = save_file.get_line()
 	var json = JSON.new()
-	var parse_result  #= json.parse(world_line)
-	#if not parse_result == OK:
-	#print("JSON Parse Error: ", json.get_error_message(), " in ", world_line, " at line ", json.get_error_line())
-	#return
-	#if json.data.has("world_age"):
-	#world.world_age = int(json.data["world_age"])
-	#process player nodes
+	var parse_result
 	while save_file.get_position() < save_file.get_length():
 		var json_string = save_file.get_line()
 
@@ -239,16 +223,15 @@ func load_game():
 		var node_data = json.data
 
 		# Firstly, we need to create the object and add it to the tree
-		#TODO check if the node is in the tree already
+		# check if the node is in the tree already
 		var node = get_node_or_null(node_data.parent + "/" + node_data.name)
 		if !node and node_data["filename"]:
 			node = load(node_data["filename"]).instantiate()
 		elif !node and node_data["class"]:
-			#node = load(node_data["filename"]).instantiate()
 			node = ClassDB.instantiate(node_data.class)
 		else:
 			pass
-		# Check the node has a save function.
+		# Check the node has a load function.
 		if !node.has_method("load"):
 			print("persistent node '%s' is missing a load() function, skipped" % node.name)
 			continue

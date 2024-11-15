@@ -10,7 +10,7 @@ class_name MarbleCharacter
 @onready var anim_player = $AnimationPlayer
 @onready var chatTextEdit: TextEdit = $/root/Game/UI/HUD/ChatInput
 @onready var inventoryUI = %InventoryUI
-@onready var area3D = $Area3D
+@onready var chunkScanner = %ChunkScanner
 @onready var characterSheet = $CharacterSheet
 @onready var actionsUI = %ActionsUI
 @onready var fade_anim = %AnimationPlayer
@@ -56,8 +56,6 @@ func _set_action(value):
 
 # use reset_actions to clear this and skip internal logic
 func set_action(value: Dictionary):
-	#print("player set_actions ", value)
-
 	if value.has("action") and value.action:
 		actions.action = value.action
 	# only update move if we went faster
@@ -66,12 +64,11 @@ func set_action(value: Dictionary):
 
 
 func reset_actions():
-	#print("reset actions to ", {"move": null, "action": null})
 	actions = {"move": null, "action": null}
 
 
 func get_zones() -> Array[Chunk]:
-	var areas = area3D.get_overlapping_areas()
+	var areas = chunkScanner.get_overlapping_areas()
 	var chunks: Array[Chunk] = []
 	for area: Area3D in areas:
 		chunks.append(area.get_parent())
@@ -91,7 +88,6 @@ func calculate_age():
 
 
 func update_mode(new_mode):
-	#print('client got new mode:',new_mode)
 	#TODO animations and stuff
 	if mode != new_mode:
 		if new_mode == MOVE.MODE.CROUCH:
@@ -126,7 +122,6 @@ func save():
 
 
 func _on_new_turn(_turn_id):
-	#print("player _on_new_turn ", turn_id)
 	reset_actions()
 
 
@@ -153,16 +148,16 @@ func _unhandled_input(event):
 	if Input.is_action_just_pressed("long_rest"):
 		var minutes = 8 * 60
 		if multiplayer.is_server():
-			server_request_rest(minutes)
+			time_warp(minutes)
 		else:
-			server_request_rest.rpc_id(1, minutes)
+			time_warp.rpc_id(1, minutes)
 
 	if Input.is_action_just_pressed("short_rest"):
 		var minutes = 60
 		if multiplayer.is_server():
-			server_request_rest(minutes)
+			time_warp(minutes)
 		else:
-			server_request_rest.rpc_id(1, minutes)
+			time_warp.rpc_id(1, minutes)
 
 	if Input.is_action_just_pressed("inventory"):
 		inventoryUI.visible = !inventoryUI.visible
@@ -265,17 +260,15 @@ func server_mode(new_mode: MOVE.MODE):
 	if !multiplayer.is_server():
 		print("someone trying to call server_mode")
 		return
-	#print('server_mode updating mode')
 	#if we've used an action, no hustling/running
 	if !actions.action or [MOVE.MODE.CROUCH, MOVE.MODE.WALK].has(new_mode):
 		mode = new_mode
 
 
 @rpc("any_peer")
-func server_request_rest(minutes: int):
-	print("server_request_rest")
+func time_warp(minutes: int):
 	if !multiplayer.is_server():
-		print("someone trying to call server_request_rest")
+		print("someone trying to call time_warp")
 		return
 
 	extra_age = extra_age + 1000 * 60 * minutes
@@ -313,41 +306,19 @@ func server_rotate(value: Vector2):
 	cameraPivot.rotation.x = clamp(cameraPivot.rotation.x, -PI / 2, PI / 2)
 
 
-#func shoot():
-#print('shoot ',multiplayer.get_unique_id())
-#play_shoot_effects.rpc()
-#
-#if multiplayer.is_server():
-#check_for_hit()
-#else:
-#check_for_hit.rpc_id(1)
-
-#@rpc("any_peer")
-#func check_for_hit():
-#print('check_for_hit ',multiplayer.get_unique_id())
-#if raycast.is_colliding():
-#var hit_player = raycast.get_collider()
-#print('hit player ',hit_player)
-#hit_player.receive_damage()
-
 @rpc("any_peer")
 func server_action():
 	if !multiplayer.is_server():
 		return
-	#print("server_action")
 
 	if raycast.is_colliding():
 		var bush = raycast.get_collider()
-		#print("hit something ", bush.name)
 		if bush.has_method("pick_berry"):
 			var action = "pick_berry"
 			# make actions.action always a string
 			if actions.action != null and actions.action != action:
-				#print("trying to do a second action")
 				return
-			#print("picking berry")
 			var loot = bush.pick_berry()
-			#print(loot)
 			add_to_inventory(loot)
 			set_action({"action": "pick_berry"})
 
@@ -386,16 +357,6 @@ func server_move(d):
 		set_action({"move": mode})
 		if mode in [MOVE.MODE.HUSTLE, MOVE.MODE.RUN]:
 			set_action({"action": MOVE.STRINGS[mode]})
-
-
-@rpc("authority")
-func receive_damage():
-	print("receive_damage", multiplayer.get_unique_id())
-	health -= 1
-	if health <= 0:
-		health = 3
-		position = Vector3.ZERO + Vector3(0, .5, 0)
-	#health_changed.emit(health)
 
 
 func _on_animation_player_animation_finished(anim_name):

@@ -50,6 +50,7 @@ func getVectorFromHour(hour: int):
 
 func _process(_delta: float) -> void:
 	if chunks.size() == 0:
+		#print('no chunks')
 		return
 	var total = Vector2(0.0, 0.0)
 	for c in chunks:

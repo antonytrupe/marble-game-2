@@ -2,9 +2,8 @@ extends Node3D
 
 #@onready var game = $/root/Game
 #@onready var players = %Players
-
 #@onready var Chunks = %Chunks
-#@onready var dayNightCycle = $DayNightCycle
+#@onready var dayNightCycle = %DayNightCycle
 
 @export var world_age: int = 0
 
@@ -44,11 +43,9 @@ func get_chunk_cirle(_center: Array[Chunk], _ring: int):
 
 
 func _on_time_warp(minutes: int, chunks: Array[Chunk]):
-	#print("_on_time_warp")
-
 	var _visitedChunks = chunks
 	for chunk in chunks:
-		chunk.server_request_rest(minutes)
+		chunk.time_warp(minutes)
 
 	#TODO time warp adjacent chunks
 

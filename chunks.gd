@@ -19,27 +19,25 @@ func _process(_delta: float) -> void:
 
 
 func _on_player_zoned(player: MarbleCharacter, chunk: Node3D):
-	#print("_on_player_zoned", player.name, chunk.name)
 	if game.player_id == player.name:
 		#get all the chunks the player is overlapping
 		var chunks = player.get_zones()
-		#print(chunks)
+		# tell the daynightcycle node what chunks the player is in
 		dayNightCycle.chunks = chunks
 
+	# check if we're the server
 	if !multiplayer.is_server():
-		#print('_on_player_zoned not from server')
 		return
 
+	#only generate chunks on the server
 	var chunk_json = JSON.parse_string(chunk.name)
-	#return
-	#print(chunk_json)
 	for x in range(-1, 1 + 1):
 		for z in range(-1, 1 + 1):
 			var adj_x = chunk_json[0] + x
 			var adj_y = chunk_json[1] + 0
 			var adj_z = chunk_json[2] + z
 			var adj_chunk_name = "[%s,%s,%s]" % [adj_x, adj_y, adj_z]
-			#print('adj_chunk_name:',adj_chunk_name)
+
 			var adj_chunk = get_node_or_null(adj_chunk_name)
 			if !adj_chunk:
 				var new_chunk = Chunk.instantiate()
@@ -48,4 +46,3 @@ func _on_player_zoned(player: MarbleCharacter, chunk: Node3D):
 				new_chunk.birth_date = Time.get_ticks_msec() + world.world_age
 				#new_chunk.extra_age=
 				add_child(new_chunk)
-				#print('added new chunk')

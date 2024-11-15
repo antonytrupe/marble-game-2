@@ -219,7 +219,7 @@ script = ExtResource("7_eouhd")
 _spawnable_scenes = PackedStringArray("res://chunk.tscn")
 spawn_path = NodePath("..")
 
-[node name="[0,0,0]" parent="World/Chunks" groups=["persist"] instance=ExtResource("3_pdr6q")]
+[node name="[0,0,0]" parent="World/Chunks" instance=ExtResource("3_pdr6q")]
 unique_name_in_owner = true
 
 [node name="Players" type="Node3D" parent="World"]
