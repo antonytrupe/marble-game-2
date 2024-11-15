@@ -14,7 +14,11 @@ class_name MarbleCharacter
 @onready var characterSheet = $CharacterSheet
 @onready var actionsUI = %ActionsUI
 @onready var fade_anim = %AnimationPlayer
+@onready var tradeUI = $TradeUI
 
+var tradeCharacter: CharacterBody3D
+var trading: bool = false:
+	set = set_trading
 @export var health = 3
 @export var player_id: String
 ##how fast to go
@@ -40,6 +44,20 @@ const JUMP_VELOCITY = 5.0
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chatMode = false
+
+
+func isCurrentPlayer():
+	return game and player_id and player_id == game.player_id
+
+
+func set_trading(value):
+	trading = value
+	#if the tradeui is ready and this is the current player
+	if tradeUI and isCurrentPlayer():
+		if trading:
+			tradeUI.show()
+		else:
+			tradeUI.hide()
 
 
 func _set_inventory(value: Dictionary):
@@ -132,7 +150,7 @@ func _ready():
 	actionsUI.player_id = player_id
 	#inventoryUI.inventory = inventory
 	Signals.NewTurn.connect(_on_new_turn)
-	if player_id and player_id == game.player_id:
+	if isCurrentPlayer():
 		camera.current = true
 		actionsUI.show()
 	else:
@@ -145,7 +163,7 @@ func play_fade():
 
 
 func _unhandled_input(event):
-	if game and player_id != game.player_id:
+	if game and !isCurrentPlayer():
 		return
 
 	if Input.is_action_just_pressed("long_rest"):
@@ -184,6 +202,16 @@ func _unhandled_input(event):
 		chatTextEdit.hide()
 		chatTextEdit.release_focus()
 		chatMode = false
+
+	if Input.is_action_just_pressed("quit") and trading:
+		#don't let this event bubble up
+		get_viewport().set_input_as_handled()
+
+		if multiplayer.is_server():
+			cancel_trade()
+		else:
+			cancel_trade.rpc_id(1)
+
 	if Input.is_action_just_pressed("chat"):
 		if !chatMode:
 			chatTextEdit.show()
@@ -208,7 +236,7 @@ func _physics_process(delta):
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
-	if game and player_id == game.player_id and !chatMode:
+	if isCurrentPlayer() and !chatMode:
 		# TODO check just_press/just_release, or is_pressed?
 		# crouch
 		if Input.is_action_just_pressed("crouch"):
@@ -309,19 +337,45 @@ func server_rotate(value: Vector2):
 	cameraPivot.rotation.x = clamp(cameraPivot.rotation.x, -PI / 2, PI / 2)
 
 
+func start_trade(player):
+	if !multiplayer.is_server():
+		return
+	print("me %s  them %s," % [player_id, player.player_id])
+	#open the trade window
+	trading = true
+	tradeCharacter = player
+
+
+@rpc("any_peer")
+func cancel_trade():
+	if !multiplayer.is_server():
+		print("someone trying to call cancel_trade")
+		return
+
+	tradeCharacter.trading = false
+	tradeCharacter.tradeCharacter = null
+	trading = false
+	tradeCharacter = null
+
+
 @rpc("any_peer")
 func server_action():
 	if !multiplayer.is_server():
 		return
 
 	if raycast.is_colliding():
-		var bush = raycast.get_collider()
-		if bush.has_method("pick_berry"):
+		var entity = raycast.get_collider()
+
+		if entity.has_method("start_trade"):
+			start_trade(entity)
+			entity.start_trade(self)
+
+		if entity.has_method("pick_berry"):
 			var action = "pick_berry"
 			# make actions.action always a string
 			if actions.action != null and actions.action != action:
 				return
-			var loot = bush.pick_berry()
+			var loot = entity.pick_berry()
 			add_to_inventory(loot)
 			set_action({"action": "pick_berry"})
 

@@ -1,9 +1,10 @@
-[gd_scene load_steps=19 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=20 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_2v3wm"]
 [ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://inventory.tscn" id="2_vrrxi"]
 [ext_resource type="PackedScene" uid="uid://dyx3xv5lckl7h" path="res://character_sheet.tscn" id="3_eahd0"]
 [ext_resource type="PackedScene" uid="uid://d35hxvmomxu3p" path="res://actions.tscn" id="4_72q5g"]
+[ext_resource type="PackedScene" uid="uid://j5ugiqe5hl32" path="res://trade_ui.tscn" id="5_32ebk"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_x3s4a"]
 resource_local_to_scene = true
@@ -288,6 +289,12 @@ properties/10/replication_mode = 2
 properties/11/path = NodePath(".:inventory")
 properties/11/spawn = true
 properties/11/replication_mode = 2
+properties/12/path = NodePath(".:trading")
+properties/12/spawn = true
+properties/12/replication_mode = 2
+properties/13/path = NodePath(".:tradeCharacter")
+properties/13/spawn = true
+properties/13/replication_mode = 2
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_wv48c"]
 radius = 0.1
@@ -429,5 +436,8 @@ unique_name_in_owner = true
 libraries = {
 "": SubResource("AnimationLibrary_auoph")
 }
+
+[node name="TradeUI" parent="." instance=ExtResource("5_32ebk")]
+visible = false
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
