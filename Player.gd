@@ -106,6 +106,8 @@ func load(node_data):
 		birth_date = node_data.birth_date
 	if "extra_age" in node_data:
 		extra_age = node_data.extra_age
+	if "inventory" in node_data:
+		inventory = node_data.inventory
 	#TODO figure out camera rotation
 
 
@@ -117,6 +119,7 @@ func save():
 		"health": health,
 		"birth_date": birth_date,
 		"extra_age": extra_age,
+		"inventory": inventory,
 	}
 	return save_dict
 
