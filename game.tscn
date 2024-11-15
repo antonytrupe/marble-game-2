@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=17 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" path="res://game.gd" id="1_2iwba"]
 [ext_resource type="Script" path="res://world.gd" id="1_6tkge"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://damvmfs7dqebu" path="res://bush/bush.tscn" id="3_u0r5y"]
 [ext_resource type="PackedScene" uid="uid://c1e46m2pfqiji" path="res://tree/tree.tscn" id="4_wywi7"]
 [ext_resource type="PackedScene" uid="uid://d2hkj68j5lp3w" path="res://acorn/acorn.gltf" id="7_0w8ut"]
+[ext_resource type="PackedScene" uid="uid://di4ln3kjrvrgq" path="res://acorn/acorn.tscn" id="7_1i78u"]
 [ext_resource type="Script" path="res://chunks.gd" id="7_eouhd"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_vl0i4"]
@@ -197,10 +198,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3342, 0, 15.3781)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.02497, 0, -4.95647)
 
 [node name="Tree1" parent="World/Flora" instance=ExtResource("4_wywi7")]
-transform = Transform3D(0.995136, 0, -0.0985093, 0, 1, 0, 0.0985093, 0, 0.995136, 6.24032, 0, 12.1065)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.24032, 0, 12.1065)
 
 [node name="Acorn" parent="World/Flora/Tree1" instance=ExtResource("7_0w8ut")]
-transform = Transform3D(1, 0, -2.98023e-08, 0, 1, 0, 2.98023e-08, 0, 1, -1.26158, 8.27468, -2.14988)
+transform = Transform3D(1, 0, -2.98023e-08, 0, 1, 0, 2.98023e-08, 0, 1, -1.26158, 8.27169, -2.14988)
+
+[node name="Acorn2" parent="World/Flora/Tree1" instance=ExtResource("7_1i78u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6862, 8.48391, -2.38845)
 
 [node name="Tree2" parent="World/Flora" instance=ExtResource("4_wywi7")]
 transform = Transform3D(0.680879, 0, 0.732396, 0, 1, 0, -0.732396, 0, 0.680879, 11.1828, 0, 7.49215)

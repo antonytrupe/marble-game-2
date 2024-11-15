@@ -4,7 +4,7 @@ extends Node3D
 @onready var world = %World
 @onready var dayNightCycle = %DayNightCycle
 
-const Chunk = preload("res://chunk.tscn")
+const ChunkResource = preload("res://chunk.tscn")
 
 
 # Called when the node enters the scene tree for the first time.
@@ -40,7 +40,7 @@ func _on_player_zoned(player: MarbleCharacter, chunk: Node3D):
 
 			var adj_chunk = get_node_or_null(adj_chunk_name)
 			if !adj_chunk:
-				var new_chunk = Chunk.instantiate()
+				var new_chunk = ChunkResource.instantiate()
 				new_chunk.position = Vector3(adj_x * 60, adj_y * 60, adj_z * 60)
 				new_chunk.name = adj_chunk_name
 				new_chunk.birth_date = Time.get_ticks_msec() + world.world_age

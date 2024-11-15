@@ -2,7 +2,7 @@
 extends Node3D
 
 #10 years
-@export var maturity: int = 1000 * 60 * 60 * 24 * 360 * (10 * .001)
+@export var maturity: int = int(1000 * 60 * 60 * 24 * 360 * (10 * .001))
 
 @export var birth_date: int = 0:
 	set = set_birth_date

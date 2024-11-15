@@ -73,6 +73,7 @@ func add_player(_peer_id, _player_id):
 		player.name = _player_id
 		player.player_id = _player_id
 		#TODO make sure player isn't colliding with existing player
+
 		players.add_child(player)
 
 
