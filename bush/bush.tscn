@@ -1,7 +1,8 @@
-[gd_scene load_steps=25 format=3 uid="uid://damvmfs7dqebu"]
+[gd_scene load_steps=26 format=3 uid="uid://damvmfs7dqebu"]
 
 [ext_resource type="Script" path="res://bush/bush.gd" id="1_mtdqb"]
 [ext_resource type="Script" path="res://bush/bush_staticbody.gd" id="2_ggt4o"]
+[ext_resource type="PackedScene" uid="uid://cc70lwfyjqg1d" path="res://age.tscn" id="3_qldcy"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_vjxuo"]
 radius = 1.0
@@ -147,3 +148,7 @@ shape = SubResource("CapsuleShape3D_olmtm")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_wxu3a")
+
+[node name="Node3D" parent="." node_paths=PackedStringArray("entity") instance=ExtResource("3_qldcy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.14011, 0)
+entity = NodePath("..")

@@ -10,13 +10,31 @@ extends Node3D
 	set = set_extra_age
 
 @onready var world = $/root/Game/World
+@onready var ageLabel = $Node3D
 
 var calculated_age: int:
 	get = calculate_age
 
 
+func save():
+	var save_dict = {
+		"transform": JSON3D.Transform3DtoDictionary(transform),
+		"birth_date": birth_date,
+		"extra_age": extra_age,
+	}
+	return save_dict
+
+
+func load(node_data):
+	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
+	if "birth_date" in node_data:
+		birth_date = node_data.birth_date
+	if "extra_age" in node_data:
+		extra_age = node_data.extra_age
+
+
 func time_warp(minutes):
-	print('tree time_warp')
+	print("tree time_warp")
 	extra_age = extra_age + 1000 * 60 * minutes
 
 

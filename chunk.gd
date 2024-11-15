@@ -15,10 +15,8 @@ var calculated_age: int:
 	get = calculate_age
 
 
-func _process(_delta):
-	#label.text = "birth date:" + str(birth_date) + "\n" + "extra age:" + str(extra_age) + "\n" + "calculated age:" + str(calculated_age) + "\n"
-	var age = GameTime.get_age_parts(calculated_age)
-	label.text = "%d years, %d months, %d days, %02d:%02d:%02d" % [age.years, age.months, age.days, age.hours, age.minutes, age.seconds]
+#func _process(_delta):
+	#label.text = GameTime.format(calculated_age)
 
 
 func set_birth_date(value):
