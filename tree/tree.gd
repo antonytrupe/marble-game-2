@@ -1,7 +1,8 @@
 #@tool
 extends Node3D
 
-@export var maturity: int = 1000 * 60 * 60 * 24 * 360 * 10
+#10 years
+@export var maturity: int = 1000 * 60 * 60 * 24 * 360 * (10 *.01)
 
 @export var birth_date: int = 0:
 	set = set_birth_date
@@ -20,7 +21,7 @@ func _ready() -> void:
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	#rotation.y += PI * delta * .1
 	var s = clampf(float(calculated_age) / maturity, .1, 1.0)
 	#s = .5

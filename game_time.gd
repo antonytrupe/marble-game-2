@@ -1,7 +1,7 @@
 extends Node
 
 
-func get_age_parts(agems):
+func get_age_parts(agems:int):
 	return {
 		"years": agems / (1000 * 60 * 60 * 24 * 30 * 360),
 		"months": (agems / (1000 * 60 * 60 * 24 * 30)) % 360,

@@ -1,13 +1,14 @@
 extends CharacterBody3D
 class_name MarbleCharacter
 
+@onready var game = $/root/Game
+@onready var world = $/root/Game/World
 @onready var ChatBubbles = $ChatBubbles
 @onready var cameraPivot = $CameraPivot
 @onready var camera = %Camera3D
 @onready var raycast = %RayCast3D
 @onready var anim_player = $AnimationPlayer
 @onready var chatTextEdit: TextEdit = $/root/Game/UI/HUD/ChatInput
-@onready var game = $/root/Game
 @onready var inventoryUI = %InventoryUI
 @onready var area3D = $Area3D
 @onready var characterSheet = $CharacterSheet
@@ -86,7 +87,7 @@ func set_extra_age(value):
 
 
 func calculate_age():
-	return game.server_age + extra_age + Time.get_ticks_msec() - birth_date
+	return world.world_age + extra_age + Time.get_ticks_msec() - birth_date
 
 
 func update_mode(new_mode):
@@ -99,17 +100,10 @@ func update_mode(new_mode):
 			anim_player.play_backwards("crouch")
 		else:
 			anim_player.play("RESET")
-	#if anim_player.current_animation == "shoot":
-	#pass
-	#elif input_dir != Vector2.ZERO and is_on_floor():
-	#anim_player.play("move")
-	#else:
-	#anim_player.play("idle")
 	mode = new_mode
 
 
 func load(node_data):
-	name = node_data["name"]
 	player_id = node_data["player_id"]
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
 	if "birth_date" in node_data:
@@ -121,9 +115,7 @@ func load(node_data):
 
 func save():
 	var save_dict = {
-		"filename": get_scene_file_path(),
-		"name": name,
-		"parent": get_parent().get_path(),
+		#
 		"player_id": player_id,
 		"transform": JSON3D.Transform3DtoDictionary(transform),
 		"health": health,

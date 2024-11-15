@@ -338,7 +338,7 @@ _data = {
 "fade": SubResource("Animation_77lh1")
 }
 
-[node name="Player" type="CharacterBody3D" groups=["Persist"]]
+[node name="Player" type="CharacterBody3D" groups=["persist"]]
 collision_layer = 2
 collision_mask = 15
 script = ExtResource("1_2v3wm")
@@ -368,7 +368,7 @@ blend_times = [&"RESET", &"RESET", 0.5, &"RESET", &"crouch", 0.5, &"RESET", &"hu
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_hn37q")
 
-[node name="ChatBubbles" type="Node3D" parent="."]
+[node name="ChatBubbles" type="Node3D" parent="." groups=["persist"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
 
 [node name="LeftArm" type="MeshInstance3D" parent="."]

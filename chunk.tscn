@@ -29,7 +29,7 @@ properties/2/path = NodePath(".:extra_age")
 properties/2/spawn = true
 properties/2/replication_mode = 2
 
-[node name="Chunk" type="Node3D" groups=["Persist"]]
+[node name="Chunk" type="Node3D"]
 script = ExtResource("1_icme5")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]

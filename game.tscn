@@ -1,5 +1,6 @@
-[gd_scene load_steps=14 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=16 format=3 uid="uid://c8oqxmm2w2wvv"]
 
+[ext_resource type="Script" path="res://game.gd" id="1_2iwba"]
 [ext_resource type="Script" path="res://world.gd" id="1_6tkge"]
 [ext_resource type="Script" path="res://chat_input.gd" id="3_3e53o"]
 [ext_resource type="PackedScene" uid="uid://cgfpsf73dbmvb" path="res://chunk.tscn" id="3_pdr6q"]
@@ -7,11 +8,17 @@
 [ext_resource type="PackedScene" uid="uid://damvmfs7dqebu" path="res://bush/bush.tscn" id="3_u0r5y"]
 [ext_resource type="PackedScene" uid="uid://c1e46m2pfqiji" path="res://tree/tree.tscn" id="4_wywi7"]
 [ext_resource type="PackedScene" uid="uid://d2hkj68j5lp3w" path="res://acorn/acorn.gltf" id="7_0w8ut"]
+[ext_resource type="Script" path="res://chunks.gd" id="7_eouhd"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_vl0i4"]
 properties/0/path = NodePath(".:turn_number")
 properties/0/spawn = true
 properties/0/replication_mode = 2
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_pnarc"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_jysef"]
+size = Vector2(30, 2)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jat3s"]
 sky_top_color = Color(0.242901, 0.450387, 0.729387, 1)
@@ -25,16 +32,8 @@ sky_material = SubResource("ProceduralSkyMaterial_jat3s")
 background_mode = 2
 sky = SubResource("Sky_bq4b2")
 
-[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_pnarc"]
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_jysef"]
-size = Vector2(30, 2)
-
-[node name="Game" type="Node" groups=["Persist"]]
-script = ExtResource("1_6tkge")
-
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-layer = 2
+[node name="Game" type="Node" groups=["persist"]]
+script = ExtResource("1_2iwba")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -167,76 +166,87 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 200, 0)
 [node name="ServerCamera3D" type="Camera3D" parent="CameraPivot"]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
 
-[node name="DayNightCycle" type="Node3D" parent="."]
+[node name="World" type="Node3D" parent="." groups=["persist"]]
+unique_name_in_owner = true
+script = ExtResource("1_6tkge")
+
+[node name="FloorStaticBody" type="StaticBody3D" parent="World"]
+
+[node name="FloorCollisionShape3D" type="CollisionShape3D" parent="World/FloorStaticBody"]
+shape = SubResource("WorldBoundaryShape3D_pnarc")
+
+[node name="Flora" type="Node3D" parent="World"]
+unique_name_in_owner = true
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="World/Flora"]
+spawn_path = NodePath("..")
+
+[node name="Bush1" parent="World/Flora" instance=ExtResource("3_u0r5y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.839271, 0, 5.12605)
+
+[node name="Bush2" parent="World/Flora" instance=ExtResource("3_u0r5y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.57794, 0, -1.10696)
+
+[node name="Bush3" parent="World/Flora" instance=ExtResource("3_u0r5y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5915, 0, 8.92817)
+
+[node name="Bush4" parent="World/Flora" instance=ExtResource("3_u0r5y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3342, 0, 15.3781)
+
+[node name="Bush5" parent="World/Flora" instance=ExtResource("3_u0r5y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.02497, 0, -4.95647)
+
+[node name="Tree1" parent="World/Flora" instance=ExtResource("4_wywi7")]
+transform = Transform3D(0.995136, 0, -0.0985093, 0, 1, 0, 0.0985093, 0, 0.995136, 6.24032, 0, 12.1065)
+
+[node name="Acorn" parent="World/Flora/Tree1" instance=ExtResource("7_0w8ut")]
+transform = Transform3D(1, 0, -2.98023e-08, 0, 1, 0, 2.98023e-08, 0, 1, -1.26158, 8.27468, -2.14988)
+
+[node name="Tree2" parent="World/Flora" instance=ExtResource("4_wywi7")]
+transform = Transform3D(0.680879, 0, 0.732396, 0, 1, 0, -0.732396, 0, 0.680879, 11.1828, 0, 7.49215)
+
+[node name="Fauna" type="Node3D" parent="World"]
+unique_name_in_owner = true
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="World/Fauna"]
+spawn_path = NodePath("..")
+
+[node name="Chunks" type="Node3D" parent="World"]
+unique_name_in_owner = true
+script = ExtResource("7_eouhd")
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="World/Chunks"]
+_spawnable_scenes = PackedStringArray("res://chunk.tscn")
+spawn_path = NodePath("..")
+
+[node name="[0,0,0]" parent="World/Chunks" groups=["persist"] instance=ExtResource("3_pdr6q")]
+unique_name_in_owner = true
+
+[node name="Players" type="Node3D" parent="World"]
+unique_name_in_owner = true
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="World/Players"]
+_spawnable_scenes = PackedStringArray("res://player.tscn")
+spawn_path = NodePath("..")
+
+[node name="30ftRuler" type="MeshInstance3D" parent="World"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+mesh = SubResource("PlaneMesh_jysef")
+skeleton = NodePath("../..")
+
+[node name="DayNightCycle" type="Node3D" parent="World"]
+unique_name_in_owner = true
 script = ExtResource("3_qlg17")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="DayNightCycle"]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="World/DayNightCycle"]
 environment = SubResource("Environment_cqcki")
 
-[node name="Sun" type="DirectionalLight3D" parent="DayNightCycle"]
+[node name="Sun" type="DirectionalLight3D" parent="World/DayNightCycle"]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, -0.707107, 0.707106, 0, -0.707106, -0.707107, 0, 0, 0)
 layers = 0
 light_color = Color(0.961513, 0.961513, 2.31028e-06, 1)
 shadow_enabled = true
-
-[node name="FloorStaticBody" type="StaticBody3D" parent="."]
-
-[node name="FloorCollisionShape3D" type="CollisionShape3D" parent="FloorStaticBody"]
-shape = SubResource("WorldBoundaryShape3D_pnarc")
-
-[node name="Chunks" type="Node3D" parent="."]
-
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Chunks"]
-_spawnable_scenes = PackedStringArray("res://chunk.tscn")
-spawn_path = NodePath("..")
-
-[node name="[0,0,0]" parent="Chunks" instance=ExtResource("3_pdr6q")]
-unique_name_in_owner = true
-
-[node name="Players" type="Node3D" parent="."]
-
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Players"]
-_spawnable_scenes = PackedStringArray("res://player.tscn")
-spawn_path = NodePath("..")
-
-[node name="30ftRuler" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
-mesh = SubResource("PlaneMesh_jysef")
-
-[node name="Flora" type="Node3D" parent="."]
-
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Flora"]
-spawn_path = NodePath("..")
-
-[node name="Bush1" parent="Flora" instance=ExtResource("3_u0r5y")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.839271, 0, 5.12605)
-
-[node name="Bush2" parent="Flora" instance=ExtResource("3_u0r5y")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.57794, 0, -1.10696)
-
-[node name="Bush3" parent="Flora" instance=ExtResource("3_u0r5y")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5915, 0, 8.92817)
-
-[node name="Bush4" parent="Flora" instance=ExtResource("3_u0r5y")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3342, 0, 15.3781)
-
-[node name="Bush5" parent="Flora" instance=ExtResource("3_u0r5y")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.02497, 0, -4.95647)
-
-[node name="Tree1" parent="Flora" instance=ExtResource("4_wywi7")]
-transform = Transform3D(0.995136, 0, -0.0985093, 0, 1, 0, 0.0985093, 0, 0.995136, 6.24032, 0, 12.1065)
-
-[node name="Acorn" parent="Flora/Tree1" instance=ExtResource("7_0w8ut")]
-transform = Transform3D(1, 0, -2.98023e-08, 0, 1, 0, 2.98023e-08, 0, 1, -1.26158, 8.27468, -2.14988)
-
-[node name="Tree2" parent="Flora" instance=ExtResource("4_wywi7")]
-transform = Transform3D(0.680879, 0, 0.732396, 0, 1, 0, -0.732396, 0, 0.680879, 11.1828, 0, 7.49215)
-
-[node name="Fauna" type="Node3D" parent="."]
-
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Fauna"]
-spawn_path = NodePath("..")
 
 [connection signal="pressed" from="UI/MainMenu/MarginContainer/VBoxContainer/HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="UI/MainMenu/MarginContainer/VBoxContainer/JoinButton" to="." method="_on_join_button_pressed"]

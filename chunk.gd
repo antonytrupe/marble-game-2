@@ -2,7 +2,7 @@ extends Node3D
 class_name Chunk
 
 @onready var label = $Label3D
-@onready var game = $"../.."
+@onready var world = $"/root/Game/World"
 
 @export var birth_date: int = 0:
 	set = set_birth_date
@@ -21,7 +21,7 @@ func set_extra_age(value):
 
 
 func calculate_age():
-	return game.server_age + extra_age + Time.get_ticks_msec() - birth_date
+	return world.world_age + extra_age + Time.get_ticks_msec() - birth_date
 
 
 func get_players():
@@ -35,16 +35,13 @@ func server_request_rest(minutes: int):
 		return
 	extra_age = extra_age + 1000 * 60 * minutes
 	#TODO tell all the players there was a timewarp
-	var players=get_players()
+	var players = get_players()
 	for p in players:
 		p.play_fade.rpc()
 
+
 func save():
 	var save_dict = {
-		"filename": get_scene_file_path(),
-		"name": name,
-		"parent": get_parent().get_path(),
-		#"path": get_path(),
 		"transform": JSON3D.Transform3DtoDictionary(transform),
 		"birth_date": birth_date,
 		"extra_age": extra_age,
@@ -53,7 +50,6 @@ func save():
 
 
 func load(node_data):
-	name = node_data["name"]
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
 	if "birth_date" in node_data:
 		birth_date = node_data.birth_date
