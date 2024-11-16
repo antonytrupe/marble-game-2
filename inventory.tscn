@@ -1,30 +1,60 @@
-[gd_scene load_steps=2 format=3 uid="uid://b1q2vj4f542ay"]
+[gd_scene load_steps=3 format=3 uid="uid://b1q2vj4f542ay"]
 
-[ext_resource type="Script" path="res://inventory.gd" id="1_0oxwt"]
+[ext_resource type="Texture2D" uid="uid://bb3815werq1yb" path="res://inventory9patch.png" id="1_cyvvh"]
+[ext_resource type="Script" path="res://inventory.gd" id="1_dlwpd"]
 
-[node name="PanelContainer" type="PanelContainer"]
+[node name="Control" type="Control"]
+self_modulate = Color(1, 1, 1, 0)
+z_index = -3
+z_as_relative = false
+layout_mode = 3
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -149.0
-offset_top = -232.0
-offset_right = 99.0
-offset_bottom = 117.0
+offset_left = -223.0
+offset_top = -202.0
+offset_right = 380.0
+offset_bottom = 192.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-script = ExtResource("1_0oxwt")
-
-[node name="MarginContainer" type="MarginContainer" parent="."]
-layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 6
+script = ExtResource("1_dlwpd")
 
-[node name="ItemList" type="VBoxContainer" parent="MarginContainer"]
+[node name="NinePatchRect" type="NinePatchRect" parent="."]
+show_behind_parent = true
+light_mask = 0
+z_index = -2
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_cyvvh")
+patch_margin_left = 22
+patch_margin_top = 22
+patch_margin_right = 23
+patch_margin_bottom = 22
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="NinePatchRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 23
+
+[node name="ItemList" type="VBoxContainer" parent="NinePatchRect/MarginContainer"]
+unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0

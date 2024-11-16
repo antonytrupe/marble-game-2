@@ -1,9 +1,9 @@
-extends PanelContainer
+extends Control
 
 @export var inventory: Dictionary = {}:
 	set = update_inventory
 
-@onready var list = $MarginContainer/ItemList
+@onready var list = %ItemList
 const inventory_slot_scene = preload("res://inventory_slot.tscn")
 
 var slots = {}
