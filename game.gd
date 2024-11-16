@@ -1,4 +1,4 @@
-extends Node
+extends Node3D
 
 const PORT = 9999
 var enet_peer = ENetMultiplayerPeer.new()
@@ -73,7 +73,24 @@ func add_player(_peer_id, _player_id):
 		player.name = _player_id
 		player.player_id = _player_id
 		#TODO make sure player isn't colliding with existing player
-
+		#PhysicsServer3D.space_get_direct_state(0)
+		get_world_3d().space.get_id()
+		#As per docs
+		var params: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
+		params.shape_rid = player.get_rid()
+		#print(player.get_rid())
+		#print(player.get_shape_owners())
+		params.shape = player
+		params.transform = player.transform
+		params.collide_with_bodies = true
+		params.collide_with_areas = true
+		var i = get_world_3d().direct_space_state.intersect_shape(params)
+		#var i = get_world_3d().direct_space_state.collide_shape(params)
+		print(i)
+		if i:
+			print("found overlap")
+		player.position.x = RandomNumberGenerator.new().randi_range(-5, 5)
+		player.position.z = RandomNumberGenerator.new().randi_range(-5, 5)
 		players.add_child(player)
 
 
@@ -118,9 +135,11 @@ func _ready():
 		#health_bar.hide()
 		serverCamera.show()
 		serverCamera.current = true
+		get_viewport().get_window().title += " - SERVER"
 	elif config.has("player_id"):
 		player_id = config["player_id"]
 		_on_join_button_pressed(config.remote_ip)
+		get_viewport().get_window().title += " - " + player_id
 
 
 func update_turn_number(value):
