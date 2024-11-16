@@ -212,19 +212,22 @@ func _unhandled_input(event):
 		else:
 			cancel_trade.rpc_id(1)
 
+	if Input.is_action_just_pressed("quit") and inventoryUI.visible:
+		#don't let this event bubble up
+		get_viewport().set_input_as_handled()
+
+		inventoryUI.hide()
+
 	if Input.is_action_just_pressed("chat"):
-		if !chatMode:
-			chatTextEdit.show()
+		chatTextEdit.visible = !chatTextEdit.visible
+		chatMode = !chatMode
+		if chatMode:
 			chatTextEdit.grab_focus()
-			chatMode = true
 		else:
-			chatTextEdit.hide()
 			chatTextEdit.release_focus()
 			print(chatTextEdit.text)
 			server_chat.rpc_id(1, chatTextEdit.text)
 			chatTextEdit.text = ""
-			chatMode = false
-		pass
 
 
 func _process(_delta):
