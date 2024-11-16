@@ -64,7 +64,7 @@ func pick_berry():
 		berries = berries - 1
 		#print(GlobalRandom.Items.berry)
 		var a = {berry = GlobalRandom.Items.berry}
-		a.berry.count = 1
+		a.berry.quantity = 1
 		#print(a)
 		return a
 	else:

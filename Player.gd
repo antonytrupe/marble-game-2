@@ -383,9 +383,9 @@ func server_action():
 func add_to_inventory(loot: Dictionary):
 	for item_name in loot:
 		if !inventory.has(item_name):
-			inventory[item_name] = {count = 0}
+			inventory[item_name] = {quantity = 0}
 		var item = loot[item_name]
-		inventory[item_name].count += item.count
+		inventory[item_name].quantity += item.quantity
 
 
 @rpc("any_peer")
