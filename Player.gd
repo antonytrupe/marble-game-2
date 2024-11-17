@@ -16,9 +16,15 @@ class_name MarbleCharacter
 @onready var fade_anim = %AnimationPlayer
 @onready var tradeUI = $TradeUI
 
-var tradeCharacter: CharacterBody3D
+var tradePartner: MarbleCharacter
+@export var otherTradeInventory = {}:
+	set = _update_other_trade_inventory
 var trading: bool = false:
 	set = set_trading
+@export var myTradeInventory = {}:
+	set = _update_trade_inventory
+@export var trade_accepted = false
+
 @export var health = 3
 @export var player_id: String
 ##how fast to go
@@ -46,6 +52,72 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chatMode = false
 
 
+func _update_other_trade_inventory(loot):
+	otherTradeInventory = loot
+	if tradeUI:
+		tradeUI.otherPlayerTrade = otherTradeInventory
+		tradeUI.update()
+
+
+func _update_trade_inventory(loot):
+	myTradeInventory = loot
+	if tradeUI:
+		tradeUI.update()
+	if tradePartner:
+		tradePartner.otherTradeInventory = loot
+
+
+#@rpc("call_remote")
+#func updateTradeUI():
+#tradeUI.otherPlayerTrade = otherTradeInventory
+#tradeUI.update()
+
+@rpc("any_peer")
+func accept_trade():
+	if !multiplayer.is_server():
+		return
+	trade_accepted = true
+	if trade_accepted and tradePartner.trade_accepted:
+		#swap loot
+		add_to_inventory(tradePartner.myTradeInventory)
+		tradePartner.remove_from_inventory(tradePartner.myTradeInventory)
+
+		tradePartner.add_to_inventory(myTradeInventory)
+		remove_from_inventory(myTradeInventory)
+
+		#clear stuff
+		tradePartner.trading = false
+
+		trading = false
+
+
+@rpc("any_peer")
+func remove_from_trade(loot: Dictionary):
+	if !multiplayer.is_server():
+		return
+	for item_name in loot:
+		var item = loot[item_name]
+		if item.quantity > 0:
+			myTradeInventory[item_name].quantity -= item.quantity
+		if myTradeInventory[item_name].quantity <= 0:
+			myTradeInventory.erase(item_name)
+	tradePartner.updateTradeUI.rpc()
+
+
+@rpc("any_peer")
+func add_to_trade(loot: Dictionary):
+	if not multiplayer.is_server():
+		return
+	for item_name in loot:
+		if !myTradeInventory.has(item_name):
+			myTradeInventory[item_name] = {quantity = 0}
+		#var item = loot[item_name]
+		myTradeInventory[item_name].quantity += loot[item_name].quantity
+	tradePartner.otherTradeInventory = myTradeInventory
+	#tradePartner.updateTradeUI.rpc()
+	#TODO check to make sure tradeinventory quantities don't go over inventory quantity
+
+
 func isCurrentPlayer():
 	return game and player_id and player_id == game.player_id
 
@@ -55,15 +127,24 @@ func set_trading(value):
 	#if the tradeui is ready and this is the current player
 	if tradeUI and isCurrentPlayer():
 		if trading:
+			tradeUI.otherPlayerTrade = otherTradeInventory
+			tradeUI.update()
 			tradeUI.show()
 		else:
 			tradeUI.hide()
+	if !trading:
+		tradePartner = null
+		trade_accepted = false
+		myTradeInventory = {}
+		otherTradeInventory = {}
 
 
 func _set_inventory(value: Dictionary):
 	inventory = value
 	if inventoryUI:
-		inventoryUI.inventory = inventory
+		inventoryUI.update()
+	if tradeUI:
+		tradeUI.update()
 
 
 #setter, don't call directly
@@ -148,7 +229,6 @@ func _on_new_turn(_turn_id):
 
 func _ready():
 	actionsUI.player_id = player_id
-	#inventoryUI.inventory = inventory
 	Signals.NewTurn.connect(_on_new_turn)
 	if isCurrentPlayer():
 		camera.current = true
@@ -225,7 +305,6 @@ func _unhandled_input(event):
 			chatTextEdit.grab_focus()
 		else:
 			chatTextEdit.release_focus()
-			print(chatTextEdit.text)
 			server_chat.rpc_id(1, chatTextEdit.text)
 			chatTextEdit.text = ""
 
@@ -292,7 +371,6 @@ func _physics_process(delta):
 @rpc("any_peer")
 func server_mode(new_mode: MOVE.MODE):
 	if !multiplayer.is_server():
-		print("someone trying to call server_mode")
 		return
 	#if we've used an action, no hustling/running
 	if !actions.action or [MOVE.MODE.CROUCH, MOVE.MODE.WALK].has(new_mode):
@@ -302,7 +380,6 @@ func server_mode(new_mode: MOVE.MODE):
 @rpc("any_peer")
 func time_warp(minutes: int):
 	if !multiplayer.is_server():
-		print("someone trying to call time_warp")
 		return
 
 	extra_age = extra_age + 1000 * 60 * minutes
@@ -315,7 +392,6 @@ func time_warp(minutes: int):
 @rpc("any_peer", "call_remote", "reliable", 1)
 func server_chat(message):
 	if !multiplayer.is_server():
-		print("someone trying to call server_chat")
 		return
 	client_chat.rpc(message)
 
@@ -324,7 +400,6 @@ func server_chat(message):
 @rpc("authority", "call_local", "reliable", 1)
 func client_chat(message):
 	if multiplayer.get_remote_sender_id() != 1:
-		print("someone else trying to call sendChat")
 		return
 	var bubble = load("res://ChatBubble.tscn").instantiate()
 	bubble.text = message
@@ -340,25 +415,25 @@ func server_rotate(value: Vector2):
 	cameraPivot.rotation.x = clamp(cameraPivot.rotation.x, -PI / 2, PI / 2)
 
 
-func start_trade(player):
+func start_trade(player: MarbleCharacter):
 	if !multiplayer.is_server():
 		return
-	print("me %s  them %s," % [player_id, player.player_id])
 	#open the trade window
 	trading = true
-	tradeCharacter = player
+	tradePartner = player
+	player.trading = true
+	player.tradePartner = self
 
 
 @rpc("any_peer")
 func cancel_trade():
 	if !multiplayer.is_server():
-		print("someone trying to call cancel_trade")
 		return
 
-	tradeCharacter.trading = false
-	tradeCharacter.tradeCharacter = null
+	tradePartner.trading = false
+	tradePartner.tradePartner = null
 	trading = false
-	tradeCharacter = null
+	tradePartner = null
 
 
 @rpc("any_peer")
@@ -384,11 +459,23 @@ func server_action():
 
 
 func add_to_inventory(loot: Dictionary):
+	if !multiplayer.is_server():
+		return
 	for item_name in loot:
 		if !inventory.has(item_name):
 			inventory[item_name] = {quantity = 0}
 		var item = loot[item_name]
 		inventory[item_name].quantity += item.quantity
+
+
+func remove_from_inventory(loot: Dictionary):
+	if !multiplayer.is_server():
+		return
+	for item_name in loot:
+		if !inventory.has(item_name):
+			inventory[item_name] = {quantity = 0}
+		var item = loot[item_name]
+		inventory[item_name].quantity -= item.quantity
 
 
 @rpc("any_peer")
@@ -402,7 +489,6 @@ func server_jump():
 @rpc("any_peer")
 func server_move(d):
 	if !multiplayer.is_server():
-		print("server_move not from server")
 		return
 	var direction = (transform.basis * Vector3(d.x, 0, d.y)).normalized()
 

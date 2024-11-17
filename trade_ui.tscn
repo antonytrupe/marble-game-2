@@ -27,21 +27,25 @@ theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 metadata/_edit_use_anchors_ = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
 layout_mode = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="Panel/MarginContainer/HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="OtherPlayerPanel" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="OtherPlayerContainer" type="MarginContainer" parent="Panel/MarginContainer/HBoxContainer/PanelContainer"]
+[node name="OtherPlayerContainer" type="MarginContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="NinePatchRect" type="NinePatchRect" parent="Panel/MarginContainer/HBoxContainer/PanelContainer/OtherPlayerContainer"]
+[node name="NinePatchRect" type="NinePatchRect" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/OtherPlayerContainer"]
 light_mask = 0
 layout_mode = 2
 texture = ExtResource("2_wi4fs")
@@ -52,7 +56,7 @@ patch_margin_bottom = 22
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/HBoxContainer/PanelContainer/OtherPlayerContainer/NinePatchRect"]
+[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/OtherPlayerContainer/NinePatchRect"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -64,32 +68,31 @@ theme_override_constants/margin_top = 25
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 23
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer/PanelContainer/OtherPlayerContainer/NinePatchRect/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/OtherPlayerContainer/NinePatchRect/MarginContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Panel/MarginContainer/HBoxContainer/PanelContainer/OtherPlayerContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/OtherPlayerContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 text = "Other Player Items"
 
-[node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/HBoxContainer/PanelContainer/OtherPlayerContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/OtherPlayerContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="OtherPlayerTrades" type="ItemList" parent="Panel/MarginContainer/HBoxContainer/PanelContainer/OtherPlayerContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="OtherPlayerTrades" type="ItemList" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/OtherPlayerContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
-item_count = 2
-item_0/text = "one"
-item_1/text = "two"
+size_flags_vertical = 3
 
-[node name="PanelContainer2" type="PanelContainer" parent="Panel/MarginContainer/HBoxContainer"]
+[node name="MyTradesPanel" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MyTradesContainer" type="MarginContainer" parent="Panel/MarginContainer/HBoxContainer/PanelContainer2"]
+[node name="MyTradesContainer" type="MarginContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel"]
 layout_mode = 2
 
-[node name="NinePatchRect" type="NinePatchRect" parent="Panel/MarginContainer/HBoxContainer/PanelContainer2/MyTradesContainer"]
+[node name="NinePatchRect" type="NinePatchRect" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer"]
 show_behind_parent = true
 light_mask = 0
 layout_mode = 2
@@ -101,7 +104,7 @@ patch_margin_bottom = 22
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/HBoxContainer/PanelContainer2/MyTradesContainer/NinePatchRect"]
+[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -113,35 +116,34 @@ theme_override_constants/margin_top = 25
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 23
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer/PanelContainer2/MyTradesContainer/NinePatchRect/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer"]
 layout_mode = 2
 
-[node name="My Trades" type="Label" parent="Panel/MarginContainer/HBoxContainer/PanelContainer2/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="My Trades" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 text = "My  Items"
 
-[node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/HBoxContainer/PanelContainer2/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="OtherPlayerTrades" type="ItemList" parent="Panel/MarginContainer/HBoxContainer/PanelContainer2/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="MyTrades" type="ItemList" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
-item_count = 2
-item_0/text = "one"
-item_1/text = "two"
+size_flags_vertical = 3
 
-[node name="PanelContainer3" type="PanelContainer" parent="Panel/MarginContainer/HBoxContainer"]
+[node name="MyItemsPanel" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="My Inventory" type="MarginContainer" parent="Panel/MarginContainer/HBoxContainer/PanelContainer3"]
+[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel"]
 layout_mode = 2
 
-[node name="VBoxContainer3" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer/PanelContainer3/My Inventory"]
+[node name="VBoxContainer3" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer"]
 layout_mode = 2
 
-[node name="NinePatchRect" type="NinePatchRect" parent="Panel/MarginContainer/HBoxContainer/PanelContainer3/My Inventory"]
+[node name="NinePatchRect" type="NinePatchRect" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer"]
 show_behind_parent = true
 light_mask = 0
 layout_mode = 2
@@ -153,7 +155,7 @@ patch_margin_bottom = 22
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/HBoxContainer/PanelContainer3/My Inventory/NinePatchRect"]
+[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -165,19 +167,31 @@ theme_override_constants/margin_top = 25
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 23
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer/PanelContainer3/My Inventory/NinePatchRect/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
 
-[node name="Label" type="Label" parent="Panel/MarginContainer/HBoxContainer/PanelContainer3/My Inventory/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "My Inventory"
 
-[node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/HBoxContainer/PanelContainer3/My Inventory/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="MyInventory" type="ItemList" parent="Panel/MarginContainer/HBoxContainer/PanelContainer3/My Inventory/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="MyInventory" type="ItemList" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
 max_columns = 2
 same_column_width = true
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Accept" type="Button" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 0
+text = "Accept"
+
+[connection signal="pressed" from="Panel/MarginContainer/VBoxContainer/HBoxContainer2/Accept" to="." method="_on_accept_pressed"]

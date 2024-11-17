@@ -1,16 +1,14 @@
-extends PanelContainer
+extends Button
 
 @export var item: String
 
 @export var quantity: int:
 	set = update_quantity
-@onready var label = $MarginContainer/Label
+@onready var label = $"."
 
 
 func update_quantity(q: int):
-	print(item)
 	quantity = q
-	print(quantity)
 	if label:
 		label.text = "%s x%s" % [item, str(quantity)]
 

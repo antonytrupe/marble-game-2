@@ -292,9 +292,12 @@ properties/11/replication_mode = 2
 properties/12/path = NodePath(".:trading")
 properties/12/spawn = true
 properties/12/replication_mode = 2
-properties/13/path = NodePath(".:tradeCharacter")
+properties/13/path = NodePath(".:otherTradeInventory")
 properties/13/spawn = true
 properties/13/replication_mode = 2
+properties/14/path = NodePath(".:myTradeInventory")
+properties/14/spawn = true
+properties/14/replication_mode = 2
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_wv48c"]
 radius = 0.1
@@ -408,9 +411,10 @@ visible = false
 target_position = Vector3(0, 0, -300)
 collision_mask = 14
 
-[node name="InventoryUI" parent="." instance=ExtResource("2_vrrxi")]
+[node name="InventoryUI" parent="." node_paths=PackedStringArray("player") instance=ExtResource("2_vrrxi")]
 unique_name_in_owner = true
 visible = false
+player = NodePath("..")
 
 [node name="CharacterSheet" parent="." instance=ExtResource("3_eahd0")]
 unique_name_in_owner = true
@@ -436,7 +440,8 @@ libraries = {
 "": SubResource("AnimationLibrary_auoph")
 }
 
-[node name="TradeUI" parent="." instance=ExtResource("5_32ebk")]
+[node name="TradeUI" parent="." node_paths=PackedStringArray("me") instance=ExtResource("5_32ebk")]
 visible = false
+me = NodePath("..")
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
