@@ -11,6 +11,22 @@ var calculated_age: int:
 	get = calculate_age
 
 
+func pick_up():
+	hide()
+	queue_free()
+	return {
+		stone =
+		{
+			#
+			quantity = 1,
+		}
+	}
+
+
+func get_actions():
+	return ["pick_up", "knap"]
+
+
 func set_birth_date(value):
 	birth_date = value
 

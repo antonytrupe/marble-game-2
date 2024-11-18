@@ -28,6 +28,9 @@ var rng = RandomNumberGenerator.new()
 	$BushMeshInstance3D/BerryMeshInstance3D9,
 ]
 
+func get_actions():
+	return ['pick_berry']
+
 
 func set_birth_date(value):
 	birth_date = value

@@ -441,6 +441,10 @@ func cancel_trade():
 	tradePartner = null
 
 
+func get_actions():
+	return ["trade"]
+
+
 @rpc("any_peer")
 func server_action():
 	if !multiplayer.is_server():
@@ -448,6 +452,7 @@ func server_action():
 
 	if raycast.is_colliding():
 		var entity = raycast.get_collider()
+		print(entity)
 
 		if entity.has_method("start_trade"):
 			start_trade(entity)
@@ -461,6 +466,15 @@ func server_action():
 			var loot = entity.pick_berry()
 			add_to_inventory(loot)
 			set_action({"action": "pick_berry"})
+
+		if entity.has_method("pick_up"):
+			var action = "pick_up"
+			# make actions.action always a string
+			if actions.action != null and actions.action != action:
+				return
+			var loot = entity.pick_up()
+			add_to_inventory(loot)
+			set_action({"action": "pick_up"})
 
 
 func add_to_inventory(loot: Dictionary):

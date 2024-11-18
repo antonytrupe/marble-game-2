@@ -139,11 +139,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55841, 1.05764, 0.555924)
 mesh = SubResource("SphereMesh_gs0sy")
 surface_material_override/0 = SubResource("StandardMaterial3D_v7oee")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="."]
+[node name="StaticBody3D" type="StaticBody3D" parent="." node_paths=PackedStringArray("root")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 collision_layer = 4
 collision_mask = 0
 script = ExtResource("2_ggt4o")
+root = NodePath("..")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.372366, 0)
@@ -152,6 +153,6 @@ shape = SubResource("CapsuleShape3D_olmtm")
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_wxu3a")
 
-[node name="Node3D" parent="." node_paths=PackedStringArray("entity") instance=ExtResource("3_qldcy")]
+[node name="Age" parent="." node_paths=PackedStringArray("entity") instance=ExtResource("3_qldcy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.14011, 0)
 entity = NodePath("..")
