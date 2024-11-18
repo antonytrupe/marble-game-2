@@ -97,6 +97,7 @@ func start_server():
 	enet_peer.create_server(PORT)
 	multiplayer.multiplayer_peer = enet_peer
 	load_game()
+	print("started server")
 
 
 func server_disconnected():
@@ -209,6 +210,7 @@ func _ready():
 		player_id = config["player_id"]
 		_on_join_button_pressed(config.remote_ip)
 		get_viewport().get_window().title += " - " + player_id
+		print('started client')
 
 
 func update_turn_number(value):
