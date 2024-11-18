@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://b1q2vj4f542ay"]
 
-[ext_resource type="Texture2D" uid="uid://bb3815werq1yb" path="res://inventory9patch.png" id="1_cyvvh"]
+[ext_resource type="Texture2D" uid="uid://dvbfdyrl8lg37" path="res://inventory9patch.png" id="1_cyvvh"]
 [ext_resource type="Script" path="res://inventory.gd" id="1_dlwpd"]
 
 [node name="Control" type="Control"]

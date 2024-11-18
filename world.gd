@@ -1,9 +1,5 @@
 extends Node3D
-
-#@onready var game = $/root/Game
-#@onready var players = %Players
-#@onready var Chunks = %Chunks
-#@onready var dayNightCycle = %DayNightCycle
+class_name World
 
 @export var world_age: int = 0
 

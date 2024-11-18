@@ -1,8 +1,8 @@
 extends CharacterBody3D
 class_name MarbleCharacter
 
-@onready var game = $/root/Game
-@onready var world = $/root/Game/World
+@onready var game: Game = $/root/Game
+@onready var world: World = $/root/Game/World
 @onready var ChatBubbles = $ChatBubbles
 @onready var cameraPivot = $CameraPivot
 @onready var camera = %Camera3D
@@ -17,9 +17,10 @@ class_name MarbleCharacter
 @onready var tradeUI = $TradeUI
 
 var tradePartner: MarbleCharacter
+#we need otherTradeInventory on the client side because we can't sync tradePartner
 @export var otherTradeInventory = {}:
 	set = _update_other_trade_inventory
-var trading: bool = false:
+@export var trading: bool = false:
 	set = set_trading
 @export var myTradeInventory = {}:
 	set = _update_trade_inventory
@@ -390,10 +391,14 @@ func time_warp(minutes: int):
 
 #this is the function that runs on the server that any peer can call
 @rpc("any_peer", "call_remote", "reliable", 1)
-func server_chat(message):
+func server_chat(message: String):
 	if !multiplayer.is_server():
 		return
-	client_chat.rpc(message)
+	if message.begins_with("/"):
+		#print("command", self)
+		game.command(message, self)
+	else:
+		client_chat.rpc(message)
 
 
 #this the function that runs on all the peers that only the server can call

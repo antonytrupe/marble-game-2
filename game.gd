@@ -1,10 +1,13 @@
 extends Node3D
+class_name Game
 
 const PORT = 9999
 var enet_peer = ENetMultiplayerPeer.new()
 
 @onready var main_menu = $UI/MainMenu
 @onready var hud = $UI/HUD
+@onready var terra = %Terra
+@onready var flora = %Flora
 @onready var turnNumberLabel = %TurnNumber
 @onready var turnTimer = %TurnTimer
 @onready var serverCamera = $CameraPivot/ServerCamera3D
@@ -22,6 +25,43 @@ var player_id: String
 #var players = {}
 
 const Player = preload("res://player.tscn")
+const Stone = preload("res://stone/stone.tscn")
+const Acorn = preload("res://acorn/acorn.tscn")
+const Bush = preload("res://bush/bush.tscn")
+const Tree_ = preload("res://tree/tree.tscn")
+
+
+func command(cmd: String, player: MarbleCharacter):
+	if !multiplayer.is_server():
+		return
+	#print("server game command:", cmd)
+	var parts = cmd.replace("/", "").split(" ")
+	#print(parts)
+	match parts[0]:
+		"spawn", "/spawn":
+			#print("spawn")
+			match parts[1]:
+				"stone", "stones":
+					print("spawn stones")
+					var stone = Stone.instantiate()
+					stone.name = stone.name + "%010d" % RandomNumberGenerator.new().randi()
+					stone.position = player.position
+					terra.add_child(stone)
+				"acorn":
+					var acorn = Acorn.instantiate()
+					acorn.name = acorn.name + "%010d" % RandomNumberGenerator.new().randi()
+					acorn.position = player.position
+					flora.add_child(acorn)
+				"bush":
+					var bush = Bush.instantiate()
+					bush.name = bush.name + "%010d" % RandomNumberGenerator.new().randi()
+					bush.position = player.position
+					flora.add_child(bush)
+				"tree","trees":
+					var tree = Tree_.instantiate()
+					tree.name = tree.name + "%010d" % RandomNumberGenerator.new().randi()
+					tree.position = player.position
+					flora.add_child(tree)
 
 
 func start_server():

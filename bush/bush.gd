@@ -78,10 +78,11 @@ func _ready() -> void:
 
 func setup():
 	for i in range(0, 9):
-		if i < berries:
+		if i < berries and b:
 			b[i].show()
 		else:
-			b[i].hide()
+			if b:
+				b[i].hide()
 
 
 func _process(_delta):

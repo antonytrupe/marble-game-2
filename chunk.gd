@@ -6,8 +6,8 @@ class_name Chunk
 @export var extra_age: int = 0:
 	set = set_extra_age
 
-@onready var label = $Label3D
-@onready var world = $"/root/Game/World"
+@onready var label = %AgeLabel
+@onready var world = $/root/Game/World
 @onready var floraFaunaScanner = %FloraFaunaScanner
 @onready var playerScanner = %PlayerScanner
 

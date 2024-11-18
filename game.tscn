@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=16 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" path="res://game.gd" id="1_2iwba"]
 [ext_resource type="Script" path="res://world.gd" id="1_6tkge"]
@@ -7,7 +7,6 @@
 [ext_resource type="Script" path="res://day_night_cycle.gd" id="3_qlg17"]
 [ext_resource type="PackedScene" uid="uid://damvmfs7dqebu" path="res://bush/bush.tscn" id="3_u0r5y"]
 [ext_resource type="PackedScene" uid="uid://c1e46m2pfqiji" path="res://tree/tree.tscn" id="4_wywi7"]
-[ext_resource type="PackedScene" uid="uid://d2hkj68j5lp3w" path="res://acorn/acorn.gltf" id="7_0w8ut"]
 [ext_resource type="PackedScene" uid="uid://di4ln3kjrvrgq" path="res://acorn/acorn.tscn" id="7_1i78u"]
 [ext_resource type="Script" path="res://chunks.gd" id="7_eouhd"]
 
@@ -181,13 +180,11 @@ shape = SubResource("WorldBoundaryShape3D_pnarc")
 unique_name_in_owner = true
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="World/Flora"]
+_spawnable_scenes = PackedStringArray("res://bush/bush.tscn", "res://acorn/acorn.tscn", "res://tree/tree.tscn")
 spawn_path = NodePath("..")
 
 [node name="Bush1" parent="World/Flora" instance=ExtResource("3_u0r5y")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.839271, 0, 5.12605)
-
-[node name="Bush2" parent="World/Flora" instance=ExtResource("3_u0r5y")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.57794, 0, -1.10696)
 
 [node name="Bush3" parent="World/Flora" instance=ExtResource("3_u0r5y")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5915, 0, 8.92817)
@@ -200,9 +197,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.02497, 0, -4.95647)
 
 [node name="Tree1" parent="World/Flora" instance=ExtResource("4_wywi7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.24032, 0, 12.1065)
-
-[node name="Acorn" parent="World/Flora/Tree1" instance=ExtResource("7_0w8ut")]
-transform = Transform3D(1, 0, -2.98023e-08, 0, 1, 0, 2.98023e-08, 0, 1, -1.26158, 8.27169, -2.14988)
 
 [node name="Acorn2" parent="World/Flora/Tree1" instance=ExtResource("7_1i78u")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6862, 8.48391, -2.38845)
@@ -252,6 +246,13 @@ transform = Transform3D(1, 0, 0, 0, -0.707107, 0.707106, 0, -0.707106, -0.707107
 layers = 0
 light_color = Color(0.961513, 0.961513, 2.31028e-06, 1)
 shadow_enabled = true
+
+[node name="Terra" type="Node3D" parent="World"]
+unique_name_in_owner = true
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="World/Terra"]
+_spawnable_scenes = PackedStringArray("res://stone/stone.tscn")
+spawn_path = NodePath("..")
 
 [connection signal="pressed" from="UI/MainMenu/MarginContainer/VBoxContainer/HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="UI/MainMenu/MarginContainer/VBoxContainer/JoinButton" to="." method="_on_join_button_pressed"]

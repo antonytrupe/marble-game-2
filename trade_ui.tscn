@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://j5ugiqe5hl32"]
 
 [ext_resource type="Script" path="res://trade_ui.gd" id="1_iclyp"]
-[ext_resource type="Texture2D" uid="uid://bb3815werq1yb" path="res://inventory9patch.png" id="2_wi4fs"]
+[ext_resource type="Texture2D" uid="uid://dvbfdyrl8lg37" path="res://inventory9patch.png" id="2_wi4fs"]
 
 [node name="TradeUI" type="Node2D"]
 script = ExtResource("1_iclyp")

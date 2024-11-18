@@ -10,7 +10,6 @@ making fire
 skills
 xp
 quest system
-trading
 regrowing acorns
 dropping acorns
 germinating acorns
