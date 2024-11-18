@@ -14,13 +14,12 @@ properties/0/spawn = true
 properties/0/replication_mode = 1
 
 [node name="Stone" type="Node3D" groups=["persist"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.100492, 0)
 script = ExtResource("1_qlija")
 
 [node name="RigidBody3D" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.000121634, 0)
 shape = SubResource("SphereShape3D_gvsq1")
 
 [node name="CSGSphere3D" type="CSGSphere3D" parent="RigidBody3D"]

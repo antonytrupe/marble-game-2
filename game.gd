@@ -43,10 +43,9 @@ func command(cmd: String, player: MarbleCharacter):
 			var rng = RandomNumberGenerator.new()
 			match parts[1]:
 				"stone", "stones":
-					print("spawn stones")
 					var count = 1
 					if parts.size() >= 3:
-						count = parts[2]
+						count = int(parts[2])
 					count = clampi(count, 1, 10)
 					for i in count:
 						var stone = Stone.instantiate()
@@ -56,7 +55,7 @@ func command(cmd: String, player: MarbleCharacter):
 				"acorn":
 					var count = 1
 					if parts.size() >= 3:
-						count = parts[2]
+						count = int(parts[2])
 					count = clampi(count, 1, 10)
 					for i in count:
 						var acorn = Acorn.instantiate()
@@ -66,7 +65,7 @@ func command(cmd: String, player: MarbleCharacter):
 				"bush":
 					var count = 1
 					if parts.size() >= 3:
-						count = parts[2]
+						count = int(parts[2])
 					count = clampi(count, 1, 10)
 					for i in count:
 						var bush = Bush.instantiate()
@@ -76,7 +75,7 @@ func command(cmd: String, player: MarbleCharacter):
 				"tree", "trees":
 					var count = 1
 					if parts.size() >= 3:
-						count = parts[2]
+						count = int(parts[2])
 					count = clampi(count, 1, 10)
 					for i in count:
 						var tree = Tree_.instantiate()
@@ -85,13 +84,13 @@ func command(cmd: String, player: MarbleCharacter):
 						flora.add_child(tree)
 
 
-func get_random_vector(R: float, center: Vector3) -> Vector2:
+func get_random_vector(R: float, center: Vector3) -> Vector3:
 	var rng = RandomNumberGenerator.new()
 	var r = R * sqrt(rng.randf())
 	var theta = rng.randf() * 2 * PI
 	var x = center.x + r * cos(theta)
-	var y = center.y + r * sin(theta)
-	return Vector2(x, y)
+	var z = center.z + r * sin(theta)
+	return Vector3(x, 0, z)
 
 
 func start_server():
