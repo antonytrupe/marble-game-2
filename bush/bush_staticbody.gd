@@ -1,6 +1,6 @@
 extends StaticBody3D
 
-@onready var root = $".."
+@export var root :Node3D
 
 
 func pick_berry():
