@@ -136,6 +136,7 @@ func send_world_age(_world_age):
 
 
 func add_player(_peer_id, _player_id):
+	print("%s connected" % _player_id)
 	#first check if this player already has a node
 	var player = players.get_node_or_null(_player_id)
 	if !player:
@@ -171,14 +172,16 @@ func _ready():
 	# Load data from a file.
 	#var err = config.load("user://config.cfg")
 	var err = configFile.load("res://config.cfg")
-
+	var f = FileAccess.open("user://config.cfg", FileAccess.WRITE)
+	#f.flush()
+	print(f.get_path_absolute())
 	# If the file didn't load, ignore it.
 	if err != OK:
 		print("error reading config file")
 
 	var config = {}
-	config.player_id = configFile.get_value("default", "player_id", null)
-	config.remote_ip = configFile.get_value("default", "remote_ip", null)
+	config.player_id = configFile.get_value("default", "player_id", "")
+	config.remote_ip = configFile.get_value("default", "remote_ip", "")
 	config.server = configFile.get_value("default", "server", false)
 
 	print("config:", config)
@@ -210,7 +213,9 @@ func _ready():
 		player_id = config["player_id"]
 		_on_join_button_pressed(config.remote_ip)
 		get_viewport().get_window().title += " - " + player_id
-		print('started client')
+		print("started client")
+	else:
+		print("not a client nor a server")
 
 
 func update_turn_number(value):
