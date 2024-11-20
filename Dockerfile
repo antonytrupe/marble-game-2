@@ -39,10 +39,11 @@ RUN wget https://downloads.tuxfamily.org/godotengine/4.3/mono/Godot_v4.3-stable_
 
 #download templates
 # RUN wget https://github.com/godotengine/godot-builds/releases/download/4.3-stable/Godot_v4.3-stable_mono_export_templates.tpz
-# RUN mkdir -p /root/.local/share/godot/export_templates/
+RUN mkdir -p /root/.local/share/godot/export_templates/
 # RUN unzip Godot_v4.3-stable_mono_export_templates.tpz -d /root/.local/share/godot/export_templates/
 # RUN rm Godot_v4.3-stable_mono_export_templates.tpz
 # RUN mv /root/.local/share/godot/export_templates/templates/ /root/.local/share/godot/export_templates/4.3.stable.mono/
+COPY ./linux-server-export-template/ /root/.local/share/godot/export_templates/4.3.stable.mono/
 
 # Copy your Godot project
 COPY . /app
