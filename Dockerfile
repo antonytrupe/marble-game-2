@@ -91,4 +91,4 @@ COPY --from=build /app/export/linux-server /app
 # Command to run the release export
 # CMD ["./your_project.x86_64"]
 # CMD ["sleep", "infinity"]
-ENTRYPOINT ["/app/MarbleGame.sh","--","--server=true"]
+CMD ["/app/MarbleGame.sh","--","--server=true"]
