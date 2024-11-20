@@ -30,7 +30,7 @@ gdscript/warnings/integer_division=0
 
 [dotnet]
 
-project/assembly_name="Marble Game"
+project/assembly_name="MarbleGame"
 
 [global_group]
 
