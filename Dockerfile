@@ -45,17 +45,15 @@ RUN mkdir -p /root/.local/share/godot/export_templates/
 # RUN mv /root/.local/share/godot/export_templates/templates/ /root/.local/share/godot/export_templates/4.3.stable.mono/
 COPY ./linux-server-export-template/ /root/.local/share/godot/export_templates/4.3.stable.mono/
 
-
-
 # Copy your Godot project
-COPY . /app
+COPY . /app/
 
 RUN chmod +x ./Godot_v4.3-stable_mono_linux_x86_64/Godot_v4.3-stable_mono_linux.x86_64
 
 WORKDIR /app
 
 # Build the release export
-RUN /opt/godot/Godot_v4.3-stable_mono_linux_x86_64/Godot_v4.3-stable_mono_linux.x86_64 --headless --path /app/ --export-release "linux-server"  -v 
+RUN /opt/godot/Godot_v4.3-stable_mono_linux_x86_64/Godot_v4.3-stable_mono_linux.x86_64 --headless --export-release "linux-server"  -v 
 
 FROM base AS deploy
 
