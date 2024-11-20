@@ -28,6 +28,10 @@ GlobalRandom="*res://global_random.gd"
 file_logging/enable_file_logging=true
 gdscript/warnings/integer_division=0
 
+[dotnet]
+
+project/assembly_name="MarbleGame"
+
 [global_group]
 
 flora=""
