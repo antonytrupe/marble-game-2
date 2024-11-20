@@ -37,13 +37,12 @@ RUN wget https://downloads.tuxfamily.org/godotengine/4.3/mono/Godot_v4.3-stable_
     && unzip Godot_v4.3-stable_mono_linux_x86_64.zip \
     && rm Godot_v4.3-stable_mono_linux_x86_64.zip
 
-#/root/.local/share/godot/export_templates/4.3.stable.mono/linux_release.x86_64
-RUN wget https://github.com/godotengine/godot-builds/releases/download/4.3-stable/Godot_v4.3-stable_mono_export_templates.tpz
-RUN mkdir -p /root/.local/share/godot/export_templates/
-RUN unzip Godot_v4.3-stable_mono_export_templates.tpz -d /root/.local/share/godot/export_templates/
-RUN rm Godot_v4.3-stable_mono_export_templates.tpz
-
-RUN mv /root/.local/share/godot/export_templates/templates/ /root/.local/share/godot/export_templates/4.3.stable.mono/
+#download templates
+# RUN wget https://github.com/godotengine/godot-builds/releases/download/4.3-stable/Godot_v4.3-stable_mono_export_templates.tpz
+# RUN mkdir -p /root/.local/share/godot/export_templates/
+# RUN unzip Godot_v4.3-stable_mono_export_templates.tpz -d /root/.local/share/godot/export_templates/
+# RUN rm Godot_v4.3-stable_mono_export_templates.tpz
+# RUN mv /root/.local/share/godot/export_templates/templates/ /root/.local/share/godot/export_templates/4.3.stable.mono/
 
 # Copy your Godot project
 COPY . /app
@@ -51,9 +50,6 @@ COPY . /app
 RUN chmod +x ./Godot_v4.3-stable_mono_linux_x86_64/Godot_v4.3-stable_mono_linux.x86_64
 # Build the release export
 RUN /opt/godot/Godot_v4.3-stable_mono_linux_x86_64/Godot_v4.3-stable_mono_linux.x86_64 --headless --path /app/ --export-release "linux-server"  -v 
-# RUN pwd
-# Expose the port
-
 
 FROM base AS deploy
 
