@@ -54,6 +54,8 @@ RUN chmod +x ./Godot_v4.3-stable_mono_linux_x86_64/Godot_v4.3-stable_mono_linux.
 
 WORKDIR /app
 
+RUN echo $(ls -1 /app)
+
 # Build the release export
 RUN /opt/godot/Godot_v4.3-stable_mono_linux_x86_64/Godot_v4.3-stable_mono_linux.x86_64 --headless --export-release "linux-server"  -v 
 
