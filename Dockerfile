@@ -14,6 +14,8 @@ RUN apt-get install -y \
     wget \
     unzip
 RUN apt-get install -y dotnet-sdk-8.0
+
+RUN apt-get install -y libfontconfig1
 # RUN apt-get install -y mono-devel
 
 # RUN apt-get install -y Xlib
