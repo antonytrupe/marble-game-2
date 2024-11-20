@@ -32,15 +32,6 @@ gdscript/warnings/integer_division=0
 
 project/assembly_name="Marble Game"
 
-[editor]
-
-version_control/plugin_name="GitPlugin"
-version_control/autoload_on_startup=true
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/gdscript_formatter/plugin.cfg", "res://addons/terrain_3d/plugin.cfg")
-
 [global_group]
 
 flora=""
