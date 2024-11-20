@@ -95,4 +95,4 @@ RUN echo $(ls -1 /app)
 # Command to run the release export
 # CMD ["./your_project.x86_64"]
 # CMD ["sleep", "infinity"]
-CMD ["/app/MarbleGame.sh","--","--server=true"]
+CMD ["/app/MarbleGame.x86_64","--","--server=true"]
