@@ -61,6 +61,8 @@ RUN mkdir -p /app/export/linux-server
 # Build the release export
 RUN /opt/godot/Godot_v4.3-stable_mono_linux_x86_64/Godot_v4.3-stable_mono_linux.x86_64 --headless --export-release "linux-server"  -v 
 
+RUN echo $(ls -1 /app/export/linux-server)
+
 FROM base AS deploy
 
 RUN apt-get install -y libicu-dev
@@ -78,6 +80,8 @@ EXPOSE 9999/udp
 ENV PORT 9999
 
 COPY --from=build /app/export/linux-server /app
+RUN echo $(ls -1 /app)
+
 # COPY project.godot /app/
 
 # COPY server.cfg /app/
