@@ -75,6 +75,8 @@ WORKDIR /app
 EXPOSE 9999
 EXPOSE 9999/udp
 
+ENV PORT 9999
+
 COPY --from=build /app/export/linux-server /app
 # COPY project.godot /app/
 
