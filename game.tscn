@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=17 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" path="res://game.gd" id="1_2iwba"]
 [ext_resource type="Script" path="res://world.gd" id="1_6tkge"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://c1e46m2pfqiji" path="res://tree/tree.tscn" id="4_wywi7"]
 [ext_resource type="PackedScene" uid="uid://di4ln3kjrvrgq" path="res://acorn/acorn.tscn" id="7_1i78u"]
 [ext_resource type="Script" path="res://chunks.gd" id="7_eouhd"]
+[ext_resource type="Script" path="res://startupProbe.gd" id="10_mnyh5"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_vl0i4"]
 properties/0/path = NodePath(".:turn_number")
@@ -253,6 +254,9 @@ unique_name_in_owner = true
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="World/Terra"]
 _spawnable_scenes = PackedStringArray("res://stone/stone.tscn")
 spawn_path = NodePath("..")
+
+[node name="startupProbe" type="Node" parent="."]
+script = ExtResource("10_mnyh5")
 
 [connection signal="pressed" from="UI/MainMenu/MarginContainer/VBoxContainer/HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="UI/MainMenu/MarginContainer/VBoxContainer/JoinButton" to="." method="_on_join_button_pressed"]

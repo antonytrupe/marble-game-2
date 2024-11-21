@@ -77,7 +77,7 @@ WORKDIR /app
 EXPOSE 9999
 EXPOSE 9999/udp
 
-ENV PORT 9999
+ENV PORT=9999
 
 COPY --from=build /app/export/linux-server /app
 RUN echo $(ls -1 /app)
