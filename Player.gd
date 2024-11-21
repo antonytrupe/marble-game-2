@@ -3,18 +3,19 @@ class_name MarbleCharacter
 
 @onready var game: Game = $/root/Game
 @onready var world: World = $/root/Game/World
-@onready var ChatBubbles = $ChatBubbles
+@onready var chatTextEdit: TextEdit = $/root/Game/UI/HUD/ChatInput
+@onready var ChatBubbles = %ChatBubbles
 @onready var cameraPivot = $CameraPivot
 @onready var camera = %Camera3D
 @onready var raycast = %RayCast3D
 @onready var anim_player = $AnimationPlayer
-@onready var chatTextEdit: TextEdit = $/root/Game/UI/HUD/ChatInput
 @onready var inventoryUI = %InventoryUI
 @onready var chunkScanner = %ChunkScanner
-@onready var characterSheet = $CharacterSheet
+@onready var characterSheet = %CharacterSheet
 @onready var actionsUI = %ActionsUI
 @onready var fade_anim = %AnimationPlayer
-@onready var tradeUI = $TradeUI
+@onready var tradeUI = %TradeUI
+@onready var craftUI = %CraftUI
 
 var tradePartner: MarbleCharacter
 #we need otherTradeInventory on the client side because we can't sync tradePartner
@@ -52,6 +53,12 @@ const JUMP_VELOCITY = 5.0
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chatMode = false
 
+
+@rpc("any_peer")
+func craft(loot: Dictionary):
+	if not multiplayer.is_server():
+		return
+	print('craft:',loot)
 
 func _update_other_trade_inventory(loot):
 	otherTradeInventory = loot
@@ -264,6 +271,9 @@ func _unhandled_input(event):
 	if Input.is_action_just_pressed("inventory"):
 		inventoryUI.visible = !inventoryUI.visible
 
+	if Input.is_action_just_pressed("craft"):
+		craftUI.visible = !craftUI.visible
+
 	if Input.is_action_just_pressed("character_sheet"):
 		characterSheet.visible = !characterSheet.visible
 
@@ -450,6 +460,9 @@ func server_action():
 	if !multiplayer.is_server():
 		return
 
+	if trading:
+		cancel_trade()
+		return
 	if raycast.is_colliding():
 		var entity = raycast.get_collider()
 		print(entity)

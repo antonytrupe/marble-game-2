@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=22 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_2v3wm"]
 [ext_resource type="Texture2D" uid="uid://2jputlhry6c" path="res://crosshair.png" id="2_2ojr1"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://dyx3xv5lckl7h" path="res://character_sheet.tscn" id="3_eahd0"]
 [ext_resource type="PackedScene" uid="uid://d35hxvmomxu3p" path="res://actions.tscn" id="4_72q5g"]
 [ext_resource type="PackedScene" uid="uid://j5ugiqe5hl32" path="res://trade_ui.tscn" id="5_32ebk"]
+[ext_resource type="PackedScene" uid="uid://cyyfjbicwvflj" path="res://craft_ui.tscn" id="7_ncuea"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_x3s4a"]
 resource_local_to_scene = true
@@ -381,6 +382,7 @@ blend_times = [&"RESET", &"RESET", 0.5, &"RESET", &"crouch", 0.5, &"RESET", &"hu
 replication_config = SubResource("SceneReplicationConfig_hn37q")
 
 [node name="ChatBubbles" type="Node3D" parent="." groups=["persist"]]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
 
 [node name="LeftArm" type="MeshInstance3D" parent="."]
@@ -443,7 +445,7 @@ visible = false
 unique_name_in_owner = true
 visible = false
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="SleepFade" type="ColorRect" parent="."]
 z_index = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -453,13 +455,19 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="ColorRect"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="SleepFade"]
 unique_name_in_owner = true
 libraries = {
 "": SubResource("AnimationLibrary_auoph")
 }
 
 [node name="TradeUI" parent="." node_paths=PackedStringArray("me") instance=ExtResource("5_32ebk")]
+unique_name_in_owner = true
+visible = false
+me = NodePath("..")
+
+[node name="CraftUI" parent="." node_paths=PackedStringArray("me") instance=ExtResource("7_ncuea")]
+unique_name_in_owner = true
 visible = false
 me = NodePath("..")
 

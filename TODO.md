@@ -1,8 +1,11 @@
+crafting
+knapping
+unique item inventory
+
 head look
 chopping trees
 saplings
-rocks
-crafting
+
 action menu
 terrain heightmaps
 making log walls

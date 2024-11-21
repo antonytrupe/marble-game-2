@@ -147,19 +147,19 @@ func add_player(_peer_id, _player_id):
 		#PhysicsServer3D.space_get_direct_state(0)
 		get_world_3d().space.get_id()
 		#As per docs
-		var params: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
-		params.shape_rid = player.get_rid()
+		#var params: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
+		#params.shape_rid = player.get_rid()
 		#print(player.get_rid())
 		#print(player.get_shape_owners())
-		params.shape = player
-		params.transform = player.transform
-		params.collide_with_bodies = true
-		params.collide_with_areas = true
-		var i = get_world_3d().direct_space_state.intersect_shape(params)
+		#params.shape = player
+		#params.transform = player.transform
+		#params.collide_with_bodies = true
+		#params.collide_with_areas = true
+		#var i = get_world_3d().direct_space_state.intersect_shape(params)
 		#var i = get_world_3d().direct_space_state.collide_shape(params)
-		print(i)
-		if i:
-			print("found overlap")
+		#print(i)
+		#if i:
+			#print("found overlap")
 		player.position.x = RandomNumberGenerator.new().randi_range(-5, 5)
 		player.position.z = RandomNumberGenerator.new().randi_range(-5, 5)
 		players.add_child(player)
