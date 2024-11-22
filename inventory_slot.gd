@@ -4,7 +4,7 @@ extends Button
 
 @export var quantity: int:
 	set = update_quantity
-@onready var label = $"."
+@onready var label = self
 
 
 func update_quantity(q: int):

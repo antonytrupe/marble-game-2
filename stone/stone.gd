@@ -7,6 +7,8 @@ extends Node3D
 
 @onready var world = $/root/Game/World
 
+static var label:String="Stone"
+
 var calculated_age: int:
 	get = calculate_age
 
