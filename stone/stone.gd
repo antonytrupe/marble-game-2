@@ -7,20 +7,29 @@ extends Node3D
 
 @onready var world = $/root/Game/World
 
-static var label:String="Stone"
+static var label: String = "Stone"
 
 var calculated_age: int:
 	get = calculate_age
 
 
+func craft(items):
+	print('stone crafting', items)
+
 func pick_up():
 	hide()
 	queue_free()
+
+	var d=save()
+	d.erase('transform')
+
 	return {
-		stone =
+		self.label :
 		{
 			#
 			quantity = 1,
+			scene_file_path=scene_file_path,
+			items=[d],
 		}
 	}
 
@@ -41,7 +50,7 @@ func calculate_age():
 	return world.world_age + extra_age + Time.get_ticks_msec() - birth_date
 
 
-func save():
+func save()->Dictionary:
 	var save_dict = {
 		"transform": JSON3D.Transform3DtoDictionary(transform),
 		"birth_date": birth_date,

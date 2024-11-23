@@ -80,7 +80,7 @@ text = "Other Player Items"
 [node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/OtherPlayerContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="OtherPlayerTrades" type="ItemList" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/OtherPlayerContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="OtherPlayerTrades" type="GridContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/OtherPlayerContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -128,7 +128,7 @@ text = "My  Items"
 [node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="MyTrades" type="ItemList" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="MyTrades" type="GridContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -178,12 +178,10 @@ text = "My Inventory"
 [node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="MyInventory" type="ItemList" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="MyInventory" type="GridContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-max_columns = 2
-same_column_width = true
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2

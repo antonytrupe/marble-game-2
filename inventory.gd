@@ -20,7 +20,7 @@ func update():
 	for ii in player.inventory:
 		if !ii in slots:
 			var new_slot = inventory_slot_scene.instantiate()
-			new_slot.item = ii
+			new_slot.type = ii
 			slots[ii] = new_slot
 			list.add_child(new_slot)
 			new_slot.pressed.connect(_on_inventory_slot_pressed.bind(new_slot))

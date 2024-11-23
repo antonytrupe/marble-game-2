@@ -1,7 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://cyyfjbicwvflj"]
+[gd_scene load_steps=5 format=3 uid="uid://cyyfjbicwvflj"]
 
 [ext_resource type="Script" path="res://craft_ui.gd" id="1_gakny"]
 [ext_resource type="Texture2D" uid="uid://dvbfdyrl8lg37" path="res://inventory9patch.png" id="2_pasp1"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_pik4q"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_x5c3l"]
 
 [node name="CraftUI" type="Node2D"]
 script = ExtResource("1_gakny")
@@ -76,8 +80,9 @@ text = "Craft"
 
 [node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_pik4q")
 
-[node name="MyCrafts" type="ItemList" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="MyCrafts" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -126,20 +131,20 @@ text = "My Inventory"
 
 [node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_x5c3l")
 
-[node name="MyInventory" type="ItemList" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="MyInventory" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-max_columns = 2
-same_column_width = true
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 4
 
 [node name="Craft" type="Button" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
+size_flags_horizontal = 4
 size_flags_vertical = 0
 text = "Craft"
 

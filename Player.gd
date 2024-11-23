@@ -46,6 +46,8 @@ var calculated_age: int:
 @export var inventory: Dictionary:
 	set = _set_inventory
 
+@onready var inventoryNode = %Inventory
+
 const SPEED_MULTIPLIER = 1.0 / 24.0
 const JUMP_VELOCITY = 5.0
 
@@ -58,7 +60,16 @@ var chatMode = false
 func craft(loot: Dictionary):
 	if not multiplayer.is_server():
 		return
-	print('craft:',loot)
+	#print('craft:', loot)
+	var type=loot.keys()[0]
+	#print(type)
+	var tool=inventory[type]
+	#print(tool)
+	var scene = load(tool.scene_file_path)
+	var instance = scene.instantiate()
+	instance.craft(tool.items)
+	#if loot.keys().size()>0 and loot[loot.keys()[0]].has_method("craft"):
+		#loot[0].craft(loot)
 
 func _update_other_trade_inventory(loot):
 	otherTradeInventory = loot
@@ -86,13 +97,14 @@ func accept_trade():
 		return
 	trade_accepted = true
 	if trade_accepted and tradePartner.trade_accepted:
+
+		#TODO make sure the whole trade will succeed before doing any part
 		#swap loot
-		add_to_inventory(tradePartner.myTradeInventory)
-		tradePartner.remove_from_inventory(tradePartner.myTradeInventory)
+		if tradePartner.remove_from_inventory(tradePartner.myTradeInventory):
+			add_to_inventory(tradePartner.myTradeInventory)
 
-		tradePartner.add_to_inventory(myTradeInventory)
-		remove_from_inventory(myTradeInventory)
-
+		if remove_from_inventory(myTradeInventory):
+			tradePartner.add_to_inventory(myTradeInventory)
 		#clear stuff
 		tradePartner.trading = false
 
@@ -109,7 +121,7 @@ func remove_from_trade(loot: Dictionary):
 			myTradeInventory[item_name].quantity -= item.quantity
 		if myTradeInventory[item_name].quantity <= 0:
 			myTradeInventory.erase(item_name)
-	tradePartner.updateTradeUI.rpc()
+	#tradePartner.updateTradeUI.rpc()
 
 
 @rpc("any_peer")
@@ -153,6 +165,8 @@ func _set_inventory(value: Dictionary):
 		inventoryUI.update()
 	if tradeUI:
 		tradeUI.update()
+	if craftUI:
+		craftUI.update()
 
 
 #setter, don't call directly
@@ -465,7 +479,7 @@ func server_action():
 		return
 	if raycast.is_colliding():
 		var entity = raycast.get_collider()
-		print(entity)
+		print('found:',entity)
 
 		if entity.has_method("start_trade"):
 			start_trade(entity)
@@ -493,22 +507,33 @@ func server_action():
 func add_to_inventory(loot: Dictionary):
 	if !multiplayer.is_server():
 		return
+	#print(loot)
 	for item_name in loot:
 		if !inventory.has(item_name):
-			inventory[item_name] = {quantity = 0}
-		var item = loot[item_name]
-		inventory[item_name].quantity += item.quantity
+			inventory[item_name] = {quantity = 0,items=[],scene_file_path=loot[item_name].scene_file_path}
+		if !inventory[item_name].has("items"):
+			inventory[item_name].items=[]
+		if !inventory[item_name].has("scene_file_path"):
+			inventory[item_name].scene_file_path=loot[item_name].scene_file_path
+		var loot_item = loot[item_name]
+		inventory[item_name].quantity += loot_item.quantity
+		for item in loot[item_name].items:
+			#TODO instantiate in inventory
+			inventory[item_name].items.append(item)
 
 
-func remove_from_inventory(loot: Dictionary):
+func remove_from_inventory(loot: Dictionary) -> bool:
 	if !multiplayer.is_server():
-		return
+		return false
 	for item_name in loot:
-		if !inventory.has(item_name):
-			inventory[item_name] = {quantity = 0}
+		if !inventory.has(item_name) or inventory[item_name].quantity < loot[item_name].quantity:
+			return false
 		var item = loot[item_name]
-		inventory[item_name].quantity -= item.quantity
 
+		inventory[item_name].quantity -= item.quantity
+		if inventory[item_name].quantity == 0:
+			inventory.erase((item_name))
+	return true
 
 @rpc("any_peer")
 func server_jump():

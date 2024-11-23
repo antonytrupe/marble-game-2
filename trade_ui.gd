@@ -20,14 +20,22 @@ func update() -> void:
 	for ii in me.inventory:
 		if !ii in myInventorySlots:
 			var new_slot = inventory_slot_scene.instantiate()
-			new_slot.item = ii
+			new_slot.type = ii
 			myInventorySlots[ii] = new_slot
 			myItems.add_child(new_slot)
 			new_slot.pressed.connect(_on_inventory_slot_pressed.bind(new_slot))
 
 		myInventorySlots[ii].quantity = me.inventory[ii].quantity
+		#var trade_quantity = 0
 		if ii in me.myTradeInventory:
-			myInventorySlots[ii].quantity -= me.myTradeInventory[ii].quantity
+			myInventorySlots[ii].quantity = me.inventory[ii].quantity - me.myTradeInventory[ii].quantity
+			#trade_quantity = me.myTradeInventory[ii].quantity
+		if myInventorySlots[ii].quantity  <= 0:
+			#delete the inventory slot node
+			myInventorySlots[ii].queue_free()
+			#clean up data
+			myInventorySlots.erase(ii)
+
 
 	#my trades
 	for ii in me.myTradeInventory:
@@ -75,5 +83,5 @@ func _on_trade_slot_pressed(slot) -> void:
 
 
 func _on_accept_pressed() -> void:
-	pass  # Replace with function body.
+	pass # Replace with function body.
 	me.accept_trade.rpc_id(1)
