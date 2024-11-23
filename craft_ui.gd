@@ -5,11 +5,14 @@ extends Node2D
 @onready var myCraftItems = %MyCrafts
 var myInventorySlots = {}
 var myCraftSlots = {}
+var tool = null
+@onready var toolSlot = %Tool
 var crafting = {}
 const inventory_slot_scene = preload("res://inventory_slot.tscn")
 
 
 func _ready() -> void:
+	toolSlot.pressed.connect(_on_tool_slot_pressed.bind(toolSlot))
 	update()
 
 
@@ -28,7 +31,10 @@ func update() -> void:
 		#var craft_quantity = 0
 		if ii in crafting:
 			myInventorySlots[ii].quantity = me.inventory[ii].quantity - crafting[ii].quantity
-			#craft_quantity = crafting[ii].quantity
+
+		if tool and tool .type == ii:
+			myInventorySlots[ii].quantity -= tool .quantity
+
 		if myInventorySlots[ii].quantity <= 0:
 			#delete the inventory slot node
 			myInventorySlots[ii].queue_free()
@@ -52,14 +58,30 @@ func update() -> void:
 			myCraftSlots[ii].queue_free()
 			myCraftSlots.erase(ii)
 
+	#tool slot
+
+func _on_tool_slot_pressed(slot):
+	tool = null
+	slot.quantity = 0
+	slot.type = ""
+	update()
 
 func _on_inventory_slot_pressed(slot) -> void:
 	#me.add_to_trade.rpc_id(1, {slot.item: {quantity = 1}})
 
-	if !crafting.has(slot.type):
-		crafting[slot.type] = {quantity = 0}
-	#var item = loot[item_name]
-	crafting[slot.type].quantity += 1
+	if ! tool:
+		tool = {
+			type = slot.type,
+			quantity = 1,
+			}
+		toolSlot.type = slot.type
+		toolSlot.quantity = 1
+
+	else:
+		if !crafting.has(slot.type):
+			crafting[slot.type] = {quantity = 0}
+		#var item = loot[item_name]
+		crafting[slot.type].quantity += 1
 	update()
 
 func _on_craft_slot_pressed(slot) -> void:
