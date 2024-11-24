@@ -219,6 +219,9 @@ func update_mode(new_mode):
 			anim_player.play("RESET")
 	mode = new_mode
 
+@rpc
+func play_animation(animation_name):
+	anim_player.play(animation_name)
 
 func load(node_data):
 	player_id = node_data["player_id"]
@@ -562,8 +565,11 @@ func server_move(d):
 		velocity.z = move_toward(velocity.z, 0, mode * SPEED_MULTIPLIER * speed)
 	if !is_zero_approx(velocity.x) or !is_zero_approx(velocity.z):
 		set_action({"move": mode})
+		play_animation.rpc('walking')
 		if mode in [MOVE.MODE.HUSTLE, MOVE.MODE.RUN]:
 			set_action({"action": MOVE.STRINGS[mode]})
+	else:
+		play_animation.rpc('RESET')
 
 
 func _on_animation_player_animation_finished(anim_name):
