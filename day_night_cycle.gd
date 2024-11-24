@@ -1,7 +1,9 @@
 extends Node3D
 @onready var sun = %Sun
 
-@onready var chunks: Array[Chunk] = [%"[0,0,0]"]
+@onready var chunks: Array[Chunk] = [% "[0,0,0]"]
+
+@export var intensity: Curve
 
 
 func _ready() -> void:
@@ -42,7 +44,7 @@ func _ready() -> void:
 	assert(is_equal_approx(a, 1.9999), "%f isn't %f" % [a, 1.9999])
 
 
-func getVectorFromHour(hour: int):
+func getVectorFromHour(hour: float):
 	var radians = hour / 24.0 * 2.0 * PI + PI / 2.0
 	var v = Vector2.from_angle(radians)
 	return v
@@ -54,7 +56,8 @@ func _process(_delta: float) -> void:
 		return
 	var total = Vector2(0.0, 0.0)
 	for c in chunks:
-		var hour = GameTime.get_age_parts(c.calculated_age).hours
+		var t = GameTime.get_age_parts(c.calculated_age)
+		var hour = t.hours + t.minutes / 60.0 + t.seconds / (60.0 * 60.0)
 		var v = getVectorFromHour(hour)
 		total = total + v
 
@@ -69,6 +72,8 @@ func _process(_delta: float) -> void:
 
 	#.001 is a little slow
 	var _lerp = lerp_angle(start, end, .001)
+	#intensity.sample(_lerp/24.0)
+	sun.light_energy = intensity.sample(fposmod((_lerp - PI / 2.0), PI * 2) / (PI * 2))
 	#print("start:%f end:%f lerp:%f" % [start, end, _lerp])
 	if is_equal_approx(_lerp, end):
 		_lerp = end

@@ -61,11 +61,11 @@ func craft(tool , loot: Dictionary):
 	if not multiplayer.is_server():
 		return
 	#print('craft:', loot)
-	var type = loot.keys()[0]
+	# var type = loot.keys()[0]
 	#print(type)
 	#var tool=inventory[type]
-	print(tool)
-	var scene = load(tool.scene_file_path)
+	print(tool )
+	var scene = load(tool .scene_file_path)
 	var instance = scene.instantiate()
 	instance.craft(loot)
 	#if loot.keys().size()>0 and loot[loot.keys()[0]].has_method("craft"):
