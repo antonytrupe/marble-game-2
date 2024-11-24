@@ -21,6 +21,7 @@ func update() -> void:
 		if !ii in myInventorySlots:
 			var new_slot = inventory_slot_scene.instantiate()
 			new_slot.type = ii
+			new_slot.type_scene_file_path = me.inventory[ii].scene_file_path
 			myInventorySlots[ii] = new_slot
 			myItems.add_child(new_slot)
 			new_slot.pressed.connect(_on_inventory_slot_pressed.bind(new_slot))
@@ -30,7 +31,7 @@ func update() -> void:
 		if ii in me.myTradeInventory:
 			myInventorySlots[ii].quantity = me.inventory[ii].quantity - me.myTradeInventory[ii].quantity
 			#trade_quantity = me.myTradeInventory[ii].quantity
-		if myInventorySlots[ii].quantity  <= 0:
+		if myInventorySlots[ii].quantity <= 0:
 			#delete the inventory slot node
 			myInventorySlots[ii].queue_free()
 			#clean up data
@@ -41,7 +42,8 @@ func update() -> void:
 	for ii in me.myTradeInventory:
 		if !ii in myTradeSlots:
 			var new_slot = inventory_slot_scene.instantiate()
-			new_slot.item = ii
+			new_slot.type = ii
+			new_slot.type_scene_file_path = me.myTradeInventory[ii].scene_file_path
 			myTradeSlots[ii] = new_slot
 			myTradeItems.add_child(new_slot)
 			new_slot.pressed.connect(_on_trade_slot_pressed.bind(new_slot))
@@ -58,7 +60,7 @@ func update() -> void:
 	for ii in otherPlayerTrade:
 		if !ii in otherTradeSlots:
 			var new_slot = inventory_slot_scene.instantiate()
-			new_slot.item = ii
+			new_slot.type = ii
 			otherTradeSlots[ii] = new_slot
 			otherTradeItems.add_child(new_slot)
 			#new_slot.pressed.connect(_on_trade_slot_pressed.bind(new_slot))

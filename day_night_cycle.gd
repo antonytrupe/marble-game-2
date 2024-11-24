@@ -50,7 +50,7 @@ func getVectorFromHour(hour: int):
 
 func _process(_delta: float) -> void:
 	if chunks.size() == 0:
-		#print('no chunks')
+		print('no chunks')
 		return
 	var total = Vector2(0.0, 0.0)
 	for c in chunks:
@@ -78,3 +78,4 @@ func _process(_delta: float) -> void:
 		#print("start:%f end:%f lerp:%f" % [start, end, _lerp])
 
 	sun.rotation.x = _lerp
+	#print(sun.rotation.x)

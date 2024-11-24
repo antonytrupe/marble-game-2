@@ -57,17 +57,17 @@ var chatMode = false
 
 
 @rpc("any_peer")
-func craft(loot: Dictionary):
+func craft(tool , loot: Dictionary):
 	if not multiplayer.is_server():
 		return
 	#print('craft:', loot)
-	var type=loot.keys()[0]
+	var type = loot.keys()[0]
 	#print(type)
-	var tool=inventory[type]
-	#print(tool)
+	#var tool=inventory[type]
+	print(tool)
 	var scene = load(tool.scene_file_path)
 	var instance = scene.instantiate()
-	instance.craft(tool.items)
+	instance.craft(loot)
 	#if loot.keys().size()>0 and loot[loot.keys()[0]].has_method("craft"):
 		#loot[0].craft(loot)
 
@@ -479,7 +479,7 @@ func server_action():
 		return
 	if raycast.is_colliding():
 		var entity = raycast.get_collider()
-		print('found:',entity)
+		print('found:', entity)
 
 		if entity.has_method("start_trade"):
 			start_trade(entity)
@@ -507,19 +507,23 @@ func server_action():
 func add_to_inventory(loot: Dictionary):
 	if !multiplayer.is_server():
 		return
-	#print(loot)
+	#print('loot:', loot)
 	for item_name in loot:
 		if !inventory.has(item_name):
-			inventory[item_name] = {quantity = 0,items=[],scene_file_path=loot[item_name].scene_file_path}
+			inventory[item_name] = {quantity = 0, items = [], scene_file_path = loot[item_name].scene_file_path}
 		if !inventory[item_name].has("items"):
-			inventory[item_name].items=[]
+			inventory[item_name].items = []
 		if !inventory[item_name].has("scene_file_path"):
-			inventory[item_name].scene_file_path=loot[item_name].scene_file_path
-		var loot_item = loot[item_name]
-		inventory[item_name].quantity += loot_item.quantity
+			inventory[item_name].scene_file_path = loot[item_name].scene_file_path
+
+		#var loot_item = loot[item_name]
+		inventory[item_name].quantity += loot[item_name].quantity
+
 		for item in loot[item_name].items:
 			#TODO instantiate in inventory
 			inventory[item_name].items.append(item)
+
+	#print('inventory:', inventory)
 
 
 func remove_from_inventory(loot: Dictionary) -> bool:
