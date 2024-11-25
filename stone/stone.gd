@@ -5,12 +5,22 @@ extends Node3D
 @export var extra_age: int = 0:
 	set = set_extra_age
 
+var brittleness: int = 50
+var hardness: int = 50
+var sharpness: int = 0
+
 @onready var world = $/root/Game/World
 
 static var label: String = "Stone"
 
 var calculated_age: int:
 	get = calculate_age
+
+
+func _ready():
+	var rng = RandomNumberGenerator.new()
+	brittleness = rng.randi_range(1, 100)
+	hardness = rng.randi_range(1, 100)
 
 
 func craft(player: MarbleCharacter, items):
@@ -27,6 +37,7 @@ func pick_up():
 
 	var d = save()
 	d.erase('transform')
+
 
 	return {
 		self.label:
@@ -57,26 +68,24 @@ func calculate_age():
 
 func save() -> Dictionary:
 	var save_dict = {
-		"transform": JSON3D.Transform3DtoDictionary(transform),
-		"birth_date": birth_date,
-		"extra_age": extra_age,
-		"name": name,
+		transform = JSON3D.Transform3DtoDictionary(transform),
+		birth_date = birth_date,
+		extra_age = extra_age,
+		name = name,
+		"class" = get_class(),
+		scene_file_path = get_scene_file_path(),
+		hardness = hardness,
+		sharpness = sharpness,
+		brittleness = brittleness
 
-		"class": get_class(),
-		"scene_file_path": get_scene_file_path(),
 	}
 	if get_parent():
 		save_dict.parent = get_parent().get_path()
 	return save_dict
 
 
-func toDictionary() -> Dictionary:
-	return save()
-
-
 func load(node_data: Dictionary):
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
-	if "birth_date" in node_data:
-		birth_date = node_data.birth_date
-	if "extra_age" in node_data:
-		extra_age = node_data.extra_age
+	for p in node_data:
+		if p in self and p not in ['transform']:
+			self[p] = node_data[p]
