@@ -34,8 +34,8 @@ func update() -> void:
 		if ii in crafting:
 			myInventorySlots[ii].quantity = me.inventory[ii].quantity - crafting[ii].quantity
 
-		if tool and tool.type == ii:
-			myInventorySlots[ii].quantity -= tool.quantity
+		if tool and tool .type == ii:
+			myInventorySlots[ii].quantity -= tool .quantity
 
 		if myInventorySlots[ii].quantity <= 0:
 			#delete the inventory slot node
@@ -74,11 +74,12 @@ func _on_tool_slot_pressed(slot: InventorySlot):
 func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
 	#me.add_to_trade.rpc_id(1, {slot.item: {quantity = 1}})
 
-	if !tool:
+	if ! tool:
 		tool = {
 			type = slot.type,
 			quantity = 1,
 			scene_file_path = slot.type_scene_file_path,
+			items = [],
 		}
 		toolSlot.type = slot.type
 		toolSlot.quantity = 1
@@ -86,7 +87,10 @@ func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
 
 	else:
 		if !crafting.has(slot.type):
-			crafting[slot.type] = {quantity = 0}
+			crafting[slot.type] = {
+				quantity = 0,
+				items = [],
+				}
 		#var item = loot[item_name]
 		crafting[slot.type].quantity += 1
 	update()
@@ -99,7 +103,7 @@ func _on_craft_slot_pressed(slot) -> void:
 	update()
 
 func _on_craft_pressed() -> void:
-	if !tool:
+	if ! tool:
 		print('no tool item')
 		return
 	me.craft.rpc_id(1, tool , crafting)

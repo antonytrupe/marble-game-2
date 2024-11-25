@@ -172,9 +172,6 @@ func _ready():
 	# Load data from a file.
 	#var err = config.load("user://config.cfg")
 	var err = configFile.load("res://config.cfg")
-	var f = FileAccess.open("user://config.cfg", FileAccess.WRITE)
-	#f.flush()
-	print(f.get_path_absolute())
 	# If the file didn't load, ignore it.
 	if err != OK:
 		print("error reading config file")
@@ -283,8 +280,8 @@ func save_game():
 
 		node_data.name = node.name
 		node_data.parent = node.get_parent().get_path()
-		node_data.class = node.get_class()
-		node_data.filename = node.get_scene_file_path()
+		node_data. class = node.get_class()
+		node_data.scene_file_path = node.get_scene_file_path()
 
 		# JSON provides a static method to serialized JSON string.
 		var json_string = JSON.stringify(node_data, "", false)
@@ -301,7 +298,7 @@ func save_game():
 func load_game():
 	if not FileAccess.file_exists("user://savegame.save"):
 		print("save not found")
-		return  # Error! We don't have a save to load.
+		return # Error! We don't have a save to load.
 
 	var save_file = FileAccess.open("user://savegame.save", FileAccess.READ)
 	var json = JSON.new()
@@ -321,10 +318,10 @@ func load_game():
 		# Firstly, we need to create the object and add it to the tree
 		# check if the node is in the tree already
 		var node = get_node_or_null(node_data.parent + "/" + node_data.name)
-		if !node and node_data["filename"]:
-			node = load(node_data["filename"]).instantiate()
+		if !node and node_data["scene_file_path"]:
+			node = load(node_data["scene_file_path"]).instantiate()
 		elif !node and node_data["class"]:
-			node = ClassDB.instantiate(node_data.class)
+			node = ClassDB.instantiate(node_data. class )
 		else:
 			pass
 		# Check the node has a load function.

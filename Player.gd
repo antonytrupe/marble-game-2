@@ -64,10 +64,21 @@ func craft(tool , loot: Dictionary):
 	# var type = loot.keys()[0]
 	#print(type)
 	#var tool=inventory[type]
-	print(tool )
+	#print(tool )
 	var scene = load(tool .scene_file_path)
 	var instance = scene.instantiate()
-	instance.craft(loot)
+	var result = instance.craft(self, loot)
+	print(result)
+	remove_from_inventory(tool )
+	remove_from_inventory(loot)
+	add_to_inventory({
+		instance.label: {
+			quantity = 1,
+			scene_file_path = instance.get_scene_file_path(),
+			items = [instance.toDictionary(),
+			],
+		}})
+	add_to_inventory(result)
 	#if loot.keys().size()>0 and loot[loot.keys()[0]].has_method("craft"):
 		#loot[0].craft(loot)
 
@@ -511,20 +522,23 @@ func add_to_inventory(loot: Dictionary):
 	if !multiplayer.is_server():
 		return
 	#print('loot:', loot)
-	for item_name in loot:
-		if !inventory.has(item_name):
-			inventory[item_name] = {quantity = 0, items = [], scene_file_path = loot[item_name].scene_file_path}
-		if !inventory[item_name].has("items"):
-			inventory[item_name].items = []
-		if !inventory[item_name].has("scene_file_path"):
-			inventory[item_name].scene_file_path = loot[item_name].scene_file_path
+	for category in loot:
+		if !inventory.has(category):
+			inventory[category] = {quantity = 0,
+			items = [],
+			scene_file_path = loot[category].scene_file_path,
+			}
+		if !inventory[category].has("items"):
+			inventory[category].items = []
+		if !inventory[category].has("scene_file_path"):
+			inventory[category].scene_file_path = loot[category].scene_file_path
 
 		#var loot_item = loot[item_name]
-		inventory[item_name].quantity += loot[item_name].quantity
+		inventory[category].quantity += loot[category].quantity
 
-		for item in loot[item_name].items:
+		for item in loot[category].items:
 			#TODO instantiate in inventory
-			inventory[item_name].items.append(item)
+			inventory[category].items.append(item)
 
 	#print('inventory:', inventory)
 

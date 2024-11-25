@@ -19,6 +19,11 @@ var calculated_age: int:
 	#label.text = GameTime.format(calculated_age)
 
 
+# func _ready():
+# 	for player: MarbleCharacter in get_players():
+# 		var zones = player.get_zones()
+
+
 func set_birth_date(value):
 	birth_date = value
 
