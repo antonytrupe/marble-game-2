@@ -59,7 +59,7 @@ func update() -> void:
 	#other player trade
 	for ii in otherPlayerTrade:
 		if !ii in otherTradeSlots:
-			var new_slot = inventory_slot_scene.instantiate()
+			var new_slot: InventorySlot = inventory_slot_scene.instantiate()
 			new_slot.type = ii
 			otherTradeSlots[ii] = new_slot
 			otherTradeItems.add_child(new_slot)
@@ -74,13 +74,21 @@ func update() -> void:
 			otherTradeSlots.erase(ii)
 
 
-func _on_inventory_slot_pressed(slot) -> void:
-	me.add_to_trade.rpc_id(1, {slot.item: {quantity = 1}})
+func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
+	me.add_to_trade.rpc_id(1, {slot.type: {
+		quantity = 1,
+		scene_file_path = slot.type_scene_file_path,
+		items = [],
+	}})
 	update()
 
 
 func _on_trade_slot_pressed(slot) -> void:
-	me.remove_from_trade.rpc_id(1, {slot.item: {quantity = 1}})
+	me.remove_from_trade.rpc_id(1, {slot.type: {
+		quantity = 1,
+		scene_file_path = slot.type_scene_file_path,
+		items = slot.items,
+		}})
 	update()
 
 

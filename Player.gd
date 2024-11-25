@@ -141,9 +141,14 @@ func add_to_trade(loot: Dictionary):
 		return
 	for item_name in loot:
 		if !myTradeInventory.has(item_name):
-			myTradeInventory[item_name] = {quantity = 0}
+			myTradeInventory[item_name] = {
+				quantity = 0,
+				scene_file_path = loot[item_name].scene_file_path,
+				items = [],
+				}
 		#var item = loot[item_name]
 		myTradeInventory[item_name].quantity += loot[item_name].quantity
+		myTradeInventory[item_name].items.append_array(loot[item_name].items)
 	tradePartner.otherTradeInventory = myTradeInventory
 	#tradePartner.updateTradeUI.rpc()
 	#TODO check to make sure tradeinventory quantities don't go over inventory quantity
