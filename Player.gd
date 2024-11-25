@@ -1,24 +1,9 @@
 extends CharacterBody3D
 class_name MarbleCharacter
 
-@onready var game: Game = $/root/Game
-@onready var world: World = $/root/Game/World
-@onready var chatTextEdit: TextEdit = $/root/Game/UI/HUD/ChatInput
-@onready var ChatBubbles = %ChatBubbles
-@onready var cameraPivot = $CameraPivot
-@onready var camera = %Camera3D
-@onready var raycast = %RayCast3D
-@onready var anim_player = $AnimationPlayer
-@onready var inventoryUI = %InventoryUI
-@onready var chunkScanner = %ChunkScanner
-@onready var characterSheet = %CharacterSheet
-@onready var actionsUI = %ActionsUI
-@onready var fade_anim = %AnimationPlayer
-@onready var tradeUI = %TradeUI
-@onready var craftUI = %CraftUI
+const SPEED_MULTIPLIER = 1.0 / 24.0
+const JUMP_VELOCITY = 5.0
 
-var tradePartner: MarbleCharacter
-#we need otherTradeInventory on the client side because we can't sync tradePartner
 @export var otherTradeInventory = {}:
 	set = _update_other_trade_inventory
 @export var trading: bool = false:
@@ -35,10 +20,9 @@ var tradePartner: MarbleCharacter
 @export var speed = 30.0
 @export var birth_date: int = 0:
 	set = set_birth_date
+
 @export var extra_age: int = 0:
 	set = set_extra_age
-var calculated_age: int:
-	get = calculate_age
 
 @export var actions = {"move": null, "action": null}:
 	set = _set_action
@@ -46,14 +30,32 @@ var calculated_age: int:
 @export var inventory: Dictionary:
 	set = _set_inventory
 
-@onready var inventoryNode = %Inventory
+var tradePartner: MarbleCharacter
+#we need otherTradeInventory on the client side because we can't sync tradePartner
 
-const SPEED_MULTIPLIER = 1.0 / 24.0
-const JUMP_VELOCITY = 5.0
+var calculated_age: int:
+	get = calculate_age
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chatMode = false
+
+@onready var game: Game = $/root/Game
+@onready var world: World = $/root/Game/World
+@onready var chatTextEdit: TextEdit = $/root/Game/UI/HUD/ChatInput
+@onready var ChatBubbles = %ChatBubbles
+@onready var cameraPivot = $CameraPivot
+@onready var camera = %Camera3D
+@onready var raycast = %RayCast3D
+@onready var anim_player = $AnimationPlayer
+@onready var inventoryUI = %InventoryUI
+@onready var chunkScanner = %ChunkScanner
+@onready var characterSheet = %CharacterSheet
+@onready var actionsUI = %ActionsUI
+@onready var fade_anim = %AnimationPlayer
+@onready var tradeUI = %TradeUI
+@onready var craftUI = %CraftUI
+@onready var inventoryNode = %Inventory
 
 
 @rpc("any_peer")
@@ -75,7 +77,7 @@ func craft(tool , loot: Dictionary):
 		instance.label: {
 			quantity = 1,
 			scene_file_path = instance.get_scene_file_path(),
-			items = [instance.toDictionary(),
+			items = [instance.save(),
 			],
 		}})
 	add_to_inventory(result)
