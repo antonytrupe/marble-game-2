@@ -529,10 +529,10 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 texture = ExtResource("2_2ojr1")
 
-[node name="InventoryUI" parent="." node_paths=PackedStringArray("player") instance=ExtResource("2_vrrxi")]
+[node name="InventoryUI" parent="." node_paths=PackedStringArray("me") instance=ExtResource("2_vrrxi")]
 unique_name_in_owner = true
 visible = false
-player = NodePath("..")
+me = NodePath("..")
 
 [node name="CharacterSheet" parent="." instance=ExtResource("3_eahd0")]
 unique_name_in_owner = true

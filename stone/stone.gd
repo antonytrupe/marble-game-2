@@ -11,7 +11,7 @@ var sharpness: int = 0
 
 @onready var world = $/root/Game/World
 
-static var label: String = "Stone"
+static var category: String = "Stone"
 
 var calculated_age: int:
 	get = calculate_age
@@ -38,9 +38,8 @@ func pick_up():
 	var d = save()
 	d.erase('transform')
 
-
 	return {
-		self.label:
+		category:
 		{
 			#
 			quantity = 1,
@@ -66,17 +65,22 @@ func calculate_age():
 	return world.world_age + extra_age + Time.get_ticks_msec() - birth_date
 
 
+func toDictionary() -> Dictionary:
+	return save()
+
+
 func save() -> Dictionary:
 	var save_dict = {
 		transform = JSON3D.Transform3DtoDictionary(transform),
 		birth_date = birth_date,
 		extra_age = extra_age,
 		name = name,
+		category=category,
 		"class" = get_class(),
 		scene_file_path = get_scene_file_path(),
 		hardness = hardness,
 		sharpness = sharpness,
-		brittleness = brittleness
+		brittleness = brittleness,
 
 	}
 	if get_parent():

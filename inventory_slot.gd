@@ -3,32 +3,54 @@ class_name InventorySlot
 
 @export var type_scene_file_path: String
 
-@export var type: String:
-	set = update_type
-@export var items: Array = []
+@export var category: String
+var _items = {}:
+	get = get_items
 
-@export var quantity: int:
-	set = update_quantity
 @onready var label = self
 
 
-func update_type(t: String):
-	type = t
-	if label:
-		label.text = "%s x%s" % [type, str(quantity)]
+func get_items():
+	return _items
 
 
-func update_quantity(q: int):
-	quantity = q
-	if label:
-		label.text = "%s x%s" % [type, str(quantity)]
+func size():
+	return _items.keys().size()
+
+
+func add_items(items: Dictionary):
+	for item in items.values():
+		_items[item.name] = item
+		category = item.category
+	update()
+
+
+func remove_item(item: Dictionary):
+	_items.erase(item.name)
+	update()
+
+
+func add_item(item: Dictionary):
+	_items[item.name] = item
+	category = item.category
+	update()
+
+
+func update_category(c: String):
+	category = c
+	update()
 
 
 # Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	label.text = "%s x%s" % [self.type, str(self.quantity)]
+func update() -> void:
+	print('item inventory update')
+	if label:
+		if size() == 0:
+			hide()
+		else:
+			show()
+		label.text = "%s x%s" % [category, str(size())]
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass
+func _ready():
+	update()

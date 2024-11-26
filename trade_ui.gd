@@ -17,65 +17,59 @@ func _ready() -> void:
 
 func update() -> void:
 	#my inventory
-	for ii in me.inventory:
-		if !ii in myInventorySlots:
+	for category in me.inventory:
+		if !category in myInventorySlots:
 			var new_slot = inventory_slot_scene.instantiate()
-			new_slot.type = ii
-			new_slot.type_scene_file_path = me.inventory[ii].scene_file_path
-			myInventorySlots[ii] = new_slot
+			new_slot.category = category
+			new_slot.type_scene_file_path = me.inventory[category].scene_file_path
+			myInventorySlots[category] = new_slot
 			myItems.add_child(new_slot)
 			new_slot.pressed.connect(_on_inventory_slot_pressed.bind(new_slot))
 
-		myInventorySlots[ii].quantity = me.inventory[ii].quantity
 		#var trade_quantity = 0
-		if ii in me.myTradeInventory:
-			myInventorySlots[ii].quantity = me.inventory[ii].quantity - me.myTradeInventory[ii].quantity
+		if category in me.myTradeInventory:
+			myInventorySlots[category].quantity = me.inventory[category].quantity - me.myTradeInventory[category].quantity
 			#trade_quantity = me.myTradeInventory[ii].quantity
-		if myInventorySlots[ii].quantity <= 0:
-			#delete the inventory slot node
-			myInventorySlots[ii].queue_free()
-			#clean up data
-			myInventorySlots.erase(ii)
 
 
 	#my trades
-	for ii in me.myTradeInventory:
-		if !ii in myTradeSlots:
+	for category in me.myTradeInventory:
+		if !category in myTradeSlots:
 			var new_slot = inventory_slot_scene.instantiate()
-			new_slot.type = ii
-			new_slot.type_scene_file_path = me.myTradeInventory[ii].scene_file_path
-			myTradeSlots[ii] = new_slot
+			new_slot.category = category
+			new_slot.type_scene_file_path = me.myTradeInventory[category].scene_file_path
+			myTradeSlots[category] = new_slot
 			myTradeItems.add_child(new_slot)
 			new_slot.pressed.connect(_on_trade_slot_pressed.bind(new_slot))
 
-		myTradeSlots[ii].quantity = me.myTradeInventory[ii].quantity
+		myTradeSlots[category].quantity = me.myTradeInventory[category].quantity
 
 	#remove any slots that don't have items any more
-	for ii in myTradeSlots:
-		if !me.myTradeInventory.has(ii) or me.myTradeInventory[ii].quantity <= 0:
-			myTradeSlots[ii].queue_free()
-			myTradeSlots.erase(ii)
+	for category in myTradeSlots:
+		if !me.myTradeInventory.has(category) or me.myTradeInventory[category].quantity <= 0:
+			myTradeSlots[category].queue_free()
+			myTradeSlots.erase(category)
 
 	#other player trade
-	for ii in otherPlayerTrade:
-		if !ii in otherTradeSlots:
+	for category in otherPlayerTrade:
+		if !category in otherTradeSlots:
 			var new_slot: InventorySlot = inventory_slot_scene.instantiate()
-			new_slot.type = ii
-			otherTradeSlots[ii] = new_slot
+			new_slot.category = category
+			otherTradeSlots[category] = new_slot
 			otherTradeItems.add_child(new_slot)
 			#new_slot.pressed.connect(_on_trade_slot_pressed.bind(new_slot))
 
-		otherTradeSlots[ii].quantity = otherPlayerTrade[ii].quantity
+		otherTradeSlots[category].quantity = otherPlayerTrade[category].quantity
 
 	#remove any slots that don't have items any more
-	for ii in otherTradeSlots:
-		if !otherPlayerTrade.has(ii) or otherPlayerTrade[ii].quantity <= 0:
-			otherTradeSlots[ii].queue_free()
-			otherTradeSlots.erase(ii)
+	for category in otherTradeSlots:
+		if !otherPlayerTrade.has(category) or otherPlayerTrade[category].quantity <= 0:
+			otherTradeSlots[category].queue_free()
+			otherTradeSlots.erase(category)
 
 
 func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
-	me.add_to_trade.rpc_id(1, {slot.type: {
+	me.add_to_trade.rpc_id(1, {slot.category: {
 		quantity = 1,
 		scene_file_path = slot.type_scene_file_path,
 		items = [],
@@ -84,7 +78,7 @@ func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
 
 
 func _on_trade_slot_pressed(slot) -> void:
-	me.remove_from_trade.rpc_id(1, {slot.type: {
+	me.remove_from_trade.rpc_id(1, {slot.category: {
 		quantity = 1,
 		scene_file_path = slot.type_scene_file_path,
 		items = slot.items,
