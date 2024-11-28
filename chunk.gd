@@ -6,16 +6,27 @@ class_name Chunk
 @export var extra_age: int = 0:
 	set = set_extra_age
 
+@export var flora: Node3D
+@export var fauna: Node3D
+@export var terra: Node3D
+
 @onready var label = %AgeLabel
 @onready var world = $/root/Game/World
 @onready var floraFaunaScanner = %FloraFaunaScanner
 @onready var playerScanner = %PlayerScanner
 
+var rng = RandomNumberGenerator.new()
+
+
 var calculated_age: int:
 	get = calculate_age
 
 
-#func _process(_delta):
+func _process(delta):
+	var r=rng.randf_range(0.0, 5000.0)
+	if r*delta/0.0133<1.0:
+		print(delta)
+		print('spawn stone in chunk %s' % name)
 	#label.text = GameTime.format(calculated_age)
 
 

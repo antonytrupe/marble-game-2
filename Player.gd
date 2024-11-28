@@ -40,6 +40,8 @@ var calculated_age: int:
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chatMode = false
 
+var skills = {}
+
 @onready var game: Game = $/root/Game
 @onready var world: World = $/root/Game/World
 @onready var chatTextEdit: TextEdit = $/root/Game/UI/HUD/ChatInput
@@ -55,25 +57,21 @@ var chatMode = false
 @onready var fade_anim = %AnimationPlayer
 @onready var tradeUI = %TradeUI
 @onready var craftUI = %CraftUI
-@onready var inventoryNode = %Inventory
+#@onready var inventoryNode = %Inventory
 
 
 @rpc("any_peer")
-func craft(tool , loot: Dictionary):
+func craft(action: String, tool: Dictionary, loot: Dictionary):
 	if not multiplayer.is_server():
 		return
 	var scene = load(tool .scene_file_path)
 	var instance = scene.instantiate()
-	var result = instance.craft(self, loot)
+	var result = instance.call(action, self, loot)
+	#var result = instance.craft(self, loot)
 	#print(result)
-	remove_from_inventory(tool )
+	#remove_from_inventory({tool.category:{"items":{tool.name:tool}}})
 	remove_from_inventory(loot)
-	add_to_inventory({
-		instance.category: {
-			scene_file_path = instance.get_scene_file_path(),
-			items = [instance.save(),
-			],
-		}})
+
 	add_to_inventory(result)
 	#if loot.keys().size()>0 and loot[loot.keys()[0]].has_method("craft"):
 		#loot[0].craft(loot)
@@ -244,18 +242,21 @@ func load(node_data):
 		extra_age = node_data.extra_age
 	if "inventory" in node_data:
 		inventory = node_data.inventory
+	if "skills" in node_data:
+		skills = node_data.inventory
 	#TODO figure out camera rotation
 
 
 func save():
 	var save_dict = {
 		#
-		"player_id": player_id,
-		"transform": JSON3D.Transform3DtoDictionary(transform),
-		"health": health,
-		"birth_date": birth_date,
-		"extra_age": extra_age,
-		"inventory": inventory,
+		player_id = player_id,
+		transform = JSON3D.Transform3DtoDictionary(transform),
+		health = health,
+		birth_date = birth_date,
+		extra_age = extra_age,
+		inventory = inventory,
+		skills = skills,
 	}
 	return save_dict
 
@@ -267,12 +268,23 @@ func _on_new_turn(_turn_id):
 func _ready():
 	actionsUI.player_id = player_id
 	Signals.NewTurn.connect(_on_new_turn)
+	#if multiplayer.is_server():
+		#Signals.PlayerZoned.connect(_on_player_zoned)
 	if isCurrentPlayer():
 		camera.current = true
 		actionsUI.show()
 	else:
 		pass
 
+
+#func _on_player_zoned(player: MarbleCharacter, chunk: Node3D):
+	#if game.player_id == player.name:
+		##get all the chunks the player is overlapping
+		#var chunks = player.get_zones()
+		#if !chunks:
+			#print('%s not in any chunks' % [player.name])
+		## tell the daynightcycle node what chunks the player is in
+		#dayNightCycle.chunks = chunks
 
 @rpc("authority")
 func play_fade():
@@ -545,16 +557,20 @@ func add_to_inventory(loot: Dictionary):
 
 
 func remove_from_inventory(loot: Dictionary) -> bool:
+	print('remove_from_inventory:', loot)
 	if !multiplayer.is_server():
 		return false
 	for category in loot:
 		if !inventory.has(category) or inventory[category].items.keys().size() < loot[category].items.keys().size():
+			print('not removing')
 			return false
+
+		for id in loot[category].items.keys():
+			inventory[category].items.erase(id)
+			print("removed %s" % id)
 
 		if inventory[category].items.keys().size() == 0:
 			inventory.erase((category))
-		for id in loot[category].items:
-			inventory[category].items.erase(loot[category].items[id])
 	return true
 
 @rpc("any_peer")

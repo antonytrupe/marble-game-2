@@ -1,4 +1,5 @@
 extends Node3D
+class_name Stone
 
 @export var birth_date: int = 0:
 	set = set_birth_date
@@ -23,12 +24,16 @@ func _ready():
 	hardness = rng.randi_range(1, 100)
 
 
-func craft(player: MarbleCharacter, items):
-	print('%s stone crafting' % player.name, items)
-	for type in items:
-		print(type)
+func craft(player: MarbleCharacter, loot: Dictionary):
+	print('%s stone crafting' % player.name, loot)
+	for _category in loot:
+		print(category)
+		if _category == category:
+			for i in loot[_category].items.values():
+				print(i.name)
+				#TODO figure out what to do here
 
-	return items
+	return loot
 
 
 func pick_up():
@@ -42,7 +47,6 @@ func pick_up():
 		category:
 		{
 			#
-			quantity = 1,
 			scene_file_path = scene_file_path,
 			items = [d],
 		}
@@ -50,7 +54,13 @@ func pick_up():
 
 
 func get_actions():
-	return ["pick_up", "knap"]
+	print(get_parent().get_class())
+	var actions = []
+	if get_parent().name == 'Terra':
+		actions.append('pick_up')
+	elif get_parent().is_class('MarbleCharacter'):
+		actions.append('knap')
+	return actions
 
 
 func set_birth_date(value):
@@ -75,7 +85,7 @@ func save() -> Dictionary:
 		birth_date = birth_date,
 		extra_age = extra_age,
 		name = name,
-		category=category,
+		category = category,
 		"class" = get_class(),
 		scene_file_path = get_scene_file_path(),
 		hardness = hardness,

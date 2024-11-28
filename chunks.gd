@@ -9,7 +9,7 @@ const ChunkResource = preload("res://chunk.tscn")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	if multiplayer.is_server():
+	if !multiplayer.is_server():
 		Signals.PlayerZoned.connect(_on_player_zoned)
 
 

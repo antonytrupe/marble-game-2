@@ -568,8 +568,4 @@ unique_name_in_owner = true
 visible = false
 me = NodePath("..")
 
-[node name="Inventory" type="Node3D" parent="."]
-unique_name_in_owner = true
-visible = false
-
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

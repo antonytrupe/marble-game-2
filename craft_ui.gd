@@ -18,6 +18,21 @@ func _ready() -> void:
 
 @rpc("any_peer", "call_remote")
 func update() -> void:
+
+	myInventorySlots = {}
+	for c in myItems.get_children():
+		myItems.remove_child(c)
+		c.queue_free()
+
+	myCraftSlots = {}
+	for c in myCraftItems.get_children():
+		myCraftItems.remove_child(c)
+		c.queue_free()
+
+	if tool:
+		toolSlot.remove_item(tool )
+		tool = null
+
 	#print('craftui update',me.inventory)
 	for category in me.inventory:
 		for item in me.inventory[category].items.values():
@@ -56,6 +71,7 @@ func add_item_to_tool(item: Dictionary):
 	toolSlot.type_scene_file_path = item.scene_file_path
 	toolSlot.add_item(item)
 	tool = item
+	#TODO update the actions buttonss
 
 
 func remove_item_from_tool() -> Dictionary:
@@ -77,6 +93,11 @@ func add_item_to_craft(item: Dictionary):
 		myCraftItems.add_child(new_slot)
 		new_slot.pressed.connect(_on_craft_slot_pressed.bind(new_slot))
 
+		craftInventory[item.category] = {
+			items = {}
+		}
+
+	craftInventory[item.category].items[item.name] = item
 	myCraftSlots[item.category].add_item(item)
 
 
@@ -90,6 +111,8 @@ func remove_item_from_craft(category: String) -> Dictionary:
 		myCraftSlots.erase(category)
 		slot.hide()
 		slot.queue_free()
+
+	craftInventory[item.category].items.erase(item.name)
 
 	return item
 
@@ -120,4 +143,5 @@ func _on_craft_pressed() -> void:
 	if ! tool:
 		print('no tool item')
 		return
-	me.craft.rpc_id(1, tool , craftInventory)
+	me.craft.rpc_id(1, 'craft', tool , craftInventory)
+	update()

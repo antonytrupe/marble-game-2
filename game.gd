@@ -23,12 +23,32 @@ var player_id: String
 # This will contain player info for every player,
 # with the keys being each player's unique IDs.
 #var players = {}
+var rng = RandomNumberGenerator.new()
 
 const Player = preload("res://player.tscn")
-const Stone = preload("res://stone/stone.tscn")
+const StoneScene = preload("res://stone/stone.tscn")
 const Acorn = preload("res://acorn/acorn.tscn")
 const Bush = preload("res://bush/bush.tscn")
 const Tree_ = preload("res://tree/tree.tscn")
+
+func get_chunk(_position: Vector3) -> Chunk:
+	return null
+
+
+func get_chunk_name(p: Vector3) -> String:
+	var _x = p.x / 60
+	return "[0,0,0]"
+
+
+func spawn_stones(quantity: int, p: Vector3):
+	quantity = clampi(quantity, 1, 100)
+	for i in quantity:
+		var stone = StoneScene.instantiate()
+		stone.name = stone.name + "%010d" % rng.randi()
+		stone.position = get_random_vector(10, p)
+		#var chunk_name=get_chunk_name(stone.position)
+		# var chunk=get_chunk(stone.position)
+		terra.add_child(stone)
 
 
 func command(cmd: String, player: MarbleCharacter):
@@ -40,18 +60,12 @@ func command(cmd: String, player: MarbleCharacter):
 	match parts[0]:
 		"spawn", "/spawn":
 			#print("spawn")
-			var rng = RandomNumberGenerator.new()
 			match parts[1]:
 				"stone", "stones":
 					var count = 1
 					if parts.size() >= 3:
 						count = int(parts[2])
-					count = clampi(count, 1, 10)
-					for i in count:
-						var stone = Stone.instantiate()
-						stone.name = stone.name + "%010d" % rng.randi()
-						stone.position = get_random_vector(10, player.position)
-						terra.add_child(stone)
+					spawn_stones(count, player.position)
 				"acorn":
 					var count = 1
 					if parts.size() >= 3:
@@ -61,6 +75,7 @@ func command(cmd: String, player: MarbleCharacter):
 						var acorn = Acorn.instantiate()
 						acorn.name = acorn.name + "%010d" % rng.randi()
 						acorn.position = get_random_vector(10, player.position)
+						#var chunk = get_chunk(acorn.position)
 						flora.add_child(acorn)
 				"bush":
 					var count = 1
@@ -71,6 +86,7 @@ func command(cmd: String, player: MarbleCharacter):
 						var bush = Bush.instantiate()
 						bush.name = bush.name + "%010d" % rng.randi()
 						bush.position = get_random_vector(10, player.position)
+						#var chunk = get_chunk(bush.position)
 						flora.add_child(bush)
 				"tree", "trees":
 					var count = 1
@@ -81,11 +97,12 @@ func command(cmd: String, player: MarbleCharacter):
 						var tree = Tree_.instantiate()
 						tree.name = tree.name + "%010d" % rng.randi()
 						tree.position = get_random_vector(10, player.position)
+						#var chunk = get_chunk(tree.position)
 						flora.add_child(tree)
 
 
 func get_random_vector(R: float, center: Vector3) -> Vector3:
-	var rng = RandomNumberGenerator.new()
+	#var rng = RandomNumberGenerator.new()
 	var r = R * sqrt(rng.randf())
 	var theta = rng.randf() * 2 * PI
 	var x = center.x + r * cos(theta)
