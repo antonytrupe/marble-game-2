@@ -31,8 +31,11 @@ properties/2/replication_mode = 2
 [sub_resource type="BoxShape3D" id="BoxShape3D_p2tpf"]
 size = Vector3(60, 60, 60)
 
-[node name="Chunk" type="Node3D" groups=["persist"]]
+[node name="Chunk" type="Node3D" node_paths=PackedStringArray("flora", "fauna", "terra") groups=["persist"]]
 script = ExtResource("1_icme5")
+flora = NodePath("Flora")
+fauna = NodePath("Fauna")
+terra = NodePath("Terra")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_asbb7")
@@ -66,6 +69,26 @@ collision_mask = 12
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="FloraFaunaScanner"]
 shape = SubResource("BoxShape3D_p2tpf")
+
+[node name="Flora" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Flora"]
+_spawnable_scenes = PackedStringArray("res://bush/bush.tscn", "res://acorn/acorn.tscn", "res://tree/tree.tscn")
+spawn_path = NodePath("..")
+
+[node name="Fauna" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Fauna"]
+spawn_path = NodePath("..")
+
+[node name="Terra" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Terra"]
+_spawnable_scenes = PackedStringArray("res://stone/stone.tscn")
+spawn_path = NodePath("..")
 
 [connection signal="body_entered" from="PlayerScanner" to="." method="_on_area_3d_body_entered"]
 [connection signal="body_exited" from="PlayerScanner" to="." method="_on_chunk_area_3d_body_exited"]

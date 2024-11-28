@@ -12,7 +12,7 @@ albedo_color = Color(0.198139, 0.198138, 0.195976, 1)
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_gomn2"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
-properties/0/replication_mode = 1
+properties/0/replication_mode = 2
 
 [node name="Stone" type="Node3D" groups=["persist"]]
 script = ExtResource("1_qlija")

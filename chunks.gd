@@ -9,7 +9,7 @@ const ChunkResource = preload("res://chunk.tscn")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	if multiplayer.is_server():
+	if !multiplayer.is_server():
 		Signals.PlayerZoned.connect(_on_player_zoned)
 
 
@@ -22,6 +22,8 @@ func _on_player_zoned(player: MarbleCharacter, chunk: Node3D):
 	if game.player_id == player.name:
 		#get all the chunks the player is overlapping
 		var chunks = player.get_zones()
+		if !chunks:
+			print('%s not in any chunks' % [player.name])
 		# tell the daynightcycle node what chunks the player is in
 		dayNightCycle.chunks = chunks
 

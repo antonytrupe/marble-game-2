@@ -53,8 +53,7 @@ theme_override_constants/margin_top = 25
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 23
 
-[node name="ItemList" type="VBoxContainer" parent="NinePatchRect/MarginContainer"]
+[node name="ItemList" type="VFlowContainer" parent="NinePatchRect/MarginContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
-size_flags_vertical = 0

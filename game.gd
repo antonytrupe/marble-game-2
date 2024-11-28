@@ -23,12 +23,32 @@ var player_id: String
 # This will contain player info for every player,
 # with the keys being each player's unique IDs.
 #var players = {}
+var rng = RandomNumberGenerator.new()
 
 const Player = preload("res://player.tscn")
-const Stone = preload("res://stone/stone.tscn")
+const StoneScene = preload("res://stone/stone.tscn")
 const Acorn = preload("res://acorn/acorn.tscn")
 const Bush = preload("res://bush/bush.tscn")
 const Tree_ = preload("res://tree/tree.tscn")
+
+func get_chunk(_position: Vector3) -> Chunk:
+	return null
+
+
+func get_chunk_name(p: Vector3) -> String:
+	var _x = p.x / 60
+	return "[0,0,0]"
+
+
+func spawn_stones(quantity: int, p: Vector3):
+	quantity = clampi(quantity, 1, 100)
+	for i in quantity:
+		var stone = StoneScene.instantiate()
+		stone.name = stone.name + "%010d" % rng.randi()
+		stone.position = get_random_vector(10, p)
+		#var chunk_name=get_chunk_name(stone.position)
+		# var chunk=get_chunk(stone.position)
+		terra.add_child(stone)
 
 
 func command(cmd: String, player: MarbleCharacter):
@@ -40,18 +60,12 @@ func command(cmd: String, player: MarbleCharacter):
 	match parts[0]:
 		"spawn", "/spawn":
 			#print("spawn")
-			var rng = RandomNumberGenerator.new()
 			match parts[1]:
 				"stone", "stones":
 					var count = 1
 					if parts.size() >= 3:
 						count = int(parts[2])
-					count = clampi(count, 1, 10)
-					for i in count:
-						var stone = Stone.instantiate()
-						stone.name = stone.name + "%010d" % rng.randi()
-						stone.position = get_random_vector(10, player.position)
-						terra.add_child(stone)
+					spawn_stones(count, player.position)
 				"acorn":
 					var count = 1
 					if parts.size() >= 3:
@@ -61,6 +75,7 @@ func command(cmd: String, player: MarbleCharacter):
 						var acorn = Acorn.instantiate()
 						acorn.name = acorn.name + "%010d" % rng.randi()
 						acorn.position = get_random_vector(10, player.position)
+						#var chunk = get_chunk(acorn.position)
 						flora.add_child(acorn)
 				"bush":
 					var count = 1
@@ -71,6 +86,7 @@ func command(cmd: String, player: MarbleCharacter):
 						var bush = Bush.instantiate()
 						bush.name = bush.name + "%010d" % rng.randi()
 						bush.position = get_random_vector(10, player.position)
+						#var chunk = get_chunk(bush.position)
 						flora.add_child(bush)
 				"tree", "trees":
 					var count = 1
@@ -81,11 +97,12 @@ func command(cmd: String, player: MarbleCharacter):
 						var tree = Tree_.instantiate()
 						tree.name = tree.name + "%010d" % rng.randi()
 						tree.position = get_random_vector(10, player.position)
+						#var chunk = get_chunk(tree.position)
 						flora.add_child(tree)
 
 
 func get_random_vector(R: float, center: Vector3) -> Vector3:
-	var rng = RandomNumberGenerator.new()
+	#var rng = RandomNumberGenerator.new()
 	var r = R * sqrt(rng.randf())
 	var theta = rng.randf() * 2 * PI
 	var x = center.x + r * cos(theta)
@@ -172,9 +189,6 @@ func _ready():
 	# Load data from a file.
 	#var err = config.load("user://config.cfg")
 	var err = configFile.load("res://config.cfg")
-	var f = FileAccess.open("user://config.cfg", FileAccess.WRITE)
-	#f.flush()
-	print(f.get_path_absolute())
 	# If the file didn't load, ignore it.
 	if err != OK:
 		print("error reading config file")
@@ -283,8 +297,8 @@ func save_game():
 
 		node_data.name = node.name
 		node_data.parent = node.get_parent().get_path()
-		node_data.class = node.get_class()
-		node_data.filename = node.get_scene_file_path()
+		node_data. class = node.get_class()
+		node_data.scene_file_path = node.get_scene_file_path()
 
 		# JSON provides a static method to serialized JSON string.
 		var json_string = JSON.stringify(node_data, "", false)
@@ -301,7 +315,7 @@ func save_game():
 func load_game():
 	if not FileAccess.file_exists("user://savegame.save"):
 		print("save not found")
-		return  # Error! We don't have a save to load.
+		return # Error! We don't have a save to load.
 
 	var save_file = FileAccess.open("user://savegame.save", FileAccess.READ)
 	var json = JSON.new()
@@ -321,10 +335,10 @@ func load_game():
 		# Firstly, we need to create the object and add it to the tree
 		# check if the node is in the tree already
 		var node = get_node_or_null(node_data.parent + "/" + node_data.name)
-		if !node and node_data["filename"]:
-			node = load(node_data["filename"]).instantiate()
+		if !node and node_data["scene_file_path"]:
+			node = load(node_data["scene_file_path"]).instantiate()
 		elif !node and node_data["class"]:
-			node = ClassDB.instantiate(node_data.class)
+			node = ClassDB.instantiate(node_data. class )
 		else:
 			pass
 		# Check the node has a load function.
