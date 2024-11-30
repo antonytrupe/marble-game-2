@@ -46,21 +46,21 @@ var quests = []
 
 @onready var game: Game = $/root/Game
 @onready var world: World = $/root/Game/World
-@onready var chatTextEdit: TextEdit = $/root/Game/UI/HUD/ChatInput
-@onready var ChatBubbles = %ChatBubbles
-@onready var cameraPivot = $CameraPivot
+@onready var chat_text_edit: TextEdit = $/root/Game/UI/HUD/ChatInput
+@onready var chat_bubbles = %ChatBubbles
+@onready var camera_pivot = $CameraPivot
 @onready var camera = %Camera3D
 @onready var raycast = %RayCast3D
 @onready var anim_player = $AnimationPlayer
-@onready var inventoryUI = %InventoryUI
-@onready var chunkScanner = %ChunkScanner
-@onready var characterSheet = %CharacterSheet
-@onready var questCreator = %QuestCreator
-@onready var actionsUI = %ActionsUI
+@onready var inventory_ui = %InventoryUI
+@onready var chunk_scanner = %ChunkScanner
+@onready var character_sheet = %CharacterSheet
+@onready var quest_creator_ui = %QuestCreator
+@onready var actions_ui = %ActionsUI
 @onready var fade_anim = %AnimationPlayer
-@onready var tradeUI = %TradeUI
-@onready var craftUI = %CraftUI
-@onready var crossHair = %CrossHair
+@onready var trade_ui = %TradeUI
+@onready var craft_ui = %CraftUI
+@onready var cross_hair = %CrossHair
 
 #@onready var inventoryNode = %Inventory
 
@@ -97,23 +97,23 @@ func craft(action: String, tool: Dictionary, loot: Dictionary):
 
 func _update_other_trade_inventory(loot):
 	other_trade_inventory = loot
-	if tradeUI:
-		tradeUI.other_player_trade = other_trade_inventory
-		tradeUI.update()
+	if trade_ui:
+		trade_ui.other_player_trade = other_trade_inventory
+		trade_ui.update()
 
 
 func _update_trade_inventory(loot):
 	my_trade_inventory = loot
-	if tradeUI:
-		tradeUI.update()
+	if trade_ui:
+		trade_ui.update()
 	if trade_partner:
 		trade_partner.other_trade_inventory = loot
 
 
 #@rpc("call_remote")
 #func updateTradeUI():
-#tradeUI.otherPlayerTrade = otherTradeInventory
-#tradeUI.update()
+#trade_ui.otherPlayerTrade = otherTradeInventory
+#trade_ui.update()
 
 @rpc("any_peer")
 func accept_trade():
@@ -171,13 +171,13 @@ func is_current_player():
 func set_trading(value):
 	trading = value
 	#if the tradeui is ready and this is the current player
-	if tradeUI and is_current_player():
+	if trade_ui and is_current_player():
 		if trading:
-			tradeUI.other_player_trade = other_trade_inventory
-			tradeUI.update()
-			tradeUI.show()
+			trade_ui.other_player_trade = other_trade_inventory
+			trade_ui.update()
+			trade_ui.show()
 		else:
-			tradeUI.hide()
+			trade_ui.hide()
 	if !trading:
 		trade_partner = null
 		trade_accepted = false
@@ -188,12 +188,12 @@ func set_trading(value):
 func _set_inventory(value: Dictionary):
 	#print('player._set_inventory')
 	inventory = value
-	if inventoryUI:
-		inventoryUI.update()
-	if tradeUI:
-		tradeUI.update()
-	if craftUI:
-		craftUI.update()
+	if inventory_ui:
+		inventory_ui.update()
+	if trade_ui:
+		trade_ui.update()
+	if craft_ui:
+		craft_ui.update()
 
 
 #setter, don't call directly
@@ -216,7 +216,7 @@ func reset_actions():
 
 
 func get_zones() -> Array[Chunk]:
-	var areas = chunkScanner.get_overlapping_areas()
+	var areas = chunk_scanner.get_overlapping_areas()
 	var chunks: Array[Chunk] = []
 	for area: Area3D in areas:
 		chunks.append(area.get_parent())
@@ -241,13 +241,13 @@ func update_mode(new_mode):
 	if mode != new_mode:
 		if new_mode == MOVE.MODE.CROUCH:
 			anim_player.play("crouch")
-			print('play crouch')
+			print("play crouch")
 		elif mode == MOVE.MODE.CROUCH:
 			anim_player.play_backwards("crouch")
-			print('play crouch backwards')
+			print("play crouch backwards")
 		else:
 			anim_player.play("RESET")
-			print('play reset')
+			print("play reset")
 	mode = new_mode
 
 
@@ -289,14 +289,14 @@ func _on_new_turn(_turn_id):
 
 
 func _ready():
-	actionsUI.player_id = player_id
+	actions_ui.player_id = player_id
 	Signals.NewTurn.connect(_on_new_turn)
 	#if multiplayer.is_server():
 	#Signals.PlayerZoned.connect(_on_player_zoned)
 	if is_current_player():
 		camera.current = true
-		actionsUI.show()
-		crossHair.visible = true
+		actions_ui.show()
+		cross_hair.visible = true
 	else:
 		pass
 
@@ -334,18 +334,18 @@ func _unhandled_input(event):
 			time_warp.rpc_id(1, minutes)
 
 	if Input.is_action_just_pressed("inventory"):
-		inventoryUI.visible = !inventoryUI.visible
+		inventory_ui.visible = !inventory_ui.visible
 
 	if Input.is_action_just_pressed("craft"):
-		craftUI.visible = !craftUI.visible
-		crossHair.visible = !crossHair.visible
+		craft_ui.visible = !craft_ui.visible
+		cross_hair.visible = !cross_hair.visible
 
 	if Input.is_action_just_pressed("character_sheet"):
-		characterSheet.visible = !characterSheet.visible
+		character_sheet.visible = !character_sheet.visible
 
 	if Input.is_action_just_pressed("quest_creator"):
-		questCreator.visible = !questCreator.visible
-		crossHair.visible = !crossHair.visible
+		quest_creator_ui.visible = !quest_creator_ui.visible
+		cross_hair.visible = !cross_hair.visible
 
 	if event is InputEventMouseMotion:
 		if (
@@ -363,8 +363,8 @@ func _unhandled_input(event):
 	if Input.is_action_just_pressed("quit") and chat_mode:
 		#don't let this event bubble up
 		get_viewport().set_input_as_handled()
-		chatTextEdit.hide()
-		chatTextEdit.release_focus()
+		chat_text_edit.hide()
+		chat_text_edit.release_focus()
 		chat_mode = false
 
 	if Input.is_action_just_pressed("quit") and trading:
@@ -376,25 +376,25 @@ func _unhandled_input(event):
 		else:
 			cancel_trade.rpc_id(1)
 
-	if Input.is_action_just_pressed("quit") and inventoryUI.visible:
+	if Input.is_action_just_pressed("quit") and inventory_ui.visible:
 		#don't let this event bubble up
 		get_viewport().set_input_as_handled()
 
-		inventoryUI.hide()
+		inventory_ui.hide()
 
 	if Input.is_action_just_pressed("chat"):
-		chatTextEdit.visible = !chatTextEdit.visible
+		chat_text_edit.visible = !chat_text_edit.visible
 		chat_mode = !chat_mode
 		if chat_mode:
-			chatTextEdit.grab_focus()
+			chat_text_edit.grab_focus()
 		else:
-			chatTextEdit.release_focus()
-			server_chat.rpc_id(1, chatTextEdit.text)
-			chatTextEdit.text = ""
+			chat_text_edit.release_focus()
+			server_chat.rpc_id(1, chat_text_edit.text)
+			chat_text_edit.text = ""
 
 
 func _process(_delta):
-	characterSheet.age = calculated_age
+	character_sheet.age = calculated_age
 
 
 func _physics_process(delta):
@@ -491,7 +491,7 @@ func client_chat(message):
 		return
 	var bubble = load("res://ChatBubble.tscn").instantiate()
 	bubble.text = message
-	ChatBubbles.add_child(bubble)
+	chat_bubbles.add_child(bubble)
 
 
 @rpc("any_peer")
@@ -499,8 +499,8 @@ func server_rotate(value: Vector2):
 	if !multiplayer.is_server():
 		return
 	rotate_y(-value.x * .005)
-	cameraPivot.rotate_x(-value.y * .005)
-	cameraPivot.rotation.x = clamp(cameraPivot.rotation.x, -PI / 2, PI / 2)
+	camera_pivot.rotate_x(-value.y * .005)
+	camera_pivot.rotation.x = clamp(camera_pivot.rotation.x, -PI / 2, PI / 2)
 
 
 func start_trade(player: MarbleCharacter):
@@ -585,7 +585,7 @@ func add_to_inventory(loot: Dictionary):
 			inventory[category].items[item.name] = item
 
 	#print('inventory:', inventory)
-	craftUI.update.rpc()
+	craft_ui.update.rpc()
 
 
 func remove_from_inventory(loot: Dictionary) -> bool:
@@ -637,4 +637,4 @@ func server_move(d):
 			set_action({"action": MOVE.STRINGS[mode]})
 	#else:
 	#TODO animation state machine so that walk and crouch can play at the same time
-		#play_animation.rpc("RESET")
+	#play_animation.rpc("RESET")

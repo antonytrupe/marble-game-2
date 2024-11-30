@@ -1,8 +1,8 @@
 extends Node3D
 
+@export var text: String
 var start
 @onready var parent = get_parent_node_3d()
-@export var text: String
 @onready var label = $Label3D
 
 

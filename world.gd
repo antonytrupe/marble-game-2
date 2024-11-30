@@ -1,12 +1,12 @@
-extends Node3D
 class_name World
+extends Node3D
+
+const CHUNK_SCENE = preload("res://chunk.tscn")
 
 @export var world_age: int = 0
 
 var calculated_age: int:
 	get = calculate_age
-
-const ChunkScene = preload("res://chunk.tscn")
 
 var turn_start: int = 0
 
@@ -39,7 +39,7 @@ func get_chunk_cirle(_center: Array[Chunk], _ring: int):
 
 
 func _on_time_warp(minutes: int, chunks: Array[Chunk]):
-	var _visitedChunks = chunks
+	#var visited_chunks = chunks
 	for chunk in chunks:
 		chunk.time_warp(minutes)
 

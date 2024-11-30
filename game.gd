@@ -24,11 +24,11 @@ var rng = RandomNumberGenerator.new()
 @onready var hud = $UI/HUD
 @onready var terra = %Terra
 @onready var flora = %Flora
-@onready var turnNumberLabel = %TurnNumber
-@onready var turnTimer = %TurnTimer
-@onready var serverCamera = $CameraPivot/ServerCamera3D
+@onready var turn_number_label = %TurnNumber
+@onready var turn_timer = %TurnTimer
+@onready var server_camera = $CameraPivot/ServerCamera3D
 @onready var world = %World
-@onready var worldTime = %WorldTimeLabel
+@onready var world_time = %WorldTimeLabel
 @onready var players = %Players
 
 
@@ -221,8 +221,8 @@ func _ready():
 		main_menu.hide()
 		hud.show()
 		#health_bar.hide()
-		serverCamera.show()
-		serverCamera.current = true
+		server_camera.show()
+		server_camera.current = true
 		get_viewport().get_window().title += " - SERVER"
 	elif config.has("player_id"):
 		player_id = config["player_id"]
@@ -235,7 +235,7 @@ func _ready():
 
 func update_turn_number(value):
 	turn_number = value
-	turnNumberLabel.text = "turn " + str(value)
+	turn_number_label.text = "turn " + str(value)
 	turn_start = Time.get_ticks_msec()
 	Signals.NewTurn.emit(turn_number)
 
@@ -258,19 +258,19 @@ func _process(_delta):
 	var now = Time.get_ticks_msec()
 
 	var age = GameTime.get_age_parts(world.calculated_age)
-	worldTime.text = (
+	world_time.text = (
 		"%d years, %d months, %d days, %02d:%02d:%02d"
 		% [age.years, age.months, age.days, age.hours, age.minutes, age.seconds]
 	)
 
 	if multiplayer.is_server():
-		turnTimer.value = (now + world.world_age) % 6000
-		var newTurnNumber = (now + world.world_age) / (6 * 1000) + 1
-		if turn_number != newTurnNumber:
-			turn_number = newTurnNumber
+		turn_timer.value = (now + world.world_age) % 6000
+		var new_turn_number = (now + world.world_age) / (6 * 1000) + 1
+		if turn_number != new_turn_number:
+			turn_number = new_turn_number
 
 	else:
-		turnTimer.value = (now - turn_start) % 6000
+		turn_timer.value = (now - turn_start) % 6000
 
 
 func save():

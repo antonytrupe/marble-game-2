@@ -1,5 +1,5 @@
-extends Node3D
 class_name Chunk
+extends Node3D
 
 @export var birth_date: int = 0:
 	set = set_birth_date
@@ -10,23 +10,22 @@ class_name Chunk
 @export var fauna: Node3D
 @export var terra: Node3D
 
-@onready var label = %AgeLabel
-@onready var world = $/root/Game/World
-@onready var floraFaunaScanner = %FloraFaunaScanner
-@onready var playerScanner = %PlayerScanner
-
 var rng = RandomNumberGenerator.new()
-
 
 var calculated_age: int:
 	get = calculate_age
 
+@onready var label = %AgeLabel
+@onready var world = $/root/Game/World
+@onready var flora_fauna_scanner = %FloraFaunaScanner
+@onready var player_scanner = %PlayerScanner
+
 
 func _process(delta):
-	var r=rng.randf_range(0.0, 5000.0)
-	if r*delta/0.0133<1.0:
+	var r = rng.randf_range(0.0, 5000.0)
+	if r * delta / 0.0133 < 1.0:
 		print(delta)
-		print('spawn stone in chunk %s' % name)
+		print("spawn stone in chunk %s" % name)
 	#label.text = GameTime.format(calculated_age)
 
 
@@ -48,11 +47,11 @@ func calculate_age():
 
 
 func get_players():
-	return playerScanner.get_overlapping_bodies()
+	return player_scanner.get_overlapping_bodies()
 
 
 func get_flora_fauna() -> Array[Node3D]:
-	var areas = floraFaunaScanner.get_overlapping_areas()
+	var areas = flora_fauna_scanner.get_overlapping_areas()
 	var entities: Array[Node3D] = []
 	for area: Area3D in areas:
 		entities.append(area.get_parent())
@@ -111,11 +110,11 @@ func generate_terrain():
 	#mesh=a_mesh
 
 
-func _on_area_3d_body_entered(playerArea: Node3D) -> void:
-	if playerArea is CharacterBody3D:
-		Signals.PlayerZoned.emit(playerArea, self)
+func _on_area_3d_body_entered(player_area: Node3D) -> void:
+	if player_area is CharacterBody3D:
+		Signals.PlayerZoned.emit(player_area, self)
 
 
-func _on_chunk_area_3d_body_exited(playerArea: Node3D) -> void:
-	if playerArea is CharacterBody3D:
-		Signals.PlayerZoned.emit(playerArea, self)
+func _on_chunk_area_3d_body_exited(player_area: Node3D) -> void:
+	if player_area is CharacterBody3D:
+		Signals.PlayerZoned.emit(player_area, self)
