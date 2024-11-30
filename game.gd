@@ -1,8 +1,24 @@
-extends Node3D
 class_name Game
+extends Node3D
 
 const PORT = 9999
+const PLAYER_SCENE = preload("res://player.tscn")
+const STONE_SCENE = preload("res://stone/stone.tscn")
+const ACORN_SCENE = preload("res://acorn/acorn.tscn")
+const BUSH_SCENE = preload("res://bush/bush.tscn")
+const TREE_SCENE = preload("res://tree/tree.tscn")
+
+@export var turn_number = 1:
+	set = update_turn_number
+
 var enet_peer = ENetMultiplayerPeer.new()
+
+var turn_start = 0
+var player_id: String
+# This will contain player info for every player,
+# with the keys being each player's unique IDs.
+#var players = {}
+var rng = RandomNumberGenerator.new()
 
 @onready var main_menu = $UI/MainMenu
 @onready var hud = $UI/HUD
@@ -15,35 +31,20 @@ var enet_peer = ENetMultiplayerPeer.new()
 @onready var worldTime = %WorldTimeLabel
 @onready var players = %Players
 
-@export var turn_number = 1:
-	set = update_turn_number
-
-var turn_start = 0
-var player_id: String
-# This will contain player info for every player,
-# with the keys being each player's unique IDs.
-#var players = {}
-var rng = RandomNumberGenerator.new()
-
-const Player = preload("res://player.tscn")
-const StoneScene = preload("res://stone/stone.tscn")
-const Acorn = preload("res://acorn/acorn.tscn")
-const Bush = preload("res://bush/bush.tscn")
-const Tree_ = preload("res://tree/tree.tscn")
 
 func get_chunk(_position: Vector3) -> Chunk:
 	return null
 
 
 func get_chunk_name(p: Vector3) -> String:
-	var _x = p.x / 60
+	# var x = p.x / 60
 	return "[0,0,0]"
 
 
 func spawn_stones(quantity: int, p: Vector3):
 	quantity = clampi(quantity, 1, 100)
 	for i in quantity:
-		var stone = StoneScene.instantiate()
+		var stone = STONE_SCENE.instantiate()
 		stone.name = stone.name + "%010d" % rng.randi()
 		stone.position = get_random_vector(10, p)
 		#var chunk_name=get_chunk_name(stone.position)
@@ -72,7 +73,7 @@ func command(cmd: String, player: MarbleCharacter):
 						count = int(parts[2])
 					count = clampi(count, 1, 10)
 					for i in count:
-						var acorn = Acorn.instantiate()
+						var acorn = ACORN_SCENE.instantiate()
 						acorn.name = acorn.name + "%010d" % rng.randi()
 						acorn.position = get_random_vector(10, player.position)
 						#var chunk = get_chunk(acorn.position)
@@ -83,7 +84,7 @@ func command(cmd: String, player: MarbleCharacter):
 						count = int(parts[2])
 					count = clampi(count, 1, 10)
 					for i in count:
-						var bush = Bush.instantiate()
+						var bush = BUSH_SCENE.instantiate()
 						bush.name = bush.name + "%010d" % rng.randi()
 						bush.position = get_random_vector(10, player.position)
 						#var chunk = get_chunk(bush.position)
@@ -94,7 +95,7 @@ func command(cmd: String, player: MarbleCharacter):
 						count = int(parts[2])
 					count = clampi(count, 1, 10)
 					for i in count:
-						var tree = Tree_.instantiate()
+						var tree = TREE_SCENE.instantiate()
 						tree.name = tree.name + "%010d" % rng.randi()
 						tree.position = get_random_vector(10, player.position)
 						#var chunk = get_chunk(tree.position)
@@ -157,7 +158,7 @@ func add_player(_peer_id, _player_id):
 	#first check if this player already has a node
 	var player = players.get_node_or_null(_player_id)
 	if !player:
-		player = Player.instantiate()
+		player = PLAYER_SCENE.instantiate()
 		player.name = _player_id
 		player.player_id = _player_id
 		#TODO make sure player isn't colliding with existing player
@@ -176,7 +177,7 @@ func add_player(_peer_id, _player_id):
 		#var i = get_world_3d().direct_space_state.collide_shape(params)
 		#print(i)
 		#if i:
-			#print("found overlap")
+		#print("found overlap")
 		player.position.x = RandomNumberGenerator.new().randi_range(-5, 5)
 		player.position.z = RandomNumberGenerator.new().randi_range(-5, 5)
 		players.add_child(player)
@@ -185,18 +186,18 @@ func add_player(_peer_id, _player_id):
 func _ready():
 	#var signals=load("res://Signals.cs").new()
 
-	var configFile = ConfigFile.new()
+	var config_file = ConfigFile.new()
 	# Load data from a file.
 	#var err = config.load("user://config.cfg")
-	var err = configFile.load("res://config.cfg")
+	var err = config_file.load("res://config.cfg")
 	# If the file didn't load, ignore it.
 	if err != OK:
 		print("error reading config file")
 
 	var config = {}
-	config.player_id = configFile.get_value("default", "player_id", "")
-	config.remote_ip = configFile.get_value("default", "remote_ip", "")
-	config.server = configFile.get_value("default", "server", false)
+	config.player_id = config_file.get_value("default", "player_id", "")
+	config.remote_ip = config_file.get_value("default", "remote_ip", "")
+	config.server = config_file.get_value("default", "server", false)
 
 	print("config:", config)
 
@@ -257,7 +258,10 @@ func _process(_delta):
 	var now = Time.get_ticks_msec()
 
 	var age = GameTime.get_age_parts(world.calculated_age)
-	worldTime.text = "%d years, %d months, %d days, %02d:%02d:%02d" % [age.years, age.months, age.days, age.hours, age.minutes, age.seconds]
+	worldTime.text = (
+		"%d years, %d months, %d days, %02d:%02d:%02d"
+		% [age.years, age.months, age.days, age.hours, age.minutes, age.seconds]
+	)
 
 	if multiplayer.is_server():
 		turnTimer.value = (now + world.world_age) % 6000
@@ -297,7 +301,7 @@ func save_game():
 
 		node_data.name = node.name
 		node_data.parent = node.get_parent().get_path()
-		node_data. class = node.get_class()
+		node_data.class = node.get_class()
 		node_data.scene_file_path = node.get_scene_file_path()
 
 		# JSON provides a static method to serialized JSON string.
@@ -309,13 +313,16 @@ func save_game():
 	#save_file.close()
 	save_file.flush()
 	print("saved ", save_file.get_path_absolute())
-	DirAccess.copy_absolute(save_file.get_path_absolute(), "user://savegame_" + str(Time.get_ticks_msec() + world.world_age) + ".save")
+	DirAccess.copy_absolute(
+		save_file.get_path_absolute(),
+		"user://savegame_" + str(Time.get_ticks_msec() + world.world_age) + ".save"
+	)
 
 
 func load_game():
 	if not FileAccess.file_exists("user://savegame.save"):
 		print("save not found")
-		return # Error! We don't have a save to load.
+		return  # Error! We don't have a save to load.
 
 	var save_file = FileAccess.open("user://savegame.save", FileAccess.READ)
 	var json = JSON.new()
@@ -326,7 +333,14 @@ func load_game():
 		# Check if there is any error while parsing the JSON string, skip in case of failure.
 		parse_result = json.parse(json_string)
 		if not parse_result == OK:
-			print("JSON Parse Error: ", json.get_error_message(), " in ", json_string, " at line ", json.get_error_line())
+			print(
+				"JSON Parse Error: ",
+				json.get_error_message(),
+				" in ",
+				json_string,
+				" at line ",
+				json.get_error_line()
+			)
 			continue
 
 		# Get the data from the JSON object.
@@ -338,7 +352,7 @@ func load_game():
 		if !node and node_data["scene_file_path"]:
 			node = load(node_data["scene_file_path"]).instantiate()
 		elif !node and node_data["class"]:
-			node = ClassDB.instantiate(node_data. class )
+			node = ClassDB.instantiate(node_data.class)
 		else:
 			pass
 		# Check the node has a load function.

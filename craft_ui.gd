@@ -1,14 +1,14 @@
 extends Node2D
+const INVENTORY_SLOT_SCENE = preload("res://inventory_slot.tscn")
 
 @export var me: MarbleCharacter
-@onready var myItems = %MyInventory
-@onready var myCraftItems = %MyCrafts
 var myInventorySlots = {}
 var myCraftSlots = {}
 var tool = null
-@onready var toolSlot: InventorySlot = %Tool
 var craftInventory = {}
-const inventory_slot_scene = preload("res://inventory_slot.tscn")
+@onready var toolSlot: InventorySlot = %Tool
+@onready var myItems = %MyInventory
+@onready var myCraftItems = %MyCrafts
 
 
 func _ready() -> void:
@@ -18,7 +18,6 @@ func _ready() -> void:
 
 @rpc("any_peer", "call_remote")
 func update() -> void:
-
 	myInventorySlots = {}
 	for c in myItems.get_children():
 		myItems.remove_child(c)
@@ -30,7 +29,7 @@ func update() -> void:
 		c.queue_free()
 
 	if tool:
-		toolSlot.remove_item(tool )
+		toolSlot.remove_item(tool)
 		tool = null
 
 	#print('craftui update',me.inventory)
@@ -41,7 +40,7 @@ func update() -> void:
 
 func add_item_to_inventory(item: Dictionary):
 	if !(item.category in myInventorySlots):
-		var new_slot: InventorySlot = inventory_slot_scene.instantiate()
+		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
 		#new_slot.items = {}
 		new_slot.type_scene_file_path = item.scene_file_path
 		#new_slot.items=me.inventory[ii].items
@@ -67,7 +66,6 @@ func remove_item_from_inventory(category: String) -> Dictionary:
 
 
 func add_item_to_tool(item: Dictionary):
-
 	toolSlot.type_scene_file_path = item.scene_file_path
 	toolSlot.add_item(item)
 	tool = item
@@ -75,17 +73,16 @@ func add_item_to_tool(item: Dictionary):
 
 
 func remove_item_from_tool() -> Dictionary:
+	toolSlot.remove_item(tool)
 
-	toolSlot.remove_item(tool )
-
-	var _tool = tool
+	var t = tool
 	tool = null
-	return _tool
+	return t
 
 
 func add_item_to_craft(item: Dictionary):
 	if !(item.category in myCraftSlots):
-		var new_slot: InventorySlot = inventory_slot_scene.instantiate()
+		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
 		#new_slot.items = {}
 		new_slot.type_scene_file_path = item.scene_file_path
 		#new_slot.items=me.inventory[ii].items
@@ -93,9 +90,7 @@ func add_item_to_craft(item: Dictionary):
 		myCraftItems.add_child(new_slot)
 		new_slot.pressed.connect(_on_craft_slot_pressed.bind(new_slot))
 
-		craftInventory[item.category] = {
-			items = {}
-		}
+		craftInventory[item.category] = {items = {}}
 
 	craftInventory[item.category].items[item.name] = item
 	myCraftSlots[item.category].add_item(item)
@@ -122,10 +117,10 @@ func _on_tool_slot_pressed():
 	add_item_to_inventory(item)
 	#update()
 
-func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
 
+func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
 	var item = remove_item_from_inventory(slot.category)
-	if ! tool:
+	if !tool:
 		add_item_to_tool(item)
 
 	else:
@@ -134,14 +129,14 @@ func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
 
 
 func _on_craft_slot_pressed(slot: InventorySlot) -> void:
-
 	var item = remove_item_from_craft(slot.category)
 	add_item_to_inventory(item)
 	#update()
 
+
 func _on_craft_pressed() -> void:
-	if ! tool:
-		print('no tool item')
+	if !tool:
+		print("no tool item")
 		return
-	me.craft.rpc_id(1, 'craft', tool , craftInventory)
+	me.craft.rpc_id(1, "craft", tool, craftInventory)
 	update()

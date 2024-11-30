@@ -1,5 +1,5 @@
-extends Button
 class_name InventorySlot
+extends Button
 
 @export var type_scene_file_path: String
 
@@ -43,7 +43,7 @@ func update_category(c: String):
 
 # Called when the node enters the scene tree for the first time.
 func update() -> void:
-	print('item inventory update')
+	print("item inventory update")
 	if label:
 		if size() == 0:
 			hide()
