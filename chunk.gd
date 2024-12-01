@@ -24,8 +24,9 @@ var calculated_age: int:
 func _process(delta):
 	var r = rng.randf_range(0.0, 5000.0)
 	if r * delta / 0.0133 < 1.0:
-		print(delta)
-		print("spawn stone in chunk %s" % name)
+		pass
+		# print(delta)
+		#print("spawn stone in chunk %s" % name)
 	#label.text = GameTime.format(calculated_age)
 
 

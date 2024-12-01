@@ -115,6 +115,7 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="UI/HUD/MarginContainer/VBoxContainer"]
+visible = false
 layout_mode = 2
 
 [node name="WorldTimeLabel" type="Label" parent="UI/HUD/MarginContainer/VBoxContainer/PanelContainer"]

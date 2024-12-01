@@ -5,9 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://inventory.tscn" id="2_vrrxi"]
 [ext_resource type="PackedScene" uid="uid://dyx3xv5lckl7h" path="res://character_sheet.tscn" id="3_eahd0"]
 [ext_resource type="PackedScene" uid="uid://d35hxvmomxu3p" path="res://actions.tscn" id="4_72q5g"]
-[ext_resource type="PackedScene" uid="uid://j5ugiqe5hl32" path="res://trade_ui.tscn" id="5_32ebk"]
 [ext_resource type="PackedScene" uid="uid://cyyfjbicwvflj" path="res://craft_ui.tscn" id="7_ncuea"]
 [ext_resource type="PackedScene" uid="uid://cblqeddvc1mon" path="res://quest_creator.tscn" id="8_cvl0s"]
+[ext_resource type="PackedScene" uid="uid://b4c105b3jd8a8" path="res://PlayerInteraction.tscn" id="9_4ae2x"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_x3s4a"]
 resource_local_to_scene = true
@@ -563,11 +563,6 @@ libraries = {
 "": SubResource("AnimationLibrary_auoph")
 }
 
-[node name="TradeUI" parent="." node_paths=PackedStringArray("me") instance=ExtResource("5_32ebk")]
-unique_name_in_owner = true
-visible = false
-me = NodePath("..")
-
 [node name="CraftUI" parent="." node_paths=PackedStringArray("me") instance=ExtResource("7_ncuea")]
 unique_name_in_owner = true
 visible = false
@@ -575,6 +570,12 @@ me = NodePath("..")
 
 [node name="QuestCreator" parent="." node_paths=PackedStringArray("me") instance=ExtResource("8_cvl0s")]
 unique_name_in_owner = true
+visible = false
+me = NodePath("..")
+
+[node name="PlayerInteractionUI" parent="." node_paths=PackedStringArray("me") instance=ExtResource("9_4ae2x")]
+unique_name_in_owner = true
+layer = 2
 visible = false
 me = NodePath("..")
 

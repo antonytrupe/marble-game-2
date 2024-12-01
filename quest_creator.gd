@@ -11,4 +11,4 @@ func _on_create_quest_button_pressed() -> void:
 	#print(itemName)
 	#print(item.get_item_text(item.selected))
 	var quantity=quantity_button.value
-	me.create_quest(item_name,quantity)
+	me.create_quest.rpc_id(1,item_name,quantity)
