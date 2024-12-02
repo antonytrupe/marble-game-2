@@ -14,7 +14,7 @@ enum MODE {
 	RUN = 6,
 }
 
-var STRINGS = {
+const STRINGS = {
 	MODE.CROUCH: "CROUCH",
 	MODE.WALK: "WALK",
 	MODE.HUSTLE: "HUSTLE",

@@ -1,36 +1,35 @@
 extends Node2D
+const INVENTORY_SLOT_SCENE = preload("res://inventory_slot.tscn")
 
 @export var me: MarbleCharacter
-@onready var myItems = %MyInventory
-@onready var myCraftItems = %MyCrafts
-var myInventorySlots = {}
-var myCraftSlots = {}
+var my_inventory_slots = {}
+var my_craft_slots = {}
 var tool = null
-@onready var toolSlot: InventorySlot = %Tool
-var craftInventory = {}
-const inventory_slot_scene = preload("res://inventory_slot.tscn")
+var craft_inventory = {}
+@onready var tool_slot: InventorySlot = %Tool
+@onready var my_items = %MyInventory
+@onready var my_craft_items = %MyCrafts
 
 
 func _ready() -> void:
-	toolSlot.pressed.connect(_on_tool_slot_pressed)
+	tool_slot.pressed.connect(_on_tool_slot_pressed)
 	update()
 
 
 @rpc("any_peer", "call_remote")
 func update() -> void:
-
-	myInventorySlots = {}
-	for c in myItems.get_children():
-		myItems.remove_child(c)
+	my_inventory_slots = {}
+	for c in my_items.get_children():
+		my_items.remove_child(c)
 		c.queue_free()
 
-	myCraftSlots = {}
-	for c in myCraftItems.get_children():
-		myCraftItems.remove_child(c)
+	my_craft_slots = {}
+	for c in my_craft_items.get_children():
+		my_craft_items.remove_child(c)
 		c.queue_free()
 
 	if tool:
-		toolSlot.remove_item(tool )
+		tool_slot.remove_item(tool)
 		tool = null
 
 	#print('craftui update',me.inventory)
@@ -40,26 +39,26 @@ func update() -> void:
 
 
 func add_item_to_inventory(item: Dictionary):
-	if !(item.category in myInventorySlots):
-		var new_slot: InventorySlot = inventory_slot_scene.instantiate()
+	if !(item.category in my_inventory_slots):
+		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
 		#new_slot.items = {}
 		new_slot.type_scene_file_path = item.scene_file_path
 		#new_slot.items=me.inventory[ii].items
-		myInventorySlots[item.category] = new_slot
-		myItems.add_child(new_slot)
+		my_inventory_slots[item.category] = new_slot
+		my_items.add_child(new_slot)
 		new_slot.pressed.connect(_on_inventory_slot_pressed.bind(new_slot))
 
-	myInventorySlots[item.category].add_item(item)
+	my_inventory_slots[item.category].add_item(item)
 
 
 func remove_item_from_inventory(category: String) -> Dictionary:
-	var slot: InventorySlot = myInventorySlots[category]
+	var slot: InventorySlot = my_inventory_slots[category]
 	var item = slot.get_items().values()[0]
 	slot.remove_item(item)
 	slot.update()
 
 	if slot.size() == 0:
-		myInventorySlots.erase(category)
+		my_inventory_slots.erase(category)
 		slot.hide()
 		slot.queue_free()
 
@@ -67,52 +66,48 @@ func remove_item_from_inventory(category: String) -> Dictionary:
 
 
 func add_item_to_tool(item: Dictionary):
-
-	toolSlot.type_scene_file_path = item.scene_file_path
-	toolSlot.add_item(item)
+	tool_slot.type_scene_file_path = item.scene_file_path
+	tool_slot.add_item(item)
 	tool = item
 	#TODO update the actions buttonss
 
 
 func remove_item_from_tool() -> Dictionary:
+	tool_slot.remove_item(tool)
 
-	toolSlot.remove_item(tool )
-
-	var _tool = tool
+	var t = tool
 	tool = null
-	return _tool
+	return t
 
 
 func add_item_to_craft(item: Dictionary):
-	if !(item.category in myCraftSlots):
-		var new_slot: InventorySlot = inventory_slot_scene.instantiate()
+	if !(item.category in my_craft_slots):
+		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
 		#new_slot.items = {}
 		new_slot.type_scene_file_path = item.scene_file_path
 		#new_slot.items=me.inventory[ii].items
-		myCraftSlots[item.category] = new_slot
-		myCraftItems.add_child(new_slot)
+		my_craft_slots[item.category] = new_slot
+		my_craft_items.add_child(new_slot)
 		new_slot.pressed.connect(_on_craft_slot_pressed.bind(new_slot))
 
-		craftInventory[item.category] = {
-			items = {}
-		}
+		craft_inventory[item.category] = {items = {}}
 
-	craftInventory[item.category].items[item.name] = item
-	myCraftSlots[item.category].add_item(item)
+	craft_inventory[item.category].items[item.name] = item
+	my_craft_slots[item.category].add_item(item)
 
 
 func remove_item_from_craft(category: String) -> Dictionary:
-	var slot: InventorySlot = myCraftSlots[category]
+	var slot: InventorySlot = my_craft_slots[category]
 	var item = slot.get_items().values()[0]
 	slot.remove_item(item)
 	slot.update()
 
 	if slot.size() == 0:
-		myCraftSlots.erase(category)
+		my_craft_slots.erase(category)
 		slot.hide()
 		slot.queue_free()
 
-	craftInventory[item.category].items.erase(item.name)
+	craft_inventory[item.category].items.erase(item.name)
 
 	return item
 
@@ -122,10 +117,10 @@ func _on_tool_slot_pressed():
 	add_item_to_inventory(item)
 	#update()
 
-func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
 
+func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
 	var item = remove_item_from_inventory(slot.category)
-	if ! tool:
+	if !tool:
 		add_item_to_tool(item)
 
 	else:
@@ -134,14 +129,14 @@ func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
 
 
 func _on_craft_slot_pressed(slot: InventorySlot) -> void:
-
 	var item = remove_item_from_craft(slot.category)
 	add_item_to_inventory(item)
 	#update()
 
+
 func _on_craft_pressed() -> void:
-	if ! tool:
-		print('no tool item')
+	if !tool:
+		print("no tool item")
 		return
-	me.craft.rpc_id(1, 'craft', tool , craftInventory)
+	me.craft.rpc_id(1, "craft", tool, craft_inventory)
 	update()

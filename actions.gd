@@ -2,8 +2,8 @@ extends CanvasLayer
 
 @export var player_id: int
 
-@onready var actionStatus = %ActionStatus
-@onready var movementStatus = %MovementStatus
+@onready var action_status = %ActionStatus
+@onready var movement_status = %MovementStatus
 
 
 # Called when the node enters the scene tree for the first time.
@@ -21,16 +21,16 @@ func _on_action(_player_id, actions: Dictionary):
 
 		if actions.move:
 			#print(MOVE.STRINGS[actions.move])
-			movementStatus.text = MOVE.STRINGS[actions.move]
+			movement_status.text = MOVE.STRINGS[actions.move]
 		else:
-			movementStatus.text = ""
+			movement_status.text = ""
 
 		if actions.action:
 			#print(type_string(typeof(actions.action)))
 			if actions.action is String:
 				#print("action is string")
-				actionStatus.text = actions.action
+				action_status.text = actions.action
 			elif actions.action is MOVE.MODE:
-				actionStatus.text = MOVE.STRINGS[actions.move]
+				action_status.text = MOVE.STRINGS[actions.move]
 		else:
-			actionStatus.text = ""
+			action_status.text = ""

@@ -1,12 +1,13 @@
-[gd_scene load_steps=22 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=23 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_2v3wm"]
 [ext_resource type="Texture2D" uid="uid://2jputlhry6c" path="res://crosshair.png" id="2_2ojr1"]
 [ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://inventory.tscn" id="2_vrrxi"]
 [ext_resource type="PackedScene" uid="uid://dyx3xv5lckl7h" path="res://character_sheet.tscn" id="3_eahd0"]
 [ext_resource type="PackedScene" uid="uid://d35hxvmomxu3p" path="res://actions.tscn" id="4_72q5g"]
-[ext_resource type="PackedScene" uid="uid://j5ugiqe5hl32" path="res://trade_ui.tscn" id="5_32ebk"]
 [ext_resource type="PackedScene" uid="uid://cyyfjbicwvflj" path="res://craft_ui.tscn" id="7_ncuea"]
+[ext_resource type="PackedScene" uid="uid://cblqeddvc1mon" path="res://quest_creator.tscn" id="8_cvl0s"]
+[ext_resource type="PackedScene" uid="uid://b4c105b3jd8a8" path="res://PlayerInteraction.tscn" id="9_4ae2x"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_x3s4a"]
 resource_local_to_scene = true
@@ -391,12 +392,18 @@ properties/11/replication_mode = 2
 properties/12/path = NodePath(".:trading")
 properties/12/spawn = true
 properties/12/replication_mode = 2
-properties/13/path = NodePath(".:otherTradeInventory")
+properties/13/path = NodePath(".:my_trade_inventory")
 properties/13/spawn = true
 properties/13/replication_mode = 2
-properties/14/path = NodePath(".:myTradeInventory")
+properties/14/path = NodePath(".:other_trade_inventory")
 properties/14/spawn = true
 properties/14/replication_mode = 2
+properties/15/path = NodePath(".:quests")
+properties/15/spawn = true
+properties/15/replication_mode = 2
+properties/16/path = NodePath(".:other_player_quests")
+properties/16/spawn = true
+properties/16/replication_mode = 2
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_wv48c"]
 radius = 0.1
@@ -472,6 +479,7 @@ shape = SubResource("CapsuleShape3D_x3s4a")
 libraries = {
 "": SubResource("AnimationLibrary_p6wdk")
 }
+autoplay = "RESET"
 playback_default_blend_time = 0.05
 blend_times = [&"RESET", &"RESET", 0.5, &"RESET", &"crouch", 0.5, &"RESET", &"hustle", 0.1, &"crouch", &"RESET", 0.5, &"crouch", &"crouch", 0.5, &"crouch", &"hustle", 0.1]
 
@@ -513,7 +521,9 @@ visible = false
 target_position = Vector3(0, 0, -2)
 collision_mask = 30
 
-[node name="TextureRect" type="TextureRect" parent="CameraPivot/Camera3D"]
+[node name="CrossHair" type="TextureRect" parent="CameraPivot/Camera3D"]
+unique_name_in_owner = true
+visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -543,6 +553,7 @@ unique_name_in_owner = true
 visible = false
 
 [node name="SleepFade" type="ColorRect" parent="."]
+visible = false
 z_index = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -558,14 +569,27 @@ libraries = {
 "": SubResource("AnimationLibrary_auoph")
 }
 
-[node name="TradeUI" parent="." node_paths=PackedStringArray("me") instance=ExtResource("5_32ebk")]
-unique_name_in_owner = true
-visible = false
-me = NodePath("..")
-
 [node name="CraftUI" parent="." node_paths=PackedStringArray("me") instance=ExtResource("7_ncuea")]
 unique_name_in_owner = true
 visible = false
 me = NodePath("..")
+
+[node name="QuestCreator" parent="." node_paths=PackedStringArray("me") instance=ExtResource("8_cvl0s")]
+unique_name_in_owner = true
+visible = false
+me = NodePath("..")
+
+[node name="PlayerInteractionUI" parent="." node_paths=PackedStringArray("me") instance=ExtResource("9_4ae2x")]
+unique_name_in_owner = true
+layer = 2
+visible = false
+me = NodePath("..")
+
+[node name="?" type="Label3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.12448, 0)
+visible = false
+billboard = 1
+text = "?"
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

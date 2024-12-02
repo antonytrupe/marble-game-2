@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://dvbfdyrl8lg37" path="res://inventory9patch.png" id="1_cyvvh"]
 [ext_resource type="Script" path="res://inventory.gd" id="1_dlwpd"]
 
-[node name="Control" type="Control"]
+[node name="Inventory" type="Control"]
 self_modulate = Color(1, 1, 1, 0)
 z_index = -3
 z_as_relative = false

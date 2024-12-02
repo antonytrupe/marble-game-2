@@ -1,6 +1,10 @@
 crafting
 knapping
 unique item inventory
+quest system
+faction
+NPC actions
+skills
 
 head look
 chopping trees
@@ -10,9 +14,9 @@ action menu
 terrain heightmaps
 making log walls
 making fire
-skills
+
 xp
-quest system
+
 regrowing acorns
 dropping acorns
 germinating acorns
