@@ -33,10 +33,10 @@ const JUMP_VELOCITY = 5.0
 	set = _set_inventory
 
 @export var quests = {}:
-	set=_set_quests
+	set = _set_quests
 
 var trade_partner: MarbleCharacter:
-	set =_set_trade_partner
+	set = _set_trade_partner
 #we need otherTradeInventory on the client side because we can't sync trade_partner
 var calculated_age: int:
 	get = calculate_age
@@ -56,41 +56,47 @@ var skills = {}
 @onready var inventory_ui = %InventoryUI
 @onready var chunk_scanner = %ChunkScanner
 @onready var character_sheet = %CharacterSheet
-@onready var quest_creator_ui:QuestManager = %QuestCreator
+@onready var quest_creator_ui: QuestManager = %QuestCreator
 @onready var actions_ui = %ActionsUI
 @onready var fade_anim = %AnimationPlayer
 #@onready var trade_ui = %TradeUI
-@onready var trade_ui:PlayerInteraction = %PlayerInteractionUI
+@onready var trade_ui: PlayerInteraction = %PlayerInteractionUI
 @onready var craft_ui = %CraftUI
 @onready var cross_hair = %CrossHair
+@onready var quest_indicator = %"?"
 
 
-func _set_trade_partner(partner:MarbleCharacter):
-	trade_partner=partner
+func _set_trade_partner(partner: MarbleCharacter):
+	trade_partner = partner
 	if trade_partner:
-		other_player_quests=trade_partner.quests
+		other_player_quests = trade_partner.quests
 
 
-func _set_quests(value:Dictionary):
-	quests=value
+func _set_quests(value: Dictionary):
+	quests = value
+	if quest_indicator:
+		if quests.size():
+			quest_indicator.visible = true
+		else:
+			quest_indicator.visible = false
 	if quest_creator_ui:
 		quest_creator_ui.update()
 
 
 @rpc("any_peer")
-func create_quest(quest:Dictionary):
+func create_quest(quest: Dictionary):
 	if not multiplayer.is_server():
 		return
 	print(quest)
-	quests[quest.name]=quest
+	quests[quest.name] = quest
 	quest_creator_ui.update()
 
 
 @rpc("any_peer")
-func delete_quest(quest:Dictionary):
+func delete_quest(quest: Dictionary):
 	if not multiplayer.is_server():
 		return
-	print('deleting quest')
+	print("deleting quest")
 	quests.erase(quest.name)
 
 
@@ -137,7 +143,7 @@ func _set_trade_inventory(loot):
 func accept_trade():
 	if !multiplayer.is_server():
 		return
-	print('accept_trade')
+	print("accept_trade")
 	trade_accepted = true
 	if trade_accepted and trade_partner.trade_accepted:
 		#TODO make sure the whole trade will succeed before doing any part
@@ -158,14 +164,10 @@ func remove_from_trade(loot: Dictionary):
 	if !multiplayer.is_server():
 		return
 	for category in loot:
-		#var item = loot[category]
 		for item in loot[category].items.values():
 			my_trade_inventory[category].items.erase(item.name)
-		#if item.items.keys().size() > 0:
-			#my_trade_inventory[category].quantity -= item.quantity
 		if my_trade_inventory[category].items.keys().size() <= 0:
 			my_trade_inventory.erase(category)
-	#trade_partner.updateTradeUI.rpc()
 
 
 @rpc("any_peer")
