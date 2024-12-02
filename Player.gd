@@ -5,24 +5,26 @@ const SPEED_MULTIPLIER = 1.0 / 24.0
 const JUMP_VELOCITY = 5.0
 
 @export var other_trade_inventory = {}:
-	set = _update_other_trade_inventory
+	set = _set_other_trade_inventory
+@export var other_player_quests = {}:
+	set = _set_other_player_quests
 @export var trading: bool = false:
 	set = _set_trading
 @export var my_trade_inventory = {}:
-	set = _update_trade_inventory
+	set = _set_trade_inventory
 @export var trade_accepted = false
 
 @export var health = 3
 @export var player_id: String
 ##how fast to go
 @export var mode: MOVE.MODE = MOVE.MODE.WALK:
-	set = update_mode
+	set = _set_mode
 @export var speed = 30.0
 @export var birth_date: int = 0:
-	set = set_birth_date
+	set = _set_birth_date
 
 @export var extra_age: int = 0:
-	set = set_extra_age
+	set = _set_extra_age
 
 @export var actions = {"move": null, "action": null}:
 	set = _set_action
@@ -30,7 +32,11 @@ const JUMP_VELOCITY = 5.0
 @export var inventory: Dictionary:
 	set = _set_inventory
 
-var trade_partner: MarbleCharacter
+@export var quests = {}:
+	set=_set_quests
+
+var trade_partner: MarbleCharacter:
+	set =_set_trade_partner
 #we need otherTradeInventory on the client side because we can't sync trade_partner
 var calculated_age: int:
 	get = calculate_age
@@ -38,7 +44,6 @@ var calculated_age: int:
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chat_mode = false
 var skills = {}
-var quests = []
 
 @onready var game: Game = $/root/Game
 @onready var world: World = $/root/Game/World
@@ -51,28 +56,42 @@ var quests = []
 @onready var inventory_ui = %InventoryUI
 @onready var chunk_scanner = %ChunkScanner
 @onready var character_sheet = %CharacterSheet
-@onready var quest_creator_ui = %QuestCreator
+@onready var quest_creator_ui:QuestManager = %QuestCreator
 @onready var actions_ui = %ActionsUI
 @onready var fade_anim = %AnimationPlayer
 #@onready var trade_ui = %TradeUI
-@onready var trade_ui = %PlayerInteractionUI
+@onready var trade_ui:PlayerInteraction = %PlayerInteractionUI
 @onready var craft_ui = %CraftUI
 @onready var cross_hair = %CrossHair
 
 
+func _set_trade_partner(partner:MarbleCharacter):
+	trade_partner=partner
+	if trade_partner:
+		other_player_quests=trade_partner.quests
+
+
+func _set_quests(value:Dictionary):
+	quests=value
+	if quest_creator_ui:
+		quest_creator_ui.update()
+
+
 @rpc("any_peer")
-func create_quest(item_name, quantity):
+func create_quest(quest:Dictionary):
 	if not multiplayer.is_server():
 		return
-	print(item_name, quantity)
-	(
-		quests.append(
-			{
-				item = item_name,
-				quantity = quantity,
-			}
-		)
-	)
+	print(quest)
+	quests[quest.name]=quest
+	quest_creator_ui.update()
+
+
+@rpc("any_peer")
+func delete_quest(quest:Dictionary):
+	if not multiplayer.is_server():
+		return
+	print('deleting quest')
+	quests.erase(quest.name)
 
 
 @rpc("any_peer")
@@ -92,25 +111,27 @@ func craft(action: String, tool: Dictionary, loot: Dictionary):
 	#loot[0].craft(loot)
 
 
-func _update_other_trade_inventory(loot):
+func _set_other_player_quests(q):
+	other_player_quests = q
+	if trade_ui:
+		trade_ui.other_player_quests = other_player_quests
+		trade_ui.update()
+
+
+func _set_other_trade_inventory(loot):
 	other_trade_inventory = loot
 	if trade_ui:
 		trade_ui.other_player_trade = other_trade_inventory
 		trade_ui.update()
 
 
-func _update_trade_inventory(loot):
+func _set_trade_inventory(loot):
 	my_trade_inventory = loot
 	if trade_ui:
 		trade_ui.update()
 	if trade_partner:
 		trade_partner.other_trade_inventory = loot
 
-
-#@rpc("call_remote")
-#func updateTradeUI():
-#trade_ui.otherPlayerTrade = otherTradeInventory
-#trade_ui.update()
 
 @rpc("any_peer")
 func accept_trade():
@@ -168,12 +189,15 @@ func is_current_player():
 	return game and player_id and player_id == game.player_id
 
 
+#is this always on the server?
 func _set_trading(value):
 	trading = value
 	#if the tradeui is ready and this is the current player
 	if trade_ui and is_current_player():
 		if trading:
 			trade_ui.other_player_trade = other_trade_inventory
+			trade_ui.other_player_quests = other_player_quests
+
 			trade_ui.update()
 			trade_ui.show()
 		else:
@@ -223,11 +247,11 @@ func get_zones() -> Array[Chunk]:
 	return chunks
 
 
-func set_birth_date(value):
+func _set_birth_date(value):
 	birth_date = value
 
 
-func set_extra_age(value):
+func _set_extra_age(value):
 	extra_age = value
 
 
@@ -235,7 +259,7 @@ func calculate_age():
 	return world.world_age + extra_age + Time.get_ticks_msec() - birth_date
 
 
-func update_mode(new_mode):
+func _set_mode(new_mode):
 	#print(new_mode)
 	#TODO animations and stuff
 	if mode != new_mode:
@@ -504,10 +528,11 @@ func start_trade(player: MarbleCharacter):
 	if !multiplayer.is_server():
 		return
 	#open the trade window
-	trading = true
 	trade_partner = player
-	player.trading = true
+	trading = true
+
 	player.trade_partner = self
+	player.trading = true
 
 
 @rpc("any_peer")

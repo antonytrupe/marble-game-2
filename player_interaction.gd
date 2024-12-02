@@ -1,18 +1,24 @@
+class_name PlayerInteraction
 extends CanvasLayer
+
 const INVENTORY_SLOT_SCENE = preload("res://inventory_slot.tscn")
+const QUEST_HEADER_SCENE = preload("res://QuestHeader.tscn")
 
 @export var me: MarbleCharacter
 #@export var other:MarbleCharacter
 @export var other_player_trade: Dictionary = {}
+@export var other_player_quests: Dictionary = {}
 
 #state about what's on the screen
 var my_inventory_slots = {}
 var my_trade_slots = {}
 var other_trade_slots = {}
+var quest_to_ui={}
 
 @onready var my_items = %MyInventory
 @onready var my_trade_items = %MyTrades
 @onready var other_trade_items = %OtherPlayerTrades
+@onready var other_quests_ui = %OtherPlayerQuests
 
 func _ready() -> void:
 	update()
@@ -20,12 +26,22 @@ func _ready() -> void:
 
 func update() -> void:
 	#print('player interactions update',me.inventory)
+
+	#quests
+	for quest in other_player_quests.values():
+		#print(quest)
+		if quest.name not in quest_to_ui:
+			#print('adding quest')
+			var h=QUEST_HEADER_SCENE.instantiate()
+			h.quest=quest
+			#h.me=me
+			quest_to_ui[quest.name]=h
+			other_quests_ui.add_child(h)
+
+
 	#my inventory
-
-
 	for category in me.inventory:
 		if !category in my_inventory_slots:
-			#print('new category %s' %category)
 			var new_slot = INVENTORY_SLOT_SCENE.instantiate()
 			new_slot.category = category
 			new_slot.type_scene_file_path = me.inventory[category].scene_file_path
@@ -65,12 +81,10 @@ func update() -> void:
 
 
 func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
-	#print('_on_inventory_slot_pressed')
 	var item=slot._items.values()[0]
 	slot.remove_item(item)
 
 	if !item.category in my_trade_slots:
-		#print('new category %s' %category)
 		var new_slot = INVENTORY_SLOT_SCENE.instantiate()
 		new_slot.category = item.category
 		new_slot.type_scene_file_path = item.scene_file_path
@@ -81,15 +95,12 @@ func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
 	my_trade_slots[item.category].add_items({
 				item.name:item,
 				},
-			 )
+			)
 
 	me.add_to_trade.rpc_id(1, {slot.category: {
 		scene_file_path = slot.type_scene_file_path,
 		items = {item.name:item},
 	}})
-
-	#print(me.my_trade_inventory)
-	#update()
 
 
 func _on_trade_slot_pressed(slot:InventorySlot) -> void:
@@ -97,7 +108,6 @@ func _on_trade_slot_pressed(slot:InventorySlot) -> void:
 	slot.remove_item(item)
 
 	if !item.category in my_inventory_slots:
-		#print('new category %s' %category)
 		var new_slot = INVENTORY_SLOT_SCENE.instantiate()
 		new_slot.category = item.category
 		new_slot.type_scene_file_path = item.scene_file_path

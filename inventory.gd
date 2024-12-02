@@ -15,7 +15,6 @@ func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
 
 
 func update():
-	#print('inventory update:',player.inventory)
 	for category in me.inventory:
 		for item in me.inventory[category].items.values():
 			add_item_to_inventory(item)
