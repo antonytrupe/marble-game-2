@@ -1,5 +1,5 @@
-extends Node2D
-const INVENTORY_SLOT_SCENE = preload("res://inventory_slot.tscn")
+extends Panel
+const INVENTORY_SLOT_SCENE = preload("res://inventory_slot_2.tscn")
 
 @export var me: MarbleCharacter
 var my_inventory_slots = {}
@@ -39,16 +39,13 @@ func update() -> void:
 
 
 func add_item_to_inventory(item: Dictionary):
-	if !(item.category in my_inventory_slots):
-		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
-		#new_slot.items = {}
-		new_slot.type_scene_file_path = item.scene_file_path
-		#new_slot.items=me.inventory[ii].items
-		my_inventory_slots[item.category] = new_slot
-		my_items.add_child(new_slot)
-		new_slot.pressed.connect(_on_inventory_slot_pressed.bind(new_slot))
 
-	my_inventory_slots[item.category].add_item(item)
+	var new_slot: InventorySlot2 = INVENTORY_SLOT_SCENE.instantiate()
+	new_slot.item =item
+	#new_slot.items=me.inventory[ii].items
+	my_inventory_slots[item.name] = new_slot
+	my_items.add_child(new_slot)
+	#new_slot.pressed.connect(_on_inventory_slot_pressed.bind(new_slot))
 
 
 func remove_item_from_inventory(category: String) -> Dictionary:
@@ -82,7 +79,7 @@ func remove_item_from_tool() -> Dictionary:
 
 func add_item_to_craft(item: Dictionary):
 	if !(item.category in my_craft_slots):
-		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
+		var new_slot: InventorySlot2 = INVENTORY_SLOT_SCENE.instantiate()
 		#new_slot.items = {}
 		new_slot.type_scene_file_path = item.scene_file_path
 		#new_slot.items=me.inventory[ii].items

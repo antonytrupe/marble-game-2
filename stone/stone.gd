@@ -48,7 +48,7 @@ func pick_up():
 		{
 			#
 			scene_file_path = scene_file_path,
-			items = [d],
+			items = {d.name:d},
 		}
 	}
 
