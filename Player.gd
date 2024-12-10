@@ -585,7 +585,7 @@ func interact():
 		#print('found:', entity)
 
 		if entity.has_method("start_trade"):
-			print('start trade')
+			print("start trade")
 			start_trade(entity)
 			entity.start_trade(self)
 
