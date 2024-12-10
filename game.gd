@@ -32,11 +32,21 @@ var rng = RandomNumberGenerator.new()
 @onready var players = %Players
 
 
+func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
+	print("game _can_drop_data", data)
+	return true
+
+
+func _drop_data(_at_position: Vector2, data: Variant) -> void:
+	print("game  _drop_data", data)
+	#craft_ui.add_item_to_reagents(data.item)
+
+
 func get_chunk(_position: Vector3) -> Chunk:
 	return null
 
 
-func get_chunk_name(p: Vector3) -> String:
+func get_chunk_name(_p: Vector3) -> String:
 	# var x = p.x / 60
 	return "[0,0,0]"
 

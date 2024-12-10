@@ -1,7 +1,7 @@
 class_name PlayerInteraction
-extends CanvasLayer
+extends Panel
 
-const INVENTORY_SLOT_SCENE = preload("res://inventory_slot.tscn")
+const INVENTORY_SLOT_SCENE = preload("res://inventory_slot_2.tscn")
 const QUEST_HEADER_SCENE = preload("res://QuestHeader.tscn")
 
 @export var me: MarbleCharacter
@@ -25,6 +25,10 @@ var selected_quest = {}
 
 func _ready() -> void:
 	update()
+
+
+func _unhandled_input(event):
+	me._unhandled_input(event)
 
 
 func select_quest(quest: Dictionary):
@@ -60,10 +64,10 @@ func update() -> void:
 	for category in me.inventory:
 		if !category in my_inventory_slots:
 			var new_slot = INVENTORY_SLOT_SCENE.instantiate()
-			new_slot.category = category
-			new_slot.type_scene_file_path = me.inventory[category].scene_file_path
-			new_slot.add_items(me.inventory[category].items)
-			new_slot.pressed.connect(_on_inventory_slot_pressed.bind(new_slot))
+			#new_slot.category = category
+			#new_slot.type_scene_file_path = me.inventory[category].scene_file_path
+			new_slot.item={}
+			#new_slot.pressed.connect(_on_inventory_slot_pressed.bind(new_slot))
 			my_inventory_slots[category] = new_slot
 			my_items.add_child(new_slot)
 
@@ -86,7 +90,7 @@ func update() -> void:
 	other_trade_slots.clear()
 	for category in me.other_trade_inventory:
 		if !category in other_trade_slots:
-			var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
+			var new_slot: InventorySlot2 = INVENTORY_SLOT_SCENE.instantiate()
 			new_slot.category = category
 			var i = me.other_trade_inventory[category].items
 			new_slot.add_items(i)
@@ -94,7 +98,7 @@ func update() -> void:
 			other_trade_items.add_child(new_slot)
 
 
-func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
+func _on_inventory_slot_pressed(slot: InventorySlot2) -> void:
 	var item = slot._items.values()[0]
 	slot.remove_item(item)
 
@@ -117,7 +121,7 @@ func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
 	}})
 
 
-func _on_trade_slot_pressed(slot: InventorySlot) -> void:
+func _on_trade_slot_pressed(slot: InventorySlot2) -> void:
 	var item = slot._items.values()[0]
 	slot.remove_item(item)
 

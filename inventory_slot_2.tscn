@@ -1,8 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://bnq55viovkou6"]
+[gd_scene load_steps=3 format=3 uid="uid://bnq55viovkou6"]
 
 [ext_resource type="Script" path="res://inventory_slot_2.gd" id="1_uep1t"]
+[ext_resource type="Script" path="res://inventory_slot_drag.gd" id="2_384ou"]
 
-[node name="MarginContainer" type="MarginContainer"]
+[node name="InventorySlot2" type="MarginContainer"]
 offset_right = 128.0
 offset_bottom = 64.0
 theme_override_constants/margin_left = 2
@@ -11,8 +12,10 @@ theme_override_constants/margin_right = 2
 theme_override_constants/margin_bottom = 2
 script = ExtResource("1_uep1t")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="." node_paths=PackedStringArray("inventory_slot")]
 layout_mode = 2
+script = ExtResource("2_384ou")
+inventory_slot = NodePath("..")
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
 layout_mode = 2

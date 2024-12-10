@@ -2,12 +2,13 @@ class_name InventorySlot2
 extends MarginContainer
 
 @export var item:Dictionary
+@export var src=null
 
 @onready var attributes_label =%Attributes
 @onready var name_label=%Name
 
-func update_label() -> void:
 
+func update_label() -> void:
 		if item:
 			name_label.text=item.name
 			var s:String
@@ -19,7 +20,3 @@ func update_label() -> void:
 
 func _ready():
 	update_label()
-	#var preview_scene: Resource=load(item.scene_file_path)
-	#var p=preview_scene.instantiate()
-	#p.load(item)
-	#vp.add_child(p)

@@ -54,6 +54,7 @@ var skills = {}
 @onready var raycast = %RayCast3D
 @onready var anim_player = $AnimationPlayer
 @onready var inventory_ui = %InventoryUI
+@onready var inventory_ui_window = %InventoryUIWindow
 @onready var chunk_scanner = %ChunkScanner
 @onready var character_sheet = %CharacterSheet
 @onready var quest_creator_ui: QuestManager = %QuestCreator
@@ -62,6 +63,7 @@ var skills = {}
 #@onready var trade_ui = %TradeUI
 @onready var trade_ui: PlayerInteraction = %PlayerInteractionUI
 @onready var craft_ui = %CraftUI
+@onready var craft_ui_window = %CraftUIWindow
 @onready var cross_hair = %CrossHair
 @onready var quest_indicator = %"?"
 
@@ -101,16 +103,16 @@ func delete_quest(quest: Dictionary):
 
 
 @rpc("any_peer")
-func craft(action: String, tool: Dictionary, loot: Dictionary):
+func craft(action: String, tool: Dictionary, reagents: Dictionary):
 	if not multiplayer.is_server():
 		return
 	var scene = load(tool.scene_file_path)
 	var instance = scene.instantiate()
-	var result = instance.call(action, self, loot)
+	var result = instance.call(action, self, reagents)
 	#var result = instance.craft(self, loot)
 	#print(result)
 	#remove_from_inventory({tool.category:{"items":{tool.name:tool}}})
-	remove_from_inventory(loot)
+	remove_from_inventory(reagents)
 
 	add_to_inventory(result)
 	#if loot.keys().size()>0 and loot[loot.keys()[0]].has_method("craft"):
@@ -211,6 +213,10 @@ func _set_trading(value):
 		other_trade_inventory = {}
 
 
+func reset_inventory_ui():
+	inventory_ui.update()
+
+
 func _set_inventory(value: Dictionary):
 	#print('player._set_inventory')
 	inventory = value
@@ -219,7 +225,7 @@ func _set_inventory(value: Dictionary):
 	if trade_ui:
 		trade_ui.update()
 	if craft_ui:
-		craft_ui.update()
+		craft_ui.reset()
 
 
 #setter, don't call directly
@@ -339,6 +345,7 @@ func play_fade():
 
 
 func _unhandled_input(event):
+	#print('player _unhandled_input')
 	if game and !is_current_player():
 		return
 
@@ -356,19 +363,25 @@ func _unhandled_input(event):
 		else:
 			time_warp.rpc_id(1, minutes)
 
+	var something_visible=false
+
 	if Input.is_action_just_pressed("inventory"):
-		inventory_ui.visible = !inventory_ui.visible
+		inventory_ui_window.visible = !inventory_ui_window.visible
+		something_visible=something_visible or inventory_ui_window.visible
 
 	if Input.is_action_just_pressed("craft"):
-		craft_ui.visible = !craft_ui.visible
-		cross_hair.visible = !cross_hair.visible
+		craft_ui_window.visible = !craft_ui_window.visible
+		something_visible=something_visible or craft_ui_window.visible
 
 	if Input.is_action_just_pressed("character_sheet"):
 		character_sheet.visible = !character_sheet.visible
+		something_visible=something_visible or character_sheet.visible
 
 	if Input.is_action_just_pressed("quest_creator"):
 		quest_creator_ui.visible = !quest_creator_ui.visible
-		cross_hair.visible = !cross_hair.visible
+		something_visible=something_visible or quest_creator_ui.visible
+
+	cross_hair.visible=!something_visible
 
 	if event is InputEventMouseMotion:
 		if (
@@ -399,11 +412,17 @@ func _unhandled_input(event):
 		else:
 			cancel_trade.rpc_id(1)
 
-	if Input.is_action_just_pressed("quit") and inventory_ui.visible:
+	if Input.is_action_just_pressed("quit") and inventory_ui_window.visible:
 		#don't let this event bubble up
 		get_viewport().set_input_as_handled()
 
-		inventory_ui.hide()
+		inventory_ui_window.hide()
+
+	if Input.is_action_just_pressed("quit") and craft_ui_window.visible:
+		#don't let this event bubble up
+		get_viewport().set_input_as_handled()
+
+		craft_ui_window.hide()
 
 	if Input.is_action_just_pressed("chat"):
 		chat_text_edit.visible = !chat_text_edit.visible

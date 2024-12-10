@@ -1,26 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://b1q2vj4f542ay"]
+[gd_scene load_steps=4 format=3 uid="uid://b1q2vj4f542ay"]
 
 [ext_resource type="Texture2D" uid="uid://dvbfdyrl8lg37" path="res://inventory9patch.png" id="1_cyvvh"]
 [ext_resource type="Script" path="res://inventory.gd" id="1_dlwpd"]
+[ext_resource type="Script" path="res://inventory_drop.gd" id="3_roy6r"]
 
-[node name="Inventory" type="Control"]
-self_modulate = Color(1, 1, 1, 0)
-z_index = -3
-z_as_relative = false
-layout_mode = 3
+[node name="Inventory" type="Panel"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_vertical = 4
-mouse_filter = 2
 script = ExtResource("1_dlwpd")
 
-[node name="NinePatchRect" type="NinePatchRect" parent="."]
-show_behind_parent = true
+[node name="NinePatchRect" type="NinePatchRect" parent="." node_paths=PackedStringArray("inventory_ui")]
 light_mask = 0
-z_index = -2
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -35,6 +28,8 @@ patch_margin_right = 23
 patch_margin_bottom = 22
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
+script = ExtResource("3_roy6r")
+inventory_ui = NodePath("..")
 
 [node name="MarginContainer" type="MarginContainer" parent="NinePatchRect"]
 layout_mode = 1
