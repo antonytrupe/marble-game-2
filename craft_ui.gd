@@ -18,12 +18,11 @@ func _unhandled_input(event):
 
 
 func reset():
-
 	me.reset_inventory_ui()
 	reagent_slots = {}
-	reagent_inventory={}
-	tool_slots={}
-	tool_inventory={}
+	reagent_inventory = {}
+	tool_slots = {}
+	tool_inventory = {}
 	for c in reagent_container.get_children():
 		reagent_container.remove_child(c)
 		c.queue_free()
@@ -43,7 +42,7 @@ func add_item_to_tool(item: Dictionary):
 		tool_inventory[item.name] = item
 
 
-func remove_item_from_tool(item_name:String):
+func remove_item_from_tool(item_name: String):
 	var slot: InventorySlot2 = tool_slots[item_name]
 	slot.hide()
 	slot.queue_free()
@@ -56,13 +55,12 @@ func add_item_to_reagents(item: Dictionary):
 		var new_slot: InventorySlot2 = INVENTORY_SLOT_SCENE.instantiate()
 		new_slot.item = item
 		new_slot.src = reagent_container.get_parent()
-		new_slot.item=item
+		new_slot.item = item
 		reagent_slots[item.name] = new_slot
 		reagent_container.add_child(new_slot)
 		#new_slot.pressed.connect(_on_craft_slot_pressed.bind(new_slot))
 
 		reagent_inventory[item.name] = item
-
 
 
 func remove_item_from_reagent(item_name: String):
@@ -73,10 +71,9 @@ func remove_item_from_reagent(item_name: String):
 	reagent_inventory.erase(item_name)
 
 
-
 func _on_craft_pressed() -> void:
-	print('_on_craft_pressed')
-	if tool_inventory.size()==0:
+	print("_on_craft_pressed")
+	if tool_inventory.size() == 0:
 		print("no tool item")
 		return
 	me.craft.rpc_id(1, "craft", tool_inventory[0], reagent_inventory)

@@ -363,25 +363,25 @@ func _unhandled_input(event):
 		else:
 			time_warp.rpc_id(1, minutes)
 
-	var something_visible=false
+	var something_visible = false
 
 	if Input.is_action_just_pressed("inventory"):
 		inventory_ui_window.visible = !inventory_ui_window.visible
-		something_visible=something_visible or inventory_ui_window.visible
+		something_visible = something_visible or inventory_ui_window.visible
 
 	if Input.is_action_just_pressed("craft"):
 		craft_ui_window.visible = !craft_ui_window.visible
-		something_visible=something_visible or craft_ui_window.visible
+		something_visible = something_visible or craft_ui_window.visible
 
 	if Input.is_action_just_pressed("character_sheet"):
 		character_sheet.visible = !character_sheet.visible
-		something_visible=something_visible or character_sheet.visible
+		something_visible = something_visible or character_sheet.visible
 
 	if Input.is_action_just_pressed("quest_creator"):
 		quest_creator_ui.visible = !quest_creator_ui.visible
-		something_visible=something_visible or quest_creator_ui.visible
+		something_visible = something_visible or quest_creator_ui.visible
 
-	cross_hair.visible=!something_visible
+	cross_hair.visible = !something_visible
 
 	if event is InputEventMouseMotion:
 		if (
