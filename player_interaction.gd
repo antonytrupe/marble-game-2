@@ -1,7 +1,7 @@
 class_name PlayerInteraction
 extends Panel
 
-const INVENTORY_SLOT_SCENE = preload("res://inventory_slot_2.tscn")
+const INVENTORY_SLOT_SCENE = preload("res://inventory_slot.tscn")
 const QUEST_HEADER_SCENE = preload("res://QuestHeader.tscn")
 
 @export var me: MarbleCharacter
@@ -90,7 +90,7 @@ func update() -> void:
 	other_trade_slots.clear()
 	for category in me.other_trade_inventory:
 		if !category in other_trade_slots:
-			var new_slot: InventorySlot2 = INVENTORY_SLOT_SCENE.instantiate()
+			var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
 			new_slot.category = category
 			var i = me.other_trade_inventory[category].items
 			new_slot.add_items(i)
@@ -98,7 +98,7 @@ func update() -> void:
 			other_trade_items.add_child(new_slot)
 
 
-func _on_inventory_slot_pressed(slot: InventorySlot2) -> void:
+func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
 	var item = slot._items.values()[0]
 	slot.remove_item(item)
 
@@ -121,7 +121,7 @@ func _on_inventory_slot_pressed(slot: InventorySlot2) -> void:
 	}})
 
 
-func _on_trade_slot_pressed(slot: InventorySlot2) -> void:
+func _on_trade_slot_pressed(slot: InventorySlot) -> void:
 	var item = slot._items.values()[0]
 	slot.remove_item(item)
 

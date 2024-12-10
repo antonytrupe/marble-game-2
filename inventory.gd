@@ -1,7 +1,7 @@
 class_name PlayerInventory
 extends Panel
 
-const INVENTORY_SLOT_SCENE: Resource = preload("res://inventory_slot_2.tscn")
+const INVENTORY_SLOT_SCENE: Resource = preload("res://inventory_slot.tscn")
 
 @export var me: MarbleCharacter
 var my_inventory_slots = {}
@@ -32,7 +32,7 @@ func move_item_from_inventory(item: Dictionary):
 
 func add_item_to_inventory(item: Dictionary):
 	if !(item.name in my_inventory_slots):
-		var new_slot: InventorySlot2 = INVENTORY_SLOT_SCENE.instantiate()
+		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
 		new_slot.src = self
 		new_slot.item = item
 		my_inventory_slots[item.name] = new_slot

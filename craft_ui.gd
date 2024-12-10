@@ -1,7 +1,7 @@
 class_name CraftUI
 extends Panel
 
-const INVENTORY_SLOT_SCENE = preload("res://inventory_slot_2.tscn")
+const INVENTORY_SLOT_SCENE = preload("res://inventory_slot.tscn")
 
 @export var me: MarbleCharacter
 
@@ -33,7 +33,7 @@ func reset():
 
 func add_item_to_tool(item: Dictionary):
 	if !(item.name in tool_slots):
-		var new_slot: InventorySlot2 = INVENTORY_SLOT_SCENE.instantiate()
+		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
 		new_slot.item = item
 		new_slot.src = tool_container.get_parent()
 		tool_slots[item.name] = new_slot
@@ -43,7 +43,7 @@ func add_item_to_tool(item: Dictionary):
 
 
 func remove_item_from_tool(item_name: String):
-	var slot: InventorySlot2 = tool_slots[item_name]
+	var slot: InventorySlot = tool_slots[item_name]
 	slot.hide()
 	slot.queue_free()
 	tool_slots.erase(item_name)
@@ -52,7 +52,7 @@ func remove_item_from_tool(item_name: String):
 
 func add_item_to_reagents(item: Dictionary):
 	if !(item.name in reagent_slots):
-		var new_slot: InventorySlot2 = INVENTORY_SLOT_SCENE.instantiate()
+		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
 		new_slot.item = item
 		new_slot.src = reagent_container.get_parent()
 		new_slot.item = item
@@ -64,7 +64,7 @@ func add_item_to_reagents(item: Dictionary):
 
 
 func remove_item_from_reagent(item_name: String):
-	var slot: InventorySlot2 = reagent_slots[item_name]
+	var slot: InventorySlot = reagent_slots[item_name]
 	slot.hide()
 	slot.queue_free()
 	reagent_slots.erase(item_name)

@@ -62,6 +62,7 @@ var skills = {}
 @onready var fade_anim = %AnimationPlayer
 #@onready var trade_ui = %TradeUI
 @onready var trade_ui: PlayerInteraction = %PlayerInteractionUI
+@onready var trade_ui_window = $PlayerInteractionWindow
 @onready var craft_ui = %CraftUI
 @onready var craft_ui_window = %CraftUIWindow
 @onready var cross_hair = %CrossHair
@@ -203,9 +204,9 @@ func _set_trading(value):
 			trade_ui.other_player_quests = other_player_quests
 
 			trade_ui.update()
-			trade_ui.show()
+			trade_ui_window.show()
 		else:
-			trade_ui.hide()
+			trade_ui_window.hide()
 	if !trading:
 		trade_partner = null
 		trade_accepted = false
@@ -584,6 +585,7 @@ func interact():
 		#print('found:', entity)
 
 		if entity.has_method("start_trade"):
+			print('start trade')
 			start_trade(entity)
 			entity.start_trade(self)
 
@@ -628,7 +630,7 @@ func add_to_inventory(loot: Dictionary):
 			inventory[category].items[item.name] = item
 
 	#print('inventory:', inventory)
-	craft_ui.update.rpc()
+	#craft_ui.update.rpc()
 
 
 func remove_from_inventory(loot: Dictionary) -> bool:

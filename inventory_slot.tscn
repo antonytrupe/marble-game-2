@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bnq55viovkou6"]
 
-[ext_resource type="Script" path="res://inventory_slot_2.gd" id="1_uep1t"]
+[ext_resource type="Script" path="res://inventory_slot.gd" id="1_uep1t"]
 [ext_resource type="Script" path="res://inventory_slot_drag.gd" id="2_384ou"]
 
 [node name="InventorySlot2" type="MarginContainer"]

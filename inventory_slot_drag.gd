@@ -1,8 +1,8 @@
 extends PanelContainer
 
-const INVENTORY_SLOT_SCENE: Resource = preload("res://inventory_slot_2.tscn")
+const INVENTORY_SLOT_SCENE: Resource = preload("res://inventory_slot.tscn")
 
-@export var inventory_slot: InventorySlot2
+@export var inventory_slot: InventorySlot
 
 
 func _get_drag_data(_at_position: Vector2) -> Variant:

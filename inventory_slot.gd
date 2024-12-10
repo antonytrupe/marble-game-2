@@ -1,4 +1,4 @@
-class_name InventorySlot2
+class_name InventorySlot
 extends MarginContainer
 
 @export var item: Dictionary
