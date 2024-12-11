@@ -58,7 +58,8 @@ func remove_item_from_trade(item_name: String):
 	#update current player
 	me.my_trade_inventory.erase(item_name)
 	#update other player
-	me.trade_partner.other_trade_inventory = me.my_trade_inventory
+	if me.trade_partner:
+		me.trade_partner.other_trade_inventory = me.my_trade_inventory
 
 
 func select_quest(quest: Dictionary):
@@ -102,7 +103,7 @@ func update() -> void:
 			my_trade_items.add_child(new_slot)
 
 	#other player trade
-	print(me.other_trade_inventory)
+	#print(me.other_trade_inventory)
 	for slot in other_trade_slots.values():
 		other_trade_items.remove_child(slot)
 		slot.queue_free()
@@ -119,3 +120,13 @@ func update() -> void:
 
 func _on_accept_pressed() -> void:
 	me.accept_trade.rpc_id(1)
+
+
+func _on_hidden() -> void:
+	reset()
+
+func reset():
+	me.reset_inventory_ui()
+
+	for item in me.my_trade_inventory.values():
+		remove_item_from_trade.rpc_id(1,item.name)

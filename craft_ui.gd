@@ -76,7 +76,7 @@ func _on_craft_pressed() -> void:
 	if tool_inventory.size() == 0:
 		print("no tool item")
 		return
-	me.craft.rpc_id(1, "craft", tool_inventory[0], reagent_inventory)
+	me.craft.rpc_id(1, "craft", tool_inventory.values()[0], reagent_inventory)
 	reset()
 
 

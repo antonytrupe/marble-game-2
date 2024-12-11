@@ -8,8 +8,8 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 
 
 func _drop_data(_at_position: Vector2, data: Variant) -> void:
-	craft_ui.add_item_to_tool(data.item)
 	data.src.move_item_from_inventory(data.item)
+	craft_ui.add_item_to_tool(data.item)
 
 
 func move_item_from_inventory(item: Dictionary):

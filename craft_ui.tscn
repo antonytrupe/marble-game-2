@@ -83,7 +83,7 @@ size_flags_vertical = 3
 script = ExtResource("3_v3e7l")
 craft_ui = NodePath("../../../../../../../../..")
 
-[node name="ToolSlot" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer/ScrollContainer2"]
+[node name="ToolSlot" type="HFlowContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer/ScrollContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -103,7 +103,7 @@ size_flags_vertical = 3
 script = ExtResource("4_qdcdx")
 craft_ui = NodePath("../../../../../../../../..")
 
-[node name="MyCraftReagents" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer/ScrollContainer"]
+[node name="MyCraftReagents" type="HFlowContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer/ScrollContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3

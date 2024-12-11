@@ -249,4 +249,5 @@ layout_mode = 2
 size_flags_vertical = 0
 text = "Accept"
 
+[connection signal="hidden" from="." to="." method="_on_hidden"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsContainer/Accept" to="." method="_on_accept_pressed"]

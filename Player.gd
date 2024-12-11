@@ -29,6 +29,7 @@ const JUMP_VELOCITY = 5.0
 @export var actions = {"move": null, "action": null}:
 	set = _set_action
 
+#map of category:{items:{}}
 @export var inventory: Dictionary:
 	set = _set_inventory
 
@@ -79,9 +80,9 @@ func _set_quests(value: Dictionary):
 	quests = value
 	if quest_indicator:
 		if quests.size():
-			quest_indicator.visible = true
+			quest_indicator.show()
 		else:
-			quest_indicator.visible = false
+			quest_indicator.hide()
 	if quest_creator_ui:
 		quest_creator_ui.update()
 
@@ -205,6 +206,7 @@ func _set_trading(value):
 
 			trade_ui.update()
 			trade_ui_window.show()
+			inventory_ui_window.show()
 		else:
 			trade_ui_window.hide()
 	if !trading:
@@ -326,7 +328,7 @@ func _ready():
 	if is_current_player():
 		camera.current = true
 		actions_ui.show()
-		cross_hair.visible = true
+		cross_hair.show()
 	else:
 		pass
 
@@ -372,6 +374,8 @@ func _unhandled_input(event):
 
 	if Input.is_action_just_pressed("craft"):
 		craft_ui_window.visible = !craft_ui_window.visible
+		if craft_ui_window.visible:
+			inventory_ui_window.show()
 		something_visible = something_visible or craft_ui_window.visible
 
 	if Input.is_action_just_pressed("character_sheet"):
@@ -612,22 +616,22 @@ func add_to_inventory(loot: Dictionary):
 	if !multiplayer.is_server():
 		return
 	#print('loot:', loot)
-	for category in loot:
-		if !inventory.has(category):
-			inventory[category] = {
+	for item in loot.values():
+		if !inventory.has(item.category):
+			inventory[item.category] = {
 				items = {},
-				scene_file_path = loot[category].scene_file_path,
+				#scene_file_path = item.scene_file_path,
 			}
-		if !inventory[category].has("items"):
-			inventory[category].items = {}
-		if !inventory[category].has("scene_file_path"):
-			inventory[category].scene_file_path = loot[category].scene_file_path
+		if !inventory[item.category].has("items"):
+			inventory[item.category].items = {}
+		#if !inventory[item.category].has("scene_file_path"):
+			#inventory[item.category].scene_file_path = loot[item.category].scene_file_path
 
 		#var loot_item = loot[item_name]
 
-		for item in loot[category].items.values():
+		#for item in loot[category].items.values():
 			#TODO instantiate in inventory
-			inventory[category].items[item.name] = item
+		inventory[item.category].items[item.name] = item
 
 	#print('inventory:', inventory)
 	#craft_ui.update.rpc()
