@@ -43,14 +43,7 @@ func pick_up():
 	var d = save()
 	d.erase('transform')
 
-	return {
-		category:
-		{
-			#
-			scene_file_path = scene_file_path,
-			items = [d],
-		}
-	}
+	return {d.name:d}
 
 
 func get_actions():

@@ -1,10 +1,11 @@
+unique item inventory
 crafting
 knapping
-unique item inventory
 quest system
 faction
 NPC actions
 skills
+dropping items out of inventory
 
 head look
 chopping trees

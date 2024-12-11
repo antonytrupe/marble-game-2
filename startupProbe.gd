@@ -6,12 +6,13 @@ var connections: Array[StreamPeerTCP]
 var listening: bool = false
 
 func _ready():
-	server = TCPServer.new()
-	var r: Error = server.listen(9999)
-	if r == Error.OK:
-		listening = true
-	else:
-		listening = false
+	return
+	#server = TCPServer.new()
+	#var r: Error = server.listen(9999)
+	#if r == Error.OK:
+		#listening = true
+	#else:
+		#listening = false
 
 
 func _process(_delta):

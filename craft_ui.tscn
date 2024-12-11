@@ -1,19 +1,19 @@
-[gd_scene load_steps=4 format=3 uid="uid://cyyfjbicwvflj"]
+[gd_scene load_steps=5 format=3 uid="uid://cyyfjbicwvflj"]
 
 [ext_resource type="Script" path="res://craft_ui.gd" id="1_gakny"]
 [ext_resource type="Texture2D" uid="uid://dvbfdyrl8lg37" path="res://inventory9patch.png" id="2_pasp1"]
-[ext_resource type="PackedScene" uid="uid://ch46y53oin6wr" path="res://inventory_slot.tscn" id="3_ek26u"]
+[ext_resource type="Script" path="res://tool_drop.gd" id="3_v3e7l"]
+[ext_resource type="Script" path="res://reagents_drop.gd" id="4_qdcdx"]
 
-[node name="CraftUI" type="Node2D"]
+[node name="CraftUI" type="Panel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_gakny")
 
-[node name="Panel" type="Panel" parent="."]
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 477.0
-offset_bottom = 455.0
-
-[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+[node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,21 +28,21 @@ theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 metadata/_edit_use_anchors_ = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="MyTradesPanel" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MyTradesContainer" type="MarginContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer"]
 layout_mode = 2
 
-[node name="NinePatchRect" type="NinePatchRect" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer"]
+[node name="NinePatchRect" type="NinePatchRect" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer"]
 show_behind_parent = true
 light_mask = 0
 layout_mode = 2
@@ -54,7 +54,7 @@ patch_margin_bottom = 22
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -66,99 +66,58 @@ theme_override_constants/margin_top = 25
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 23
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect/MarginContainer"]
 layout_mode = 2
 
-[node name="My Trades" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 0
-text = "Craft"
-
-[node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 0
 text = "Tool"
 
-[node name="Tool" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer" instance=ExtResource("3_ek26u")]
+[node name="ScrollContainer2" type="ScrollContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer" node_paths=PackedStringArray("craft_ui")]
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("3_v3e7l")
+craft_ui = NodePath("../../../../../../../../..")
+
+[node name="ToolSlot" type="HFlowContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer/ScrollContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
-text = " "
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="HSeparator2" type="HSeparator" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 0
 text = "Reagents"
 
-[node name="MyCrafts" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MyTradesContainer/NinePatchRect/MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer" node_paths=PackedStringArray("craft_ui")]
 layout_mode = 2
 size_flags_vertical = 3
+script = ExtResource("4_qdcdx")
+craft_ui = NodePath("../../../../../../../../..")
 
-[node name="MyItemsPanel" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="MyCraftReagents" type="HFlowContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-
-[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel"]
-layout_mode = 2
-
-[node name="VBoxContainer3" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer"]
-layout_mode = 2
-
-[node name="NinePatchRect" type="NinePatchRect" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer"]
-show_behind_parent = true
-light_mask = 0
-layout_mode = 2
-texture = ExtResource("2_pasp1")
-patch_margin_left = 22
-patch_margin_top = 22
-patch_margin_right = 23
-patch_margin_bottom = 22
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 25
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 23
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "My Inventory"
-
-[node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="MyInventory" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/MyItemsPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
 size_flags_vertical = 3
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="Craft" type="Button" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer2"]
+[node name="Craft" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 text = "Craft"
 
-[connection signal="pressed" from="Panel/MarginContainer/VBoxContainer/HBoxContainer2/Craft" to="." method="_on_craft_pressed"]
+[connection signal="hidden" from="." to="." method="_on_hidden"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer2/Craft" to="." method="_on_craft_pressed"]

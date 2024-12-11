@@ -1,142 +1,84 @@
-extends Node2D
+class_name CraftUI
+extends Panel
+
 const INVENTORY_SLOT_SCENE = preload("res://inventory_slot.tscn")
 
 @export var me: MarbleCharacter
-var my_inventory_slots = {}
-var my_craft_slots = {}
-var tool = null
-var craft_inventory = {}
-@onready var tool_slot: InventorySlot = %Tool
-@onready var my_items = %MyInventory
-@onready var my_craft_items = %MyCrafts
+
+var reagent_slots = {}
+var reagent_inventory = {}
+var tool_slots = {}
+var tool_inventory = {}
+@onready var tool_container = %ToolSlot
+@onready var reagent_container = %MyCraftReagents
 
 
-func _ready() -> void:
-	tool_slot.pressed.connect(_on_tool_slot_pressed)
-	update()
+func _unhandled_input(event):
+	me._unhandled_input(event)
 
 
-@rpc("any_peer", "call_remote")
-func update() -> void:
-	my_inventory_slots = {}
-	for c in my_items.get_children():
-		my_items.remove_child(c)
+func reset():
+	me.reset_inventory_ui()
+	reagent_slots = {}
+	reagent_inventory = {}
+	tool_slots = {}
+	tool_inventory = {}
+	for c in reagent_container.get_children():
+		reagent_container.remove_child(c)
 		c.queue_free()
-
-	my_craft_slots = {}
-	for c in my_craft_items.get_children():
-		my_craft_items.remove_child(c)
+	for c in tool_container.get_children():
+		tool_container.remove_child(c)
 		c.queue_free()
-
-	if tool:
-		tool_slot.remove_item(tool)
-		tool = null
-
-	#print('craftui update',me.inventory)
-	for category in me.inventory:
-		for item in me.inventory[category].items.values():
-			add_item_to_inventory(item)
-
-
-func add_item_to_inventory(item: Dictionary):
-	if !(item.category in my_inventory_slots):
-		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
-		#new_slot.items = {}
-		new_slot.type_scene_file_path = item.scene_file_path
-		#new_slot.items=me.inventory[ii].items
-		my_inventory_slots[item.category] = new_slot
-		my_items.add_child(new_slot)
-		new_slot.pressed.connect(_on_inventory_slot_pressed.bind(new_slot))
-
-	my_inventory_slots[item.category].add_item(item)
-
-
-func remove_item_from_inventory(category: String) -> Dictionary:
-	var slot: InventorySlot = my_inventory_slots[category]
-	var item = slot.get_items().values()[0]
-	slot.remove_item(item)
-	slot.update()
-
-	if slot.size() == 0:
-		my_inventory_slots.erase(category)
-		slot.hide()
-		slot.queue_free()
-
-	return item
 
 
 func add_item_to_tool(item: Dictionary):
-	tool_slot.type_scene_file_path = item.scene_file_path
-	tool_slot.add_item(item)
-	tool = item
-	#TODO update the actions buttonss
-
-
-func remove_item_from_tool() -> Dictionary:
-	tool_slot.remove_item(tool)
-
-	var t = tool
-	tool = null
-	return t
-
-
-func add_item_to_craft(item: Dictionary):
-	if !(item.category in my_craft_slots):
+	if !(item.name in tool_slots):
 		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
-		#new_slot.items = {}
-		new_slot.type_scene_file_path = item.scene_file_path
-		#new_slot.items=me.inventory[ii].items
-		my_craft_slots[item.category] = new_slot
-		my_craft_items.add_child(new_slot)
-		new_slot.pressed.connect(_on_craft_slot_pressed.bind(new_slot))
+		new_slot.item = item
+		new_slot.src = tool_container.get_parent()
+		tool_slots[item.name] = new_slot
+		tool_container.add_child(new_slot)
 
-		craft_inventory[item.category] = {items = {}}
-
-	craft_inventory[item.category].items[item.name] = item
-	my_craft_slots[item.category].add_item(item)
+		tool_inventory[item.name] = item
 
 
-func remove_item_from_craft(category: String) -> Dictionary:
-	var slot: InventorySlot = my_craft_slots[category]
-	var item = slot.get_items().values()[0]
-	slot.remove_item(item)
-	slot.update()
-
-	if slot.size() == 0:
-		my_craft_slots.erase(category)
-		slot.hide()
-		slot.queue_free()
-
-	craft_inventory[item.category].items.erase(item.name)
-
-	return item
+func remove_item_from_tool(item_name: String):
+	var slot: InventorySlot = tool_slots[item_name]
+	slot.hide()
+	slot.queue_free()
+	tool_slots.erase(item_name)
+	tool_inventory.erase(item_name)
 
 
-func _on_tool_slot_pressed():
-	var item = remove_item_from_tool()
-	add_item_to_inventory(item)
-	#update()
+func add_item_to_reagents(item: Dictionary):
+	if !(item.name in reagent_slots):
+		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
+		new_slot.item = item
+		new_slot.src = reagent_container.get_parent()
+		new_slot.item = item
+		reagent_slots[item.name] = new_slot
+		reagent_container.add_child(new_slot)
+		#new_slot.pressed.connect(_on_craft_slot_pressed.bind(new_slot))
+
+		reagent_inventory[item.name] = item
 
 
-func _on_inventory_slot_pressed(slot: InventorySlot) -> void:
-	var item = remove_item_from_inventory(slot.category)
-	if !tool:
-		add_item_to_tool(item)
-
-	else:
-		add_item_to_craft(item)
-	#update()
-
-
-func _on_craft_slot_pressed(slot: InventorySlot) -> void:
-	var item = remove_item_from_craft(slot.category)
-	add_item_to_inventory(item)
-	#update()
+func remove_item_from_reagent(item_name: String):
+	var slot: InventorySlot = reagent_slots[item_name]
+	slot.hide()
+	slot.queue_free()
+	reagent_slots.erase(item_name)
+	reagent_inventory.erase(item_name)
 
 
 func _on_craft_pressed() -> void:
-	if !tool:
+	print("_on_craft_pressed")
+	if tool_inventory.size() == 0:
 		print("no tool item")
 		return
-	me.craft.rpc_id(1, "craft", tool, craft_inventory)
-	update()
+	me.craft.rpc_id(1, "craft", tool_inventory.values()[0], reagent_inventory)
+	reset()
+
+
+func _on_hidden() -> void:
+	reset()

@@ -29,6 +29,7 @@ const JUMP_VELOCITY = 5.0
 @export var actions = {"move": null, "action": null}:
 	set = _set_action
 
+#map of category:{items:{}}
 @export var inventory: Dictionary:
 	set = _set_inventory
 
@@ -54,6 +55,7 @@ var skills = {}
 @onready var raycast = %RayCast3D
 @onready var anim_player = $AnimationPlayer
 @onready var inventory_ui = %InventoryUI
+@onready var inventory_ui_window = %InventoryUIWindow
 @onready var chunk_scanner = %ChunkScanner
 @onready var character_sheet = %CharacterSheet
 @onready var quest_creator_ui: QuestManager = %QuestCreator
@@ -61,7 +63,9 @@ var skills = {}
 @onready var fade_anim = %AnimationPlayer
 #@onready var trade_ui = %TradeUI
 @onready var trade_ui: PlayerInteraction = %PlayerInteractionUI
+@onready var trade_ui_window = $PlayerInteractionWindow
 @onready var craft_ui = %CraftUI
+@onready var craft_ui_window = %CraftUIWindow
 @onready var cross_hair = %CrossHair
 @onready var quest_indicator = %"?"
 
@@ -76,9 +80,9 @@ func _set_quests(value: Dictionary):
 	quests = value
 	if quest_indicator:
 		if quests.size():
-			quest_indicator.visible = true
+			quest_indicator.show()
 		else:
-			quest_indicator.visible = false
+			quest_indicator.hide()
 	if quest_creator_ui:
 		quest_creator_ui.update()
 
@@ -101,16 +105,16 @@ func delete_quest(quest: Dictionary):
 
 
 @rpc("any_peer")
-func craft(action: String, tool: Dictionary, loot: Dictionary):
+func craft(action: String, tool: Dictionary, reagents: Dictionary):
 	if not multiplayer.is_server():
 		return
 	var scene = load(tool.scene_file_path)
 	var instance = scene.instantiate()
-	var result = instance.call(action, self, loot)
+	var result = instance.call(action, self, reagents)
 	#var result = instance.craft(self, loot)
 	#print(result)
 	#remove_from_inventory({tool.category:{"items":{tool.name:tool}}})
-	remove_from_inventory(loot)
+	remove_from_inventory(reagents)
 
 	add_to_inventory(result)
 	#if loot.keys().size()>0 and loot[loot.keys()[0]].has_method("craft"):
@@ -201,14 +205,19 @@ func _set_trading(value):
 			trade_ui.other_player_quests = other_player_quests
 
 			trade_ui.update()
-			trade_ui.show()
+			trade_ui_window.show()
+			inventory_ui_window.show()
 		else:
-			trade_ui.hide()
+			trade_ui_window.hide()
 	if !trading:
 		trade_partner = null
 		trade_accepted = false
 		my_trade_inventory = {}
 		other_trade_inventory = {}
+
+
+func reset_inventory_ui():
+	inventory_ui.update()
 
 
 func _set_inventory(value: Dictionary):
@@ -219,7 +228,7 @@ func _set_inventory(value: Dictionary):
 	if trade_ui:
 		trade_ui.update()
 	if craft_ui:
-		craft_ui.update()
+		craft_ui.reset()
 
 
 #setter, don't call directly
@@ -319,7 +328,7 @@ func _ready():
 	if is_current_player():
 		camera.current = true
 		actions_ui.show()
-		cross_hair.visible = true
+		cross_hair.show()
 	else:
 		pass
 
@@ -339,6 +348,7 @@ func play_fade():
 
 
 func _unhandled_input(event):
+	#print('player _unhandled_input')
 	if game and !is_current_player():
 		return
 
@@ -356,19 +366,27 @@ func _unhandled_input(event):
 		else:
 			time_warp.rpc_id(1, minutes)
 
+	var something_visible = false
+
 	if Input.is_action_just_pressed("inventory"):
-		inventory_ui.visible = !inventory_ui.visible
+		inventory_ui_window.visible = !inventory_ui_window.visible
+		something_visible = something_visible or inventory_ui_window.visible
 
 	if Input.is_action_just_pressed("craft"):
-		craft_ui.visible = !craft_ui.visible
-		cross_hair.visible = !cross_hair.visible
+		craft_ui_window.visible = !craft_ui_window.visible
+		if craft_ui_window.visible:
+			inventory_ui_window.show()
+		something_visible = something_visible or craft_ui_window.visible
 
 	if Input.is_action_just_pressed("character_sheet"):
 		character_sheet.visible = !character_sheet.visible
+		something_visible = something_visible or character_sheet.visible
 
 	if Input.is_action_just_pressed("quest_creator"):
 		quest_creator_ui.visible = !quest_creator_ui.visible
-		cross_hair.visible = !cross_hair.visible
+		something_visible = something_visible or quest_creator_ui.visible
+
+	cross_hair.visible = !something_visible
 
 	if event is InputEventMouseMotion:
 		if (
@@ -399,11 +417,17 @@ func _unhandled_input(event):
 		else:
 			cancel_trade.rpc_id(1)
 
-	if Input.is_action_just_pressed("quit") and inventory_ui.visible:
+	if Input.is_action_just_pressed("quit") and inventory_ui_window.visible:
 		#don't let this event bubble up
 		get_viewport().set_input_as_handled()
 
-		inventory_ui.hide()
+		inventory_ui_window.hide()
+
+	if Input.is_action_just_pressed("quit") and craft_ui_window.visible:
+		#don't let this event bubble up
+		get_viewport().set_input_as_handled()
+
+		craft_ui_window.hide()
 
 	if Input.is_action_just_pressed("chat"):
 		chat_text_edit.visible = !chat_text_edit.visible
@@ -565,6 +589,7 @@ func interact():
 		#print('found:', entity)
 
 		if entity.has_method("start_trade"):
+			print("start trade")
 			start_trade(entity)
 			entity.start_trade(self)
 
@@ -591,25 +616,25 @@ func add_to_inventory(loot: Dictionary):
 	if !multiplayer.is_server():
 		return
 	#print('loot:', loot)
-	for category in loot:
-		if !inventory.has(category):
-			inventory[category] = {
+	for item in loot.values():
+		if !inventory.has(item.category):
+			inventory[item.category] = {
 				items = {},
-				scene_file_path = loot[category].scene_file_path,
+				#scene_file_path = item.scene_file_path,
 			}
-		if !inventory[category].has("items"):
-			inventory[category].items = {}
-		if !inventory[category].has("scene_file_path"):
-			inventory[category].scene_file_path = loot[category].scene_file_path
+		if !inventory[item.category].has("items"):
+			inventory[item.category].items = {}
+		#if !inventory[item.category].has("scene_file_path"):
+			#inventory[item.category].scene_file_path = loot[item.category].scene_file_path
 
 		#var loot_item = loot[item_name]
 
-		for item in loot[category].items.values():
+		#for item in loot[category].items.values():
 			#TODO instantiate in inventory
-			inventory[category].items[item.name] = item
+		inventory[item.category].items[item.name] = item
 
 	#print('inventory:', inventory)
-	craft_ui.update.rpc()
+	#craft_ui.update.rpc()
 
 
 func remove_from_inventory(loot: Dictionary) -> bool:
