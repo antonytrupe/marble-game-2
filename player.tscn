@@ -586,7 +586,7 @@ size = Vector2i(400, 400)
 visible = false
 transient = true
 transparent = true
-popup_window = true
+mouse_passthrough = true
 script = ExtResource("8_yunen")
 me = NodePath("..")
 
@@ -603,7 +603,7 @@ size = Vector2i(400, 400)
 visible = false
 transient = true
 transparent = true
-popup_window = true
+mouse_passthrough = true
 script = ExtResource("8_yunen")
 me = NodePath("..")
 

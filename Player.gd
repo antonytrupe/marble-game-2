@@ -29,7 +29,7 @@ const JUMP_VELOCITY = 5.0
 @export var actions = {"move": null, "action": null}:
 	set = _set_action
 
-#map of category:{items:{}}
+#map of name:item
 @export var inventory: Dictionary:
 	set = _set_inventory
 
@@ -110,6 +110,7 @@ func craft(action: String, tool: Dictionary, reagents: Dictionary):
 		return
 	var scene = load(tool.scene_file_path)
 	var instance = scene.instantiate()
+	instance.load(inventory[tool.name])
 	var result = instance.call(action, self, reagents)
 	#var result = instance.craft(self, loot)
 	#print(result)
@@ -119,6 +120,8 @@ func craft(action: String, tool: Dictionary, reagents: Dictionary):
 	add_to_inventory(result)
 	#if loot.keys().size()>0 and loot[loot.keys()[0]].has_method("craft"):
 	#loot[0].craft(loot)
+	#inventory=inventory
+	reset_inventory_ui()
 
 
 func _set_other_player_quests(q):
@@ -221,7 +224,7 @@ func reset_inventory_ui():
 
 
 func _set_inventory(value: Dictionary):
-	#print('player._set_inventory')
+	# print('player._set_inventory')
 	inventory = value
 	if inventory_ui:
 		inventory_ui.update()
@@ -615,46 +618,21 @@ func interact():
 func add_to_inventory(loot: Dictionary):
 	if !multiplayer.is_server():
 		return
-	#print('loot:', loot)
+	# print('add_to_inventory:', loot)
 	for item in loot.values():
-		if !inventory.has(item.category):
-			inventory[item.category] = {
-				items = {},
-				#scene_file_path = item.scene_file_path,
-			}
-		if !inventory[item.category].has("items"):
-			inventory[item.category].items = {}
-		#if !inventory[item.category].has("scene_file_path"):
-			#inventory[item.category].scene_file_path = loot[item.category].scene_file_path
-
-		#var loot_item = loot[item_name]
-
-		#for item in loot[category].items.values():
-			#TODO instantiate in inventory
-		inventory[item.category].items[item.name] = item
-
-	#print('inventory:', inventory)
-	#craft_ui.update.rpc()
+		inventory[item.name] = item
+	# inventory=inventory
 
 
+##loot is {item_name:{item}}
 func remove_from_inventory(loot: Dictionary) -> bool:
 	#print("remove_from_inventory:", loot)
 	if !multiplayer.is_server():
 		return false
-	for category in loot:
-		if (
-			!inventory.has(category)
-			or inventory[category].items.keys().size() < loot[category].items.keys().size()
-		):
-			print("not removing")
-			return false
+	for item in loot.values():
+		inventory.erase(item.name)
+		print("removed %s" % item.name)
 
-		for id in loot[category].items.keys():
-			inventory[category].items.erase(id)
-			print("removed %s" % id)
-
-		if inventory[category].items.keys().size() == 0:
-			inventory.erase(category)
 	return true
 
 

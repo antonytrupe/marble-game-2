@@ -19,9 +19,8 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 
 
 func update():
-	for category in me.inventory:
-		for item in me.inventory[category].items.values():
-			add_item_to_inventory(item)
+	for item in me.inventory.values():
+		add_item_to_inventory(item)
 
 
 func move_item_from_inventory(item: Dictionary):
@@ -34,6 +33,9 @@ func add_item_to_inventory(item: Dictionary):
 	if !(item.name in my_inventory_slots):
 		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
 		new_slot.src = self
-		new_slot.item = item
+		#new_slot.item = item
 		my_inventory_slots[item.name] = new_slot
 		my_items.add_child(new_slot)
+
+	my_inventory_slots[item.name].item=item
+	my_inventory_slots[item.name].update_label()

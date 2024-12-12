@@ -6,9 +6,9 @@ class_name Stone
 @export var extra_age: int = 0:
 	set = set_extra_age
 
-var brittleness: int = 50
-var hardness: int = 50
-var sharpness: int = 0
+var brittleness: int
+var hardness: int
+var sharpness: int
 
 @onready var world = $/root/Game/World
 
@@ -25,15 +25,20 @@ func _ready():
 
 
 func craft(player: MarbleCharacter, loot: Dictionary):
-	print('%s stone crafting' % player.name, loot)
-	for _category in loot:
-		print(category)
-		if _category == category:
-			for i in loot[_category].items.values():
-				print(i.name)
-				#TODO figure out what to do here
-
-	return loot
+	#print('%s stone crafting' % player.name, self)
+	var result={}
+	for item_name in loot.keys():
+		var item=player.inventory[item_name]
+		#print(item)
+		if item.category == "Stone":
+			if item.hardness<hardness:
+				print("old sharpness:",item.sharpness)
+				item.sharpness+=(item.brittleness/100.0)*(hardness/100.0)
+				print("new sharpness:",item.sharpness)
+			elif item.hardness>hardness:
+				print('break tool')
+		result[item.name]=item
+	return result
 
 
 func pick_up():
@@ -92,7 +97,8 @@ func save() -> Dictionary:
 
 
 func load(node_data: Dictionary):
-	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
+	if node_data.has("transform"):
+		transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
 	for p in node_data:
 		if p in self and p not in ['transform']:
 			self[p] = node_data[p]
