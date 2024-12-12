@@ -238,6 +238,7 @@ spawn_path = NodePath("..")
 
 [node name="30ftRuler" type="MeshInstance3D" parent="World"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+visible = false
 mesh = SubResource("PlaneMesh_jysef")
 skeleton = NodePath("../..")
 
