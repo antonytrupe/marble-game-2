@@ -6,9 +6,11 @@ class_name Stone
 @export var extra_age: int = 0:
 	set = set_extra_age
 
-var brittleness: int
-var hardness: int
-var sharpness: int
+var brittleness: float
+var hardness: float
+var sharpness: float
+var mass:float
+var volume:float
 
 @onready var world = $/root/Game/World
 
