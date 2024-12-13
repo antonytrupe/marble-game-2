@@ -27,6 +27,7 @@ func _ready():
 
 
 func craft(player: MarbleCharacter, loot: Dictionary):
+
 	#print('%s stone crafting' % player.name, self)
 	var result={}
 	for item_name in loot.keys():
@@ -37,6 +38,7 @@ func craft(player: MarbleCharacter, loot: Dictionary):
 				print("old sharpness:",item.sharpness)
 				item.sharpness+=(item.brittleness/100.0)*(hardness/100.0)
 				print("new sharpness:",item.sharpness)
+				player.skillup('knapping',1)
 			elif item.hardness>hardness:
 				print('break tool')
 		result[item.name]=item

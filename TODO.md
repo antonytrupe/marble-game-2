@@ -1,20 +1,25 @@
 inventory based on volume
 inventory based on weight
 
+time warping voting
+time warping area smoothing
+
 queing actions
+action menu
 longer then instant/turn actions
+
 quest system
 faction
 NPC actions
 skills
 dropping items out of inventory
 
+remember window positions
 
 head look
 chopping trees
 saplings
 
-action menu
 terrain heightmaps
 making log walls
 making fire

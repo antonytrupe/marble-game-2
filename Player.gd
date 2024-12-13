@@ -44,6 +44,7 @@ var calculated_age: int:
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chat_mode = false
+## Dictionary{string:SkillInfo}
 var skills = {}
 
 @onready var game: Game = $/root/Game
@@ -68,6 +69,12 @@ var skills = {}
 @onready var craft_ui_window = %CraftUIWindow
 @onready var cross_hair = %CrossHair
 @onready var quest_indicator = %"?"
+
+
+func skillup(skill, amount):
+	if skill not in skills:
+		skills[skill] = {level = 1, xp = 0}
+	skills[skill] += amount
 
 
 func _set_trade_partner(partner: MarbleCharacter):
