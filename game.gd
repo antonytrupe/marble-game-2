@@ -232,8 +232,7 @@ func _on_host_button_pressed():
 
 
 func _unhandled_input(_event):
-
-	var player=get_player(player_id)
+	var player: MarbleCharacter = get_player(player_id)
 
 	if Input.is_action_just_pressed("long_rest"):
 		var minutes = 8 * 60
@@ -257,9 +256,10 @@ func _unhandled_input(_event):
 		get_tree().quit()
 
 
-func get_player(player_id):
-	var p=players.get_node_or_null(player_id)
+func get_player(player_id) -> MarbleCharacter:
+	var p = players.get_node_or_null(player_id)
 	return p
+
 
 func _process(_delta):
 	var now = Time.get_ticks_msec()
@@ -288,12 +288,14 @@ func load_node(node_data):
 
 
 func save_client():
-	var save_file = FileAccess.open("user://%s.save" %player_id, FileAccess.WRITE)
+	var save_file = FileAccess.open("user://%s.save" % player_id, FileAccess.WRITE)
 	var save_nodes = get_tree().get_nodes_in_group("persist-client")
 	for node in save_nodes:
 		# Check the node has a save function.
 		if !node.has_method("save_node"):
-			print("client persistent node '%s' is missing a save_node() function, skipped" % node.name)
+			print(
+				"client persistent node '%s' is missing a save_node() function, skipped" % node.name
+			)
 			print(node)
 			continue
 
@@ -359,12 +361,12 @@ func start_client():
 
 
 func load_client():
-	print('load client %s'%player_id)
-	if not FileAccess.file_exists("user://%s.save" %player_id):
+	print("load client %s" % player_id)
+	if not FileAccess.file_exists("user://%s.save" % player_id):
 		print("client save not found")
 		return  # Error! We don't have a save to load.
 
-	var save_file = FileAccess.open("user://%s.save"%player_id, FileAccess.READ)
+	var save_file = FileAccess.open("user://%s.save" % player_id, FileAccess.READ)
 	var json = JSON.new()
 	var parse_result
 	while save_file.get_position() < save_file.get_length():
@@ -394,11 +396,13 @@ func load_client():
 		elif !node and node_data["class"]:
 			node = ClassDB.instantiate(node_data.class)
 		else:
-			print('did not find node in tree and not enough info to instantiate')
+			print("did not find node in tree and not enough info to instantiate")
 			print(node_data)
 		# Check the node has a load function.
 		if !node.has_method("load_node"):
-			print("client persistent node '%s' is missing a load_node() function, skipped" % node.name)
+			print(
+				"client persistent node '%s' is missing a load_node() function, skipped" % node.name
+			)
 			print(node.name)
 			continue
 		node.call("load_node", node_data)
