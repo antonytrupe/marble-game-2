@@ -1,5 +1,5 @@
 class_name Game
-extends Node3D
+extends Node
 
 const PORT = 9999
 const PLAYER_SCENE = preload("res://player.tscn")
@@ -28,7 +28,7 @@ var rng = RandomNumberGenerator.new()
 @onready var turn_timer = %TurnTimer
 @onready var server_camera = $CameraPivot/ServerCamera3D
 @onready var world = %World
-@onready var world_time = %WorldTimeLabel
+#@onready var world_time = %WorldTimeLabel
 @onready var players = %Players
 
 
@@ -173,7 +173,7 @@ func add_player(_peer_id, _player_id):
 		player.player_id = _player_id
 		#TODO make sure player isn't colliding with existing player
 		#PhysicsServer3D.space_get_direct_state(0)
-		get_world_3d().space.get_id()
+		world.get_world_3d().space.get_id()
 		#As per docs
 		#var params: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
 		#params.shape_rid = player.get_rid()
@@ -270,11 +270,11 @@ func _unhandled_input(_event):
 func _process(_delta):
 	var now = Time.get_ticks_msec()
 
-	var age = GameTime.get_age_parts(world.calculated_age)
-	world_time.text = (
-		"%d years, %d months, %d days, %02d:%02d:%02d"
-		% [age.years, age.months, age.days, age.hours, age.minutes, age.seconds]
-	)
+	#var age = GameTime.get_age_parts(world.calculated_age)
+	#world_time.text = (
+		#"%d years, %d months, %d days, %02d:%02d:%02d"
+		#% [age.years, age.months, age.days, age.hours, age.minutes, age.seconds]
+	#)
 
 	if multiplayer.is_server():
 		turn_timer.value = (now + world.world_age) % 6000

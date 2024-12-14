@@ -38,13 +38,12 @@ background_mode = 2
 sky = SubResource("Sky_bq4b2")
 volumetric_fog_density = 0.0434
 
-[node name="Game" type="Node3D" groups=["persist"]]
+[node name="Game" type="Node" groups=["persist"]]
 script = ExtResource("1_2iwba")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="HUD" type="Control" parent="UI"]
-visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -73,11 +72,11 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="UI/HUD/MarginContainer/VBoxContainer"]
-visible = false
 layout_mode = 2
 
 [node name="WorldTimeLabel" type="Label" parent="UI/HUD/MarginContainer/VBoxContainer/PanelContainer"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_vertical = 8
 text = "World Time Label"
