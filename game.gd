@@ -32,16 +32,6 @@ var rng = RandomNumberGenerator.new()
 @onready var players = %Players
 
 
-func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
-	print("game _can_drop_data", data)
-	return true
-
-
-func _drop_data(_at_position: Vector2, data: Variant) -> void:
-	print("game  _drop_data", data)
-	#craft_ui.add_item_to_reagents(data.item)
-
-
 func get_chunk(_position: Vector3) -> Chunk:
 	return null
 
@@ -148,10 +138,9 @@ func _on_connected_to_server():
 
 
 @rpc("any_peer", "reliable")
-func register_player(new_player_info):
+func register_player(player_id):
 	var peer_id = multiplayer.get_remote_sender_id()
-	#players[peer_id] = new_player_info
-	add_player(peer_id, new_player_info)
+	add_player(peer_id, player_id)
 	send_world_age.rpc_id(peer_id, Time.get_ticks_msec() + world.world_age)
 
 
@@ -171,23 +160,7 @@ func add_player(_peer_id, _player_id):
 		player = PLAYER_SCENE.instantiate()
 		player.name = _player_id
 		player.player_id = _player_id
-		#TODO make sure player isn't colliding with existing player
-		#PhysicsServer3D.space_get_direct_state(0)
-		world.get_world_3d().space.get_id()
-		#As per docs
-		#var params: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
-		#params.shape_rid = player.get_rid()
-		#print(player.get_rid())
-		#print(player.get_shape_owners())
-		#params.shape = player
-		#params.transform = player.transform
-		#params.collide_with_bodies = true
-		#params.collide_with_areas = true
-		#var i = get_world_3d().direct_space_state.intersect_shape(params)
-		#var i = get_world_3d().direct_space_state.collide_shape(params)
-		#print(i)
-		#if i:
-		#print("found overlap")
+
 		player.position.x = RandomNumberGenerator.new().randi_range(-5, 5)
 		player.position.z = RandomNumberGenerator.new().randi_range(-5, 5)
 		players.add_child(player)
@@ -259,6 +232,9 @@ func _on_host_button_pressed():
 
 
 func _unhandled_input(_event):
+
+	var player=get_player(player_id)
+
 	if Input.is_action_just_pressed("quit"):
 		if multiplayer.is_server():
 			save_server()
@@ -267,14 +243,12 @@ func _unhandled_input(_event):
 		get_tree().quit()
 
 
+func get_player(player_id):
+	var p=players.get_node_or_null(player_id)
+	return p
+
 func _process(_delta):
 	var now = Time.get_ticks_msec()
-
-	#var age = GameTime.get_age_parts(world.calculated_age)
-	#world_time.text = (
-		#"%d years, %d months, %d days, %02d:%02d:%02d"
-		#% [age.years, age.months, age.days, age.hours, age.minutes, age.seconds]
-	#)
 
 	if multiplayer.is_server():
 		turn_timer.value = (now + world.world_age) % 6000
