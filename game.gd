@@ -235,6 +235,20 @@ func _unhandled_input(_event):
 
 	var player=get_player(player_id)
 
+	if Input.is_action_just_pressed("long_rest"):
+		var minutes = 8 * 60
+		if multiplayer.is_server():
+			player.time_warp(minutes)
+		else:
+			player.time_warp.rpc_id(1, minutes)
+
+	if Input.is_action_just_pressed("short_rest"):
+		var minutes = 60
+		if multiplayer.is_server():
+			player.time_warp(minutes)
+		else:
+			player.time_warp.rpc_id(1, minutes)
+
 	if Input.is_action_just_pressed("quit"):
 		if multiplayer.is_server():
 			save_server()

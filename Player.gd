@@ -362,20 +362,6 @@ func _unhandled_input(event):
 	if game and !is_current_player():
 		return
 
-	if Input.is_action_just_pressed("long_rest"):
-		var minutes = 8 * 60
-		if multiplayer.is_server():
-			time_warp(minutes)
-		else:
-			time_warp.rpc_id(1, minutes)
-
-	if Input.is_action_just_pressed("short_rest"):
-		var minutes = 60
-		if multiplayer.is_server():
-			time_warp(minutes)
-		else:
-			time_warp.rpc_id(1, minutes)
-
 	var something_visible = false
 
 	if Input.is_action_just_pressed("inventory"):
