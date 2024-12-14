@@ -20,7 +20,7 @@ var player_id: String
 #var players = {}
 var rng = RandomNumberGenerator.new()
 
-@onready var main_menu = $UI/MainMenu
+#@onready var main_menu = $UI/MainMenu
 @onready var hud = $UI/HUD
 @onready var terra = %Terra
 @onready var flora = %Flora
@@ -134,7 +134,7 @@ func server_disconnected():
 
 func _on_join_button_pressed(ip_address):
 	print("joining ", ip_address)
-	main_menu.hide()
+	#main_menu.hide()
 	hud.show()
 
 	enet_peer.create_client(ip_address, PORT)
@@ -228,7 +228,7 @@ func _ready():
 
 	if config.server:
 		start_server()
-		main_menu.hide()
+		#main_menu.hide()
 		hud.show()
 		#health_bar.hide()
 		server_camera.show()
@@ -252,7 +252,7 @@ func update_turn_number(value):
 
 
 func _on_host_button_pressed():
-	main_menu.hide()
+	#main_menu.hide()
 	hud.show()
 	start_server()
 	#add_player(multiplayer.get_unique_id())
