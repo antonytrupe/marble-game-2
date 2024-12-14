@@ -79,7 +79,7 @@ func time_warp(minutes: int):
 		p.play_fade.rpc()
 
 
-func save():
+func save_node():
 	var save_dict = {
 		"transform": JSON3D.Transform3DtoDictionary(transform),
 		"birth_date": birth_date,
@@ -88,7 +88,7 @@ func save():
 	return save_dict
 
 
-func load(node_data):
+func load_node(node_data):
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
 	if "birth_date" in node_data:
 		birth_date = node_data.birth_date

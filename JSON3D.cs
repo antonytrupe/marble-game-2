@@ -12,6 +12,26 @@ public partial class JSON3D : Node
 		Instance = this;
 	}
 
+	public Vector2 DictionaryToVector2(Dictionary<string, float> d)
+	{
+		return new Vector2(d["x"], d["y"]);
+	}
+
+	public Dictionary Vector2ToDictionary(Vector2 vector2)
+	{
+		var d = new Dictionary
+		{
+			{"x",vector2.X},
+			{"y",vector2.Y},
+		};
+		return d;
+	}
+
+	public Vector3 DictionaryToVector3(Dictionary<string, float> d)
+	{
+		return new Vector3(d["x"], d["y"], d["z"]);
+	}
+
 	public Dictionary Vector3ToDictionary(Vector3 vector3)
 	{
 		var d = new Dictionary
@@ -22,6 +42,7 @@ public partial class JSON3D : Node
 		};
 		return d;
 	}
+
 	public Dictionary Transform3DtoDictionary(Transform3D t)
 	{
 		var d = new Dictionary{
@@ -47,8 +68,5 @@ public partial class JSON3D : Node
 		return new Transform3D(_basis, origin);
 	}
 
-	public Vector3 DictionaryToVector3(Dictionary<string, float> d)
-	{
-		return new Vector3(d["x"], d["y"], d["z"]);
-	}
+
 }

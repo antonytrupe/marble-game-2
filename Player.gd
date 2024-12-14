@@ -301,7 +301,7 @@ func play_animation(animation_name):
 	anim_player.play(animation_name)
 
 
-func load(node_data):
+func load_node(node_data):
 	player_id = node_data["player_id"]
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
@@ -311,7 +311,7 @@ func load(node_data):
 	#TODO figure out camera rotation
 
 
-func save():
+func save_node():
 	var save_dict = {
 		#
 		player_id = player_id,

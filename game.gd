@@ -124,7 +124,7 @@ func get_random_vector(R: float, center: Vector3) -> Vector3:
 func start_server():
 	enet_peer.create_server(PORT)
 	multiplayer.multiplayer_peer = enet_peer
-	load_game()
+	load_server()
 	print("started server")
 
 
@@ -236,6 +236,7 @@ func _ready():
 		get_viewport().get_window().title += " - SERVER"
 	elif config.has("player_id"):
 		player_id = config["player_id"]
+		start_client()
 		_on_join_button_pressed(config.remote_ip)
 		get_viewport().get_window().title += " - " + player_id
 		print("started client")
@@ -260,7 +261,9 @@ func _on_host_button_pressed():
 func _unhandled_input(_event):
 	if Input.is_action_just_pressed("quit"):
 		if multiplayer.is_server():
-			save_game()
+			save_server()
+		else:
+			save_client()
 		get_tree().quit()
 
 
@@ -283,7 +286,7 @@ func _process(_delta):
 		turn_timer.value = (now - turn_start) % 6000
 
 
-func save():
+func save_node():
 	var save_dict = {
 		#
 		"host_player_id": player_id
@@ -291,23 +294,23 @@ func save():
 	return save_dict
 
 
-func load(node_data):
+func load_node(node_data):
 	if "host_player_id" in node_data:
 		player_id = node_data.host_player_id
 
 
-func save_game():
-	var save_file = FileAccess.open("user://savegame.save", FileAccess.WRITE)
-
-	var save_nodes = get_tree().get_nodes_in_group("persist")
+func save_client():
+	var save_file = FileAccess.open("user://%s.save" %player_id, FileAccess.WRITE)
+	var save_nodes = get_tree().get_nodes_in_group("persist-client")
 	for node in save_nodes:
 		# Check the node has a save function.
-		if !node.has_method("save"):
-			print("persistent node '%s' is missing a save() function, skipped" % node.name)
+		if !node.has_method("save_node"):
+			print("client persistent node '%s' is missing a save_node() function, skipped" % node.name)
+			print(node)
 			continue
 
 		# Call the node's save function.
-		var node_data: Dictionary = node.call("save")
+		var node_data: Dictionary = node.call("save_node")
 
 		node_data.name = node.name
 		node_data.parent = node.get_parent().get_path()
@@ -329,7 +332,94 @@ func save_game():
 	)
 
 
-func load_game():
+func save_server():
+	var save_file = FileAccess.open("user://savegame.save", FileAccess.WRITE)
+
+	var save_nodes = get_tree().get_nodes_in_group("persist")
+	for node in save_nodes:
+		# Check the node has a save function.
+		if !node.has_method("save_node"):
+			print("persistent node '%s' is missing a save_node() function, skipped" % node.name)
+			continue
+
+		# Call the node's save function.
+		var node_data: Dictionary = node.call("save_node")
+
+		node_data.name = node.name
+		node_data.parent = node.get_parent().get_path()
+		node_data.class = node.get_class()
+		node_data.scene_file_path = node.get_scene_file_path()
+
+		# JSON provides a static method to serialized JSON string.
+		var json_string = JSON.stringify(node_data, "", false)
+		#var json_string = JSON.stringify(node_data,"\t",false)
+
+		# Store the save dictionary as a new line in the save file.
+		save_file.store_line(json_string)
+	#save_file.close()
+	save_file.flush()
+	print("saved ", save_file.get_path_absolute())
+	DirAccess.copy_absolute(
+		save_file.get_path_absolute(),
+		"user://savegame_" + str(Time.get_ticks_msec() + world.world_age) + ".save"
+	)
+
+
+func start_client():
+	pass
+	#load_client()
+
+
+func load_client():
+	print('load client %s'%player_id)
+	if not FileAccess.file_exists("user://%s.save" %player_id):
+		print("client save not found")
+		return  # Error! We don't have a save to load.
+
+	var save_file = FileAccess.open("user://%s.save"%player_id, FileAccess.READ)
+	var json = JSON.new()
+	var parse_result
+	while save_file.get_position() < save_file.get_length():
+		var json_string = save_file.get_line()
+
+		# Check if there is any error while parsing the JSON string, skip in case of failure.
+		parse_result = json.parse(json_string)
+		if not parse_result == OK:
+			print(
+				"JSON Parse Error: ",
+				json.get_error_message(),
+				" in ",
+				json_string,
+				" at line ",
+				json.get_error_line()
+			)
+			continue
+
+		# Get the data from the JSON object.
+		var node_data = json.data
+
+		# Firstly, we need to create the object and add it to the tree
+		# check if the node is in the tree already
+		var node = get_node_or_null(node_data.parent + "/" + node_data.name)
+		if !node and node_data["scene_file_path"]:
+			node = load(node_data["scene_file_path"]).instantiate()
+		elif !node and node_data["class"]:
+			node = ClassDB.instantiate(node_data.class)
+		else:
+			print('did not find node in tree and not enough info to instantiate')
+			print(node_data)
+		# Check the node has a load function.
+		if !node.has_method("load_node"):
+			print("client persistent node '%s' is missing a load_node() function, skipped" % node.name)
+			print(node.name)
+			continue
+		node.call("load_node", node_data)
+		node.name = node_data.name
+		if !node.get_parent():
+			get_node_or_null(node_data["parent"]).add_child(node)
+
+
+func load_server():
 	if not FileAccess.file_exists("user://savegame.save"):
 		print("save not found")
 		return  # Error! We don't have a save to load.
@@ -366,10 +456,10 @@ func load_game():
 		else:
 			pass
 		# Check the node has a load function.
-		if !node.has_method("load"):
+		if !node.has_method("load_node"):
 			print("persistent node '%s' is missing a load() function, skipped" % node.name)
 			continue
-		node.call("load", node_data)
+		node.call("load_node", node_data)
 		node.name = node_data.name
 		if !node.get_parent():
 			get_node_or_null(node_data["parent"]).add_child(node)

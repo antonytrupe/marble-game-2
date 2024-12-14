@@ -49,7 +49,7 @@ func pick_up():
 	hide()
 	queue_free()
 
-	var d = save()
+	var d = save_node()
 	d.erase('transform')
 
 	return {d.name:d}
@@ -78,10 +78,10 @@ func calculate_age():
 
 
 func toDictionary() -> Dictionary:
-	return save()
+	return save_node()
 
 
-func save() -> Dictionary:
+func save_node() -> Dictionary:
 	var save_dict = {
 		transform = JSON3D.Transform3DtoDictionary(transform),
 		birth_date = birth_date,
@@ -100,7 +100,7 @@ func save() -> Dictionary:
 	return save_dict
 
 
-func load(node_data: Dictionary):
+func load_node(node_data: Dictionary):
 	if node_data.has("transform"):
 		transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
 	for p in node_data:

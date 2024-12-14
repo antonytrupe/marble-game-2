@@ -19,7 +19,7 @@ func calculate_age():
 	return world_age + Time.get_ticks_msec()
 
 
-func save():
+func save_node():
 	var save_dict = {
 		#
 		"world_age": calculated_age
@@ -27,7 +27,7 @@ func save():
 	return save_dict
 
 
-func load(node_data):
+func load_node(node_data):
 	name = node_data["name"]
 	if "world_age" in node_data:
 		world_age = node_data.world_age

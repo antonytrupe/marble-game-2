@@ -37,6 +37,7 @@ project/assembly_name="MarbleGame"
 flora=""
 persist=""
 fauna=""
+persist-client=""
 
 [input]
 
