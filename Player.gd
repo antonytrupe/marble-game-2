@@ -71,6 +71,156 @@ var skills = {}
 @onready var quest_indicator = %"?"
 
 
+func _ready():
+	actions_ui.player_id = player_id
+	Signals.NewTurn.connect(_on_new_turn)
+	#if multiplayer.is_server():
+	#Signals.PlayerZoned.connect(_on_player_zoned)
+	if is_current_player():
+		camera.current = true
+		actions_ui.show()
+		cross_hair.show()
+	else:
+		pass
+
+
+func _unhandled_input(event):
+	#print('player _unhandled_input')
+	if game and !is_current_player():
+		return
+
+	var something_visible = false
+
+	if Input.is_action_just_pressed("inventory"):
+		inventory_ui_window.visible = !inventory_ui_window.visible
+		something_visible = something_visible or inventory_ui_window.visible
+
+	if Input.is_action_just_pressed("craft"):
+		craft_ui_window.visible = !craft_ui_window.visible
+		if craft_ui_window.visible:
+			inventory_ui_window.show()
+		something_visible = something_visible or craft_ui_window.visible
+
+	if Input.is_action_just_pressed("character_sheet"):
+		character_sheet.visible = !character_sheet.visible
+		something_visible = something_visible or character_sheet.visible
+
+	if Input.is_action_just_pressed("quest_creator"):
+		quest_creator_ui.visible = !quest_creator_ui.visible
+		something_visible = something_visible or quest_creator_ui.visible
+
+	cross_hair.visible = !something_visible
+
+	if event is InputEventMouseMotion:
+		if (
+			Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
+			or Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE)
+		):
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+			if multiplayer.is_server():
+				server_rotate(event.relative)
+			else:
+				server_rotate.rpc_id(1, event.relative)
+		else:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+	if Input.is_action_just_pressed("quit") and chat_mode:
+		#don't let this event bubble up
+		get_viewport().set_input_as_handled()
+		chat_text_edit.hide()
+		chat_text_edit.release_focus()
+		chat_mode = false
+
+	if Input.is_action_just_pressed("quit") and trading:
+		#don't let this event bubble up
+		get_viewport().set_input_as_handled()
+
+		if multiplayer.is_server():
+			cancel_trade()
+		else:
+			cancel_trade.rpc_id(1)
+
+	if Input.is_action_just_pressed("quit") and inventory_ui_window.visible:
+		#don't let this event bubble up
+		get_viewport().set_input_as_handled()
+
+		inventory_ui_window.hide()
+
+	if Input.is_action_just_pressed("quit") and craft_ui_window.visible:
+		#don't let this event bubble up
+		get_viewport().set_input_as_handled()
+
+		craft_ui_window.hide()
+
+	if Input.is_action_just_pressed("chat"):
+		chat_text_edit.visible = !chat_text_edit.visible
+		chat_mode = !chat_mode
+		if chat_mode:
+			chat_text_edit.grab_focus()
+		else:
+			chat_text_edit.release_focus()
+			server_chat.rpc_id(1, chat_text_edit.text)
+			chat_text_edit.text = ""
+
+
+func _process(_delta):
+	character_sheet.age = calculated_age
+
+
+func _physics_process(delta):
+	# Add the gravity.
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+
+	if is_current_player() and !chat_mode:
+		# TODO check just_press/just_release, or is_pressed?
+		# crouch
+		if Input.is_action_just_pressed("crouch"):
+			if multiplayer.is_server():
+				server_mode(MOVE.MODE.CROUCH)
+			else:
+				server_mode.rpc_id(1, MOVE.MODE.CROUCH)
+		if Input.is_action_just_released("crouch"):
+			if multiplayer.is_server():
+				server_mode(MOVE.MODE.WALK)
+			else:
+				server_mode.rpc_id(1, MOVE.MODE.WALK)
+
+		# run
+		if Input.is_action_just_pressed("run"):
+			if multiplayer.is_server():
+				server_mode(MOVE.MODE.HUSTLE)
+			else:
+				server_mode.rpc_id(1, MOVE.MODE.HUSTLE)
+		if Input.is_action_just_released("run"):
+			if multiplayer.is_server():
+				server_mode(MOVE.MODE.WALK)
+			else:
+				server_mode.rpc_id(1, MOVE.MODE.WALK)
+
+		# Jump
+		if Input.is_action_just_pressed("jump") and is_on_floor():
+			if multiplayer.is_server():
+				server_jump()
+			else:
+				server_jump.rpc_id(1)
+
+		if Input.is_action_just_pressed("action"):
+			if multiplayer.is_server():
+				interact()
+			else:
+				interact.rpc_id(1)
+		# Get the input direction and handle the movement/deceleration.
+		var input_dir = Input.get_vector("left", "right", "up", "down")
+
+		if multiplayer.is_server():
+			server_move(input_dir)
+		else:
+			server_move.rpc_id(1, input_dir)
+
+	move_and_slide()
+
+
 func skillup(skill, amount):
 	if skill not in skills:
 		skills[skill] = {level = 1, xp = 0}
@@ -330,19 +480,6 @@ func _on_new_turn(_turn_id):
 	reset_actions()
 
 
-func _ready():
-	actions_ui.player_id = player_id
-	Signals.NewTurn.connect(_on_new_turn)
-	#if multiplayer.is_server():
-	#Signals.PlayerZoned.connect(_on_player_zoned)
-	if is_current_player():
-		camera.current = true
-		actions_ui.show()
-		cross_hair.show()
-	else:
-		pass
-
-
 #func _on_player_zoned(player: MarbleCharacter, chunk: Node3D):
 #if game.player_id == player.name:
 ##get all the chunks the player is overlapping
@@ -357,141 +494,6 @@ func play_fade():
 	fade_anim.play("fade")
 
 
-func _unhandled_input(event):
-	#print('player _unhandled_input')
-	if game and !is_current_player():
-		return
-
-	var something_visible = false
-
-	if Input.is_action_just_pressed("inventory"):
-		inventory_ui_window.visible = !inventory_ui_window.visible
-		something_visible = something_visible or inventory_ui_window.visible
-
-	if Input.is_action_just_pressed("craft"):
-		craft_ui_window.visible = !craft_ui_window.visible
-		if craft_ui_window.visible:
-			inventory_ui_window.show()
-		something_visible = something_visible or craft_ui_window.visible
-
-	if Input.is_action_just_pressed("character_sheet"):
-		character_sheet.visible = !character_sheet.visible
-		something_visible = something_visible or character_sheet.visible
-
-	if Input.is_action_just_pressed("quest_creator"):
-		quest_creator_ui.visible = !quest_creator_ui.visible
-		something_visible = something_visible or quest_creator_ui.visible
-
-	cross_hair.visible = !something_visible
-
-	if event is InputEventMouseMotion:
-		if (
-			Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
-			or Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE)
-		):
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-			if multiplayer.is_server():
-				server_rotate(event.relative)
-			else:
-				server_rotate.rpc_id(1, event.relative)
-		else:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-
-	if Input.is_action_just_pressed("quit") and chat_mode:
-		#don't let this event bubble up
-		get_viewport().set_input_as_handled()
-		chat_text_edit.hide()
-		chat_text_edit.release_focus()
-		chat_mode = false
-
-	if Input.is_action_just_pressed("quit") and trading:
-		#don't let this event bubble up
-		get_viewport().set_input_as_handled()
-
-		if multiplayer.is_server():
-			cancel_trade()
-		else:
-			cancel_trade.rpc_id(1)
-
-	if Input.is_action_just_pressed("quit") and inventory_ui_window.visible:
-		#don't let this event bubble up
-		get_viewport().set_input_as_handled()
-
-		inventory_ui_window.hide()
-
-	if Input.is_action_just_pressed("quit") and craft_ui_window.visible:
-		#don't let this event bubble up
-		get_viewport().set_input_as_handled()
-
-		craft_ui_window.hide()
-
-	if Input.is_action_just_pressed("chat"):
-		chat_text_edit.visible = !chat_text_edit.visible
-		chat_mode = !chat_mode
-		if chat_mode:
-			chat_text_edit.grab_focus()
-		else:
-			chat_text_edit.release_focus()
-			server_chat.rpc_id(1, chat_text_edit.text)
-			chat_text_edit.text = ""
-
-
-func _process(_delta):
-	character_sheet.age = calculated_age
-
-
-func _physics_process(delta):
-	# Add the gravity.
-	if not is_on_floor():
-		velocity.y -= gravity * delta
-
-	if is_current_player() and !chat_mode:
-		# TODO check just_press/just_release, or is_pressed?
-		# crouch
-		if Input.is_action_just_pressed("crouch"):
-			if multiplayer.is_server():
-				server_mode(MOVE.MODE.CROUCH)
-			else:
-				server_mode.rpc_id(1, MOVE.MODE.CROUCH)
-		if Input.is_action_just_released("crouch"):
-			if multiplayer.is_server():
-				server_mode(MOVE.MODE.WALK)
-			else:
-				server_mode.rpc_id(1, MOVE.MODE.WALK)
-
-		# run
-		if Input.is_action_just_pressed("run"):
-			if multiplayer.is_server():
-				server_mode(MOVE.MODE.HUSTLE)
-			else:
-				server_mode.rpc_id(1, MOVE.MODE.HUSTLE)
-		if Input.is_action_just_released("run"):
-			if multiplayer.is_server():
-				server_mode(MOVE.MODE.WALK)
-			else:
-				server_mode.rpc_id(1, MOVE.MODE.WALK)
-
-		# Jump
-		if Input.is_action_just_pressed("jump") and is_on_floor():
-			if multiplayer.is_server():
-				server_jump()
-			else:
-				server_jump.rpc_id(1)
-
-		if Input.is_action_just_pressed("action"):
-			if multiplayer.is_server():
-				interact()
-			else:
-				interact.rpc_id(1)
-		# Get the input direction and handle the movement/deceleration.
-		var input_dir = Input.get_vector("left", "right", "up", "down")
-
-		if multiplayer.is_server():
-			server_move(input_dir)
-		else:
-			server_move.rpc_id(1, input_dir)
-
-	move_and_slide()
 
 
 #this is the function that runs on the server that any peer can call

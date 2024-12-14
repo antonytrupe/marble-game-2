@@ -22,14 +22,103 @@ var rng = RandomNumberGenerator.new()
 
 #@onready var main_menu = $UI/MainMenu
 @onready var hud = $UI/HUD
+#TODO delete global terra and flora
 @onready var terra = %Terra
 @onready var flora = %Flora
 @onready var turn_number_label = %TurnNumber
 @onready var turn_timer = %TurnTimer
 @onready var server_camera = $CameraPivot/ServerCamera3D
 @onready var world = %World
-#@onready var world_time = %WorldTimeLabel
 @onready var players = %Players
+
+
+func _ready():
+	#var signals=load("res://Signals.cs").new()
+
+	var config_file = ConfigFile.new()
+	# Load data from a file.
+	#var err = config.load("user://config.cfg")
+	var err = config_file.load("res://config.cfg")
+	# If the file didn't load, ignore it.
+	if err != OK:
+		print("error reading config file")
+
+	var config = {}
+	config.player_id = config_file.get_value("default", "player_id", "")
+	config.remote_ip = config_file.get_value("default", "remote_ip", "")
+	config.server = config_file.get_value("default", "server", false)
+
+	print("config:", config)
+
+	var arguments = {}
+	for argument in OS.get_cmdline_user_args():
+		if argument.contains("="):
+			var key_value = argument.split("=")
+			arguments[key_value[0].trim_prefix("--")] = key_value[1]
+		else:
+			# Options without an argument will be present in the dictionary,
+			# with the value set to an empty string.
+			arguments[argument.trim_prefix("--")] = ""
+
+	print("arguments:", arguments)
+	config.merge(arguments, true)
+
+	print("merged:", config)
+
+	if config.server:
+		start_server()
+		#main_menu.hide()
+		hud.show()
+		#health_bar.hide()
+		server_camera.show()
+		server_camera.current = true
+		get_viewport().get_window().title += " - SERVER"
+	elif config.has("player_id"):
+		player_id = config["player_id"]
+		start_client()
+		_on_join_button_pressed(config.remote_ip)
+		get_viewport().get_window().title += " - " + player_id
+		print("started client")
+	else:
+		print("not a client nor a server")
+
+
+func _unhandled_input(_event):
+	var player: MarbleCharacter = get_player(player_id)
+
+	if Input.is_action_just_pressed("long_rest"):
+		var minutes = 8 * 60
+		if multiplayer.is_server():
+			player.time_warp(minutes)
+		else:
+			player.time_warp.rpc_id(1, minutes)
+
+	if Input.is_action_just_pressed("short_rest"):
+		var minutes = 60
+		if multiplayer.is_server():
+			player.time_warp(minutes)
+		else:
+			player.time_warp.rpc_id(1, minutes)
+
+	if Input.is_action_just_pressed("quit"):
+		if multiplayer.is_server():
+			save_server()
+		else:
+			save_client()
+		get_tree().quit()
+
+
+func _process(_delta):
+	var now = Time.get_ticks_msec()
+
+	if multiplayer.is_server():
+		turn_timer.value = (now + world.world_age) % 6000
+		var new_turn_number = (now + world.world_age) / (6 * 1000) + 1
+		if turn_number != new_turn_number:
+			turn_number = new_turn_number
+
+	else:
+		turn_timer.value = (now - turn_start) % 6000
 
 
 func get_chunk(_position: Vector3) -> Chunk:
@@ -166,57 +255,6 @@ func add_player(_peer_id, _player_id):
 		players.add_child(player)
 
 
-func _ready():
-	#var signals=load("res://Signals.cs").new()
-
-	var config_file = ConfigFile.new()
-	# Load data from a file.
-	#var err = config.load("user://config.cfg")
-	var err = config_file.load("res://config.cfg")
-	# If the file didn't load, ignore it.
-	if err != OK:
-		print("error reading config file")
-
-	var config = {}
-	config.player_id = config_file.get_value("default", "player_id", "")
-	config.remote_ip = config_file.get_value("default", "remote_ip", "")
-	config.server = config_file.get_value("default", "server", false)
-
-	print("config:", config)
-
-	var arguments = {}
-	for argument in OS.get_cmdline_user_args():
-		if argument.contains("="):
-			var key_value = argument.split("=")
-			arguments[key_value[0].trim_prefix("--")] = key_value[1]
-		else:
-			# Options without an argument will be present in the dictionary,
-			# with the value set to an empty string.
-			arguments[argument.trim_prefix("--")] = ""
-
-	print("arguments:", arguments)
-	config.merge(arguments, true)
-
-	print("merged:", config)
-
-	if config.server:
-		start_server()
-		#main_menu.hide()
-		hud.show()
-		#health_bar.hide()
-		server_camera.show()
-		server_camera.current = true
-		get_viewport().get_window().title += " - SERVER"
-	elif config.has("player_id"):
-		player_id = config["player_id"]
-		start_client()
-		_on_join_button_pressed(config.remote_ip)
-		get_viewport().get_window().title += " - " + player_id
-		print("started client")
-	else:
-		print("not a client nor a server")
-
-
 func update_turn_number(value):
 	turn_number = value
 	turn_number_label.text = "turn " + str(value)
@@ -231,47 +269,9 @@ func _on_host_button_pressed():
 	#add_player(multiplayer.get_unique_id())
 
 
-func _unhandled_input(_event):
-	var player: MarbleCharacter = get_player(player_id)
-
-	if Input.is_action_just_pressed("long_rest"):
-		var minutes = 8 * 60
-		if multiplayer.is_server():
-			player.time_warp(minutes)
-		else:
-			player.time_warp.rpc_id(1, minutes)
-
-	if Input.is_action_just_pressed("short_rest"):
-		var minutes = 60
-		if multiplayer.is_server():
-			player.time_warp(minutes)
-		else:
-			player.time_warp.rpc_id(1, minutes)
-
-	if Input.is_action_just_pressed("quit"):
-		if multiplayer.is_server():
-			save_server()
-		else:
-			save_client()
-		get_tree().quit()
-
-
-func get_player(player_id) -> MarbleCharacter:
-	var p = players.get_node_or_null(player_id)
+func get_player(pid) -> MarbleCharacter:
+	var p = players.get_node_or_null(pid)
 	return p
-
-
-func _process(_delta):
-	var now = Time.get_ticks_msec()
-
-	if multiplayer.is_server():
-		turn_timer.value = (now + world.world_age) % 6000
-		var new_turn_number = (now + world.world_age) / (6 * 1000) + 1
-		if turn_number != new_turn_number:
-			turn_number = new_turn_number
-
-	else:
-		turn_timer.value = (now - turn_start) % 6000
 
 
 func save_node():
