@@ -20,7 +20,12 @@ var player_id: String
 #var players = {}
 var rng = RandomNumberGenerator.new()
 
-#@onready var main_menu = $UI/MainMenu
+@onready var inventory_ui = %InventoryUI
+@onready var inventory_ui_window = %InventoryUIWindow
+@onready var craft_ui = %CraftUI
+@onready var craft_ui_window = %CraftUIWindow
+@onready var trade_ui: PlayerInteraction = %PlayerInteractionUI
+@onready var trade_ui_window = %PlayerInteractionWindow
 @onready var hud = $UI/HUD
 #TODO delete global terra and flora
 @onready var terra = %Terra
@@ -86,6 +91,18 @@ func _ready():
 func _unhandled_input(_event):
 	var player: MarbleCharacter = get_player(player_id)
 
+	var something_visible = false
+
+	if Input.is_action_just_pressed("inventory"):
+		inventory_ui_window.visible = !inventory_ui_window.visible
+		something_visible = something_visible or inventory_ui_window.visible
+
+	if Input.is_action_just_pressed("craft"):
+		craft_ui_window.visible = !craft_ui_window.visible
+		if craft_ui_window.visible:
+			inventory_ui_window.show()
+		something_visible = something_visible or craft_ui_window.visible
+
 	if Input.is_action_just_pressed("long_rest"):
 		var minutes = 8 * 60
 		if multiplayer.is_server():
@@ -101,11 +118,20 @@ func _unhandled_input(_event):
 			player.time_warp.rpc_id(1, minutes)
 
 	if Input.is_action_just_pressed("quit"):
-		if multiplayer.is_server():
-			save_server()
+		if inventory_ui_window.visible:
+			#get_viewport().set_input_as_handled()
+			inventory_ui_window.hide()
+
+		elif craft_ui_window.visible:
+			craft_ui_window.hide()
+			#get_viewport().set_input_as_handled()
+
 		else:
-			save_client()
-		get_tree().quit()
+			if multiplayer.is_server():
+				save_server()
+			else:
+				save_client()
+			get_tree().quit()
 
 
 func _process(_delta):
@@ -227,9 +253,9 @@ func _on_connected_to_server():
 
 
 @rpc("any_peer", "reliable")
-func register_player(player_id):
+func register_player(pid):
 	var peer_id = multiplayer.get_remote_sender_id()
-	add_player(peer_id, player_id)
+	add_player(peer_id, pid)
 	send_world_age.rpc_id(peer_id, Time.get_ticks_msec() + world.world_age)
 
 
@@ -253,6 +279,7 @@ func add_player(_peer_id, _player_id):
 		player.position.x = RandomNumberGenerator.new().randi_range(-5, 5)
 		player.position.z = RandomNumberGenerator.new().randi_range(-5, 5)
 		players.add_child(player)
+	player.peer_id=_peer_id
 
 
 func update_turn_number(value):
@@ -263,10 +290,8 @@ func update_turn_number(value):
 
 
 func _on_host_button_pressed():
-	#main_menu.hide()
 	hud.show()
 	start_server()
-	#add_player(multiplayer.get_unique_id())
 
 
 func get_player(pid) -> MarbleCharacter:

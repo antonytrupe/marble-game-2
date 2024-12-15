@@ -7,20 +7,22 @@ const INVENTORY_SLOT_SCENE: Resource = preload("res://inventory_slot.tscn")
 var my_inventory_slots = {}
 
 @onready var my_items = %ItemList
+@onready var game: Game = $/root/Game
 
 
 func _unhandled_input(event):
-	me._unhandled_input(event)
+	game._unhandled_input(event)
 
 
 func _drop_data(_at_position: Vector2, data: Variant) -> void:
 	data.src.move_item_from_inventory(data.item)
 	add_item_to_inventory(data.item)
 
-
+@rpc("authority")
 func update():
-	for item in me.inventory.values():
-		add_item_to_inventory(item)
+	if me:
+		for item in me.inventory.values():
+			add_item_to_inventory(item)
 
 
 func move_item_from_inventory(item: Dictionary):

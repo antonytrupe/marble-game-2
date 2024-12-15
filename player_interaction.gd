@@ -21,8 +21,8 @@ var selected_quest = {}
 @onready var quest_details = %QuestDetails
 
 
-func _ready() -> void:
-	update()
+#func _ready() -> void:
+	#update()
 
 
 func _unhandled_input(event):
@@ -91,16 +91,17 @@ func update() -> void:
 	if selected_quest:
 		select_quest(selected_quest)
 
-	##my trades
-	for item_name in me.my_trade_inventory:
-		var item = me.my_trade_inventory[item_name]
-		if !item_name in my_trade_slots:
-			var new_slot = INVENTORY_SLOT_SCENE.instantiate()
-			new_slot.item = item
-			new_slot.src = my_trade_items.get_parent()
-			my_trade_slots[item_name] = new_slot
+	#my trades
+	if me:
+		for item_name in me.my_trade_inventory:
+			var item = me.my_trade_inventory[item_name]
+			if !item_name in my_trade_slots:
+				var new_slot = INVENTORY_SLOT_SCENE.instantiate()
+				new_slot.item = item
+				new_slot.src = my_trade_items.get_parent()
+				my_trade_slots[item_name] = new_slot
 
-			my_trade_items.add_child(new_slot)
+				my_trade_items.add_child(new_slot)
 
 	#other player trade
 	#print(me.other_trade_inventory)
@@ -108,14 +109,15 @@ func update() -> void:
 		other_trade_items.remove_child(slot)
 		slot.queue_free()
 	other_trade_slots.clear()
-	for item_name in me.other_trade_inventory:
-		var item = me.other_trade_inventory[item_name]
-		if !item_name in other_trade_slots:
-			var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
-			new_slot.item = item
-			new_slot.src = my_trade_items
-			other_trade_slots[item_name] = new_slot
-			other_trade_items.add_child(new_slot)
+	if me:
+		for item_name in me.other_trade_inventory:
+			var item = me.other_trade_inventory[item_name]
+			if !item_name in other_trade_slots:
+				var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
+				new_slot.item = item
+				new_slot.src = my_trade_items
+				other_trade_slots[item_name] = new_slot
+				other_trade_items.add_child(new_slot)
 
 
 func _on_accept_pressed() -> void:

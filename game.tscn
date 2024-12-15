@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=23 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" path="res://game.gd" id="1_2iwba"]
 [ext_resource type="Script" path="res://world.gd" id="1_6tkge"]
@@ -10,6 +10,11 @@
 [ext_resource type="PackedScene" uid="uid://di4ln3kjrvrgq" path="res://acorn/acorn.tscn" id="7_1i78u"]
 [ext_resource type="Script" path="res://chunks.gd" id="7_eouhd"]
 [ext_resource type="Script" path="res://startupProbe.gd" id="10_mnyh5"]
+[ext_resource type="Script" path="res://window.gd" id="11_py8ii"]
+[ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://inventory.tscn" id="12_pmfyc"]
+[ext_resource type="PackedScene" uid="uid://np5o15k15boe" path="res://window_scene.tscn" id="13_d8uop"]
+[ext_resource type="PackedScene" uid="uid://cyyfjbicwvflj" path="res://craft_ui.tscn" id="14_sxr83"]
+[ext_resource type="PackedScene" uid="uid://b4c105b3jd8a8" path="res://PlayerInteraction.tscn" id="15_xo6pa"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_vl0i4"]
 properties/0/path = NodePath(".:turn_number")
@@ -223,3 +228,59 @@ spawn_path = NodePath("..")
 
 [node name="startupProbe" type="Node" parent="."]
 script = ExtResource("10_mnyh5")
+
+[node name="InventoryUIWindow" type="Window" parent="." groups=["persist-client"]]
+unique_name_in_owner = true
+auto_translate_mode = 1
+transparent_bg = true
+title = "Inventory"
+position = Vector2i(520, 100)
+size = Vector2i(400, 400)
+visible = false
+transient = true
+transparent = true
+mouse_passthrough = true
+script = ExtResource("11_py8ii")
+
+[node name="InventoryUI" parent="InventoryUIWindow" instance=ExtResource("12_pmfyc")]
+unique_name_in_owner = true
+
+[node name="CraftUIWindow" parent="." groups=["persist-client"] instance=ExtResource("13_d8uop")]
+unique_name_in_owner = true
+auto_translate_mode = 1
+transparent_bg = true
+title = "Crafting"
+position = Vector2i(100, 100)
+size = Vector2i(400, 400)
+visible = false
+transient = true
+transparent = true
+mouse_passthrough = true
+
+[node name="CraftUI" parent="CraftUIWindow" instance=ExtResource("14_sxr83")]
+unique_name_in_owner = true
+
+[node name="PlayerInteractionWindow" type="Window" parent="." node_paths=PackedStringArray("me") groups=["persist-client"]]
+unique_name_in_owner = true
+auto_translate_mode = 1
+transparent_bg = true
+title = "Player Interaction"
+initial_position = 2
+size = Vector2i(800, 400)
+visible = false
+transient = true
+transparent = true
+popup_window = true
+script = ExtResource("11_py8ii")
+me = NodePath("")
+
+[node name="PlayerInteractionUI" parent="PlayerInteractionWindow" node_paths=PackedStringArray("me") instance=ExtResource("15_xo6pa")]
+unique_name_in_owner = true
+me = NodePath("")
+
+[connection signal="close_requested" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_close_requested"]
+[connection signal="visibility_changed" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_visibility_changed"]
+[connection signal="close_requested" from="CraftUIWindow" to="CraftUIWindow" method="_on_close_requested"]
+[connection signal="visibility_changed" from="CraftUIWindow" to="CraftUIWindow" method="_on_visibility_changed"]
+[connection signal="close_requested" from="PlayerInteractionWindow" to="PlayerInteractionWindow" method="_on_close_requested"]
+[connection signal="visibility_changed" from="PlayerInteractionWindow" to="PlayerInteractionWindow" method="_on_visibility_changed"]

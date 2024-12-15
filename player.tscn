@@ -1,15 +1,10 @@
-[gd_scene load_steps=25 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=20 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_2v3wm"]
 [ext_resource type="Texture2D" uid="uid://2jputlhry6c" path="res://crosshair.png" id="2_2ojr1"]
-[ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://inventory.tscn" id="2_vrrxi"]
 [ext_resource type="PackedScene" uid="uid://dyx3xv5lckl7h" path="res://character_sheet.tscn" id="3_eahd0"]
 [ext_resource type="PackedScene" uid="uid://d35hxvmomxu3p" path="res://actions.tscn" id="4_72q5g"]
-[ext_resource type="PackedScene" uid="uid://np5o15k15boe" path="res://window_scene.tscn" id="6_rav4x"]
-[ext_resource type="PackedScene" uid="uid://cyyfjbicwvflj" path="res://craft_ui.tscn" id="7_ncuea"]
 [ext_resource type="PackedScene" uid="uid://cblqeddvc1mon" path="res://quest_creator.tscn" id="8_cvl0s"]
-[ext_resource type="Script" path="res://window.gd" id="8_yunen"]
-[ext_resource type="PackedScene" uid="uid://b4c105b3jd8a8" path="res://PlayerInteraction.tscn" id="9_4ae2x"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_x3s4a"]
 resource_local_to_scene = true
@@ -578,59 +573,4 @@ visible = false
 billboard = 1
 text = "?"
 
-[node name="CraftUIWindow" parent="." node_paths=PackedStringArray("me") groups=["persist-client"] instance=ExtResource("6_rav4x")]
-unique_name_in_owner = true
-transparent_bg = true
-title = "Crafting"
-position = Vector2i(100, 100)
-size = Vector2i(400, 400)
-visible = false
-transient = true
-transparent = true
-mouse_passthrough = true
-me = NodePath("..")
-
-[node name="CraftUI" parent="CraftUIWindow" node_paths=PackedStringArray("me") instance=ExtResource("7_ncuea")]
-unique_name_in_owner = true
-me = NodePath("../..")
-
-[node name="InventoryUIWindow" type="Window" parent="." node_paths=PackedStringArray("me") groups=["persist-client"]]
-unique_name_in_owner = true
-transparent_bg = true
-title = "Inventory"
-position = Vector2i(520, 100)
-size = Vector2i(400, 400)
-visible = false
-transient = true
-transparent = true
-mouse_passthrough = true
-script = ExtResource("8_yunen")
-me = NodePath("..")
-
-[node name="InventoryUI" parent="InventoryUIWindow" node_paths=PackedStringArray("me") instance=ExtResource("2_vrrxi")]
-unique_name_in_owner = true
-me = NodePath("../..")
-
-[node name="PlayerInteractionWindow" type="Window" parent="." node_paths=PackedStringArray("me") groups=["persist-client"]]
-transparent_bg = true
-title = "Player Interaction"
-initial_position = 2
-size = Vector2i(800, 400)
-visible = false
-transient = true
-transparent = true
-popup_window = true
-script = ExtResource("8_yunen")
-me = NodePath("..")
-
-[node name="PlayerInteractionUI" parent="PlayerInteractionWindow" node_paths=PackedStringArray("me") instance=ExtResource("9_4ae2x")]
-unique_name_in_owner = true
-me = NodePath("../..")
-
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
-[connection signal="close_requested" from="CraftUIWindow" to="CraftUIWindow" method="_on_close_requested"]
-[connection signal="visibility_changed" from="CraftUIWindow" to="CraftUIWindow" method="_on_visibility_changed"]
-[connection signal="close_requested" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_close_requested"]
-[connection signal="visibility_changed" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_visibility_changed"]
-[connection signal="close_requested" from="PlayerInteractionWindow" to="PlayerInteractionWindow" method="_on_close_requested"]
-[connection signal="visibility_changed" from="PlayerInteractionWindow" to="PlayerInteractionWindow" method="_on_visibility_changed"]
