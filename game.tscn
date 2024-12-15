@@ -250,7 +250,7 @@ script = ExtResource("10_mnyh5")
 [node name="InventoryUIWindow" parent="." groups=["persist-client"] instance=ExtResource("13_d8uop")]
 unique_name_in_owner = true
 title = "Inventory"
-position = Vector2i(510, 100)
+position = Vector2i(540, 100)
 size = Vector2i(400, 400)
 visible = false
 
