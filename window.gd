@@ -2,35 +2,28 @@ class_name UIWindow
 extends Window
 
 @export var me: MarbleCharacter
-var saved_position:Vector2i:
-	set=_set_position
 
-func _set_position(p:Vector2):
-	position=p
 
 func _on_close_requested() -> void:
-	print('_on_close_requested')
-	#location=position
-	visible=false
+	visible = false
 
-
-func _on_visibility_changed() -> void:
-	print('_on_visibility_changed')
-	if visible and saved_position:
-		position=saved_position
-	else:
-		saved_position=position
 
 func save_node():
+	print(position)
+	#print(saved_position)
 	var save_dict = {
 		#
-		saved_position = JSON3D.Vector2ToDictionary(saved_position),
+		position = JSON3D.Vector2ToDictionary(position),
+		size = JSON3D.Vector2ToDictionary(size),
 	}
 	return save_dict
 
+
 func load_node(node_data):
-	print(node_data)
-	saved_position=JSON3D.DictionaryToVector2(node_data.saved_position)
+	if "position" in node_data:
+		position = JSON3D.DictionaryToVector2(node_data.position)
+	if "size" in node_data:
+		size = JSON3D.DictionaryToVector2(node_data.size)
 	for p in node_data:
-		if p in self and p not in ["transform","saved_position"]:
+		if p in self and p not in ["transform", "position", "size"]:
 			self[p] = node_data[p]

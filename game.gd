@@ -388,8 +388,7 @@ func save_server():
 
 
 func start_client():
-	pass
-	#load_client()
+	load_client()
 
 
 func load_client():
