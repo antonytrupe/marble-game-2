@@ -90,7 +90,7 @@ func _ready():
 
 
 func _unhandled_input(_event):
-	var player: MarbleCharacter = get_player(player_id)
+	#var player: MarbleCharacter = get_player(player_id)
 
 	#TODO this isn't the right way to do this
 	var something_visible = false
@@ -157,10 +157,10 @@ func _process(_delta):
 
 ##server code
 @rpc("any_peer")
-func time_warp(minutes, player_id):
+func time_warp(minutes, pid):
 	if !multiplayer.is_server():
 		return
-	var player: MarbleCharacter = get_player(player_id)
+	var player: MarbleCharacter = get_player(pid)
 	var chunks = player.get_chunks()
 	for chunk: Chunk in chunks:
 		chunk.time_warp(minutes)

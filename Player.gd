@@ -36,7 +36,7 @@ const JUMP_VELOCITY = 5.0
 @export var quests = {}:
 	set = _set_quests
 
-@export var peer_id:int
+@export var peer_id: int
 
 var trade_partner: MarbleCharacter:
 	set = _set_trade_partner
@@ -57,7 +57,7 @@ var skills = {}
 @onready var camera = %Camera3D
 @onready var raycast = %RayCast3D
 @onready var anim_player = $AnimationPlayer
-@onready var chunk_scanner = %ChunkScanner
+@onready var chunk_scanner: Area3D = %ChunkScanner
 @onready var character_sheet = %CharacterSheet
 @onready var quest_creator_ui: QuestManager = %QuestCreator
 @onready var actions_ui = %ActionsUI
@@ -75,9 +75,9 @@ func _ready():
 		camera.current = true
 		actions_ui.show()
 		game.cross_hair.show()
-		game.inventory_ui.me=self
-		game.craft_ui.me=self
-		game.trade_ui.me=self
+		game.inventory_ui.me = self
+		game.craft_ui.me = self
+		game.trade_ui.me = self
 	else:
 		pass
 
@@ -95,8 +95,6 @@ func _unhandled_input(event):
 	if Input.is_action_just_pressed("quest_creator"):
 		quest_creator_ui.visible = !quest_creator_ui.visible
 		something_visible = something_visible or quest_creator_ui.visible
-
-
 
 	if event is InputEventMouseMotion:
 		if (
@@ -128,16 +126,16 @@ func _unhandled_input(event):
 			cancel_trade.rpc_id(1)
 
 	#if Input.is_action_just_pressed("quit") and inventory_ui_window.visible:
-		##don't let this event bubble up
-		#get_viewport().set_input_as_handled()
+	##don't let this event bubble up
+	#get_viewport().set_input_as_handled()
 #
-		#inventory_ui_window.hide()
+	#inventory_ui_window.hide()
 
 	#if Input.is_action_just_pressed("quit") and craft_ui_window.visible:
-		##don't let this event bubble up
-		#get_viewport().set_input_as_handled()
+	##don't let this event bubble up
+	#get_viewport().set_input_as_handled()
 
-		#craft_ui_window.hide()
+	#craft_ui_window.hide()
 
 	if Input.is_action_just_pressed("chat"):
 		chat_text_edit.visible = !chat_text_edit.visible
@@ -284,6 +282,7 @@ func _set_trade_inventory(loot):
 	if trade_partner:
 		trade_partner.other_trade_inventory = loot
 
+
 ##server code
 @rpc("any_peer")
 func accept_trade():
@@ -302,7 +301,6 @@ func accept_trade():
 		trade_partner.trading = false
 
 		trading = false
-
 
 
 ##server code
@@ -357,9 +355,8 @@ func _set_trading(value):
 		other_trade_inventory = {}
 
 
-
 #func reset_inventory_ui():
-	#game.inventory_ui.update()
+#game.inventory_ui.update()
 
 
 func _set_inventory(value: Dictionary):
@@ -479,6 +476,7 @@ func server_mode(new_mode: MOVE.MODE):
 	#if we've used an action, no hustling/running
 	if !actions.action or [MOVE.MODE.CROUCH, MOVE.MODE.WALK].has(new_mode):
 		mode = new_mode
+
 
 ##server code
 @rpc("any_peer")

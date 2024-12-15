@@ -221,7 +221,7 @@ visible = false
 mesh = SubResource("PlaneMesh_jysef")
 skeleton = NodePath("../..")
 
-[node name="DayNightCycle" type="Node3D" parent="World"]
+[node name="DayNightCycle" type="Node" parent="World"]
 unique_name_in_owner = true
 script = ExtResource("3_qlg17")
 intensity = SubResource("Curve_1se3c")

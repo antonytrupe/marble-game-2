@@ -3,27 +3,27 @@ const ChunkResource = preload("res://chunk.tscn")
 
 @onready var game = $"/root/Game"
 @onready var world = %World
-@onready var day_night_cycle = %DayNightCycle
+@onready var day_night_cycle: DayNightCycle = %DayNightCycle
 
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	if multiplayer.is_server():
-		Signals.PlayerZoned.connect(_on_player_zoned)
+	#if !multiplayer.is_server():
+	Signals.PlayerZoned.connect(_on_player_zoned)
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass
-
-
-func _on_player_zoned(player: MarbleCharacter, chunk: Node3D):
+func _on_player_zoned(player: MarbleCharacter, chunk: Chunk):
+	print("_on_player_zoned %s in %s on %s" % [player.name, chunk.name, game.player_id])
 	if game.player_id == player.name:
 		#get all the chunks the player is overlapping
-		var chunks = player.get_chunks()
+		var chunks: Array[Chunk] = player.get_chunks()
 		if !chunks:
-			print("%s not in any chunks" % [player.name])
+			print("%s not in any chunks at %s" % [player.name, player.position])
+			print("using zoned chunk")
+			chunks = [chunk]
 		# tell the daynightcycle node what chunks the player is in
+		else:
+			print("%s in chunks %s at %s" % [player.name, chunks, player.position])
+
 		day_night_cycle.chunks = chunks
 
 	# check if we're the server
