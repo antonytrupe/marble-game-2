@@ -20,7 +20,7 @@ var player_id: String
 #var players = {}
 var rng = RandomNumberGenerator.new()
 
-@onready var inventory_ui:PlayerInventory = %InventoryUI
+@onready var inventory_ui: PlayerInventory = %InventoryUI
 @onready var inventory_ui_window = %InventoryUIWindow
 @onready var craft_ui = %CraftUI
 @onready var craft_ui_window = %CraftUIWindow
@@ -108,16 +108,16 @@ func _unhandled_input(_event):
 	if Input.is_action_just_pressed("long_rest"):
 		var minutes = 8 * 60
 		if multiplayer.is_server():
-			player.time_warp(minutes)
+			time_warp(minutes, player_id)
 		else:
-			player.time_warp.rpc_id(1, minutes)
+			time_warp.rpc_id(1, minutes, player_id)
 
 	if Input.is_action_just_pressed("short_rest"):
 		var minutes = 60
 		if multiplayer.is_server():
-			player.time_warp(minutes)
+			time_warp(minutes, player_id)
 		else:
-			player.time_warp.rpc_id(1, minutes)
+			time_warp.rpc_id(1, minutes, player_id)
 
 	if Input.is_action_just_pressed("quit"):
 		if inventory_ui_window.visible:
@@ -141,6 +141,7 @@ func _unhandled_input(_event):
 	else:
 		cross_hair.visible = true
 
+
 func _process(_delta):
 	var now = Time.get_ticks_msec()
 
@@ -152,6 +153,37 @@ func _process(_delta):
 
 	else:
 		turn_timer.value = (now - turn_start) % 6000
+
+
+##server code
+@rpc("any_peer")
+func time_warp(minutes, player_id):
+	if !multiplayer.is_server():
+		return
+	var player: MarbleCharacter = get_player(player_id)
+	var chunks = player.get_chunks()
+	for chunk: Chunk in chunks:
+		chunk.time_warp(minutes)
+
+
+func get_adjacent_coords(coords):
+	var adjacent_coords = []
+
+	for coord in coords:
+		var x = coord.x
+		var y = coord.y
+
+		# Add the 8 adjacent coordinates
+		adjacent_coords.append(Vector2(x - 1, y - 1))
+		adjacent_coords.append(Vector2(x, y - 1))
+		adjacent_coords.append(Vector2(x + 1, y - 1))
+		adjacent_coords.append(Vector2(x - 1, y))
+		adjacent_coords.append(Vector2(x + 1, y))
+		adjacent_coords.append(Vector2(x - 1, y + 1))
+		adjacent_coords.append(Vector2(x, y + 1))
+		adjacent_coords.append(Vector2(x + 1, y + 1))
+
+	return adjacent_coords
 
 
 func get_chunk(_position: Vector3) -> Chunk:
@@ -286,7 +318,7 @@ func add_player(_peer_id, _player_id):
 		player.position.x = RandomNumberGenerator.new().randi_range(-5, 5)
 		player.position.z = RandomNumberGenerator.new().randi_range(-5, 5)
 		players.add_child(player)
-	player.peer_id=_peer_id
+	player.peer_id = _peer_id
 
 
 func update_turn_number(value):

@@ -83,7 +83,6 @@ func _ready():
 
 
 func _unhandled_input(event):
-	#print('player _unhandled_input')
 	if game and !is_current_player():
 		return
 
@@ -236,7 +235,6 @@ func _set_quests(value: Dictionary):
 func create_quest(quest: Dictionary):
 	if not multiplayer.is_server():
 		return
-	print(quest)
 	quests[quest.name] = quest
 	quest_creator_ui.update()
 
@@ -245,7 +243,6 @@ func create_quest(quest: Dictionary):
 func delete_quest(quest: Dictionary):
 	if not multiplayer.is_server():
 		return
-	print("deleting quest")
 	quests.erase(quest.name)
 
 
@@ -292,7 +289,6 @@ func _set_trade_inventory(loot):
 func accept_trade():
 	if !multiplayer.is_server():
 		return
-	print("accept_trade")
 	trade_accepted = true
 	if trade_accepted and trade_partner.trade_accepted:
 		#TODO make sure the whole trade will succeed before doing any part
@@ -367,7 +363,6 @@ func _set_trading(value):
 
 
 func _set_inventory(value: Dictionary):
-	# print('player._set_inventory')
 	inventory = value
 	if game and game.inventory_ui:
 		game.inventory_ui.reset()
@@ -396,7 +391,7 @@ func reset_actions():
 	actions = {"move": null, "action": null}
 
 
-func get_zones() -> Array[Chunk]:
+func get_chunks() -> Array[Chunk]:
 	var areas = chunk_scanner.get_overlapping_areas()
 	var chunks: Array[Chunk] = []
 	for area: Area3D in areas:
@@ -417,18 +412,14 @@ func calculate_age():
 
 
 func _set_mode(new_mode):
-	#print(new_mode)
 	#TODO animations and stuff
 	if mode != new_mode:
 		if new_mode == MOVE.MODE.CROUCH:
 			anim_player.play("crouch")
-			#print("play crouch")
 		elif mode == MOVE.MODE.CROUCH:
 			anim_player.play_backwards("crouch")
-			#print("play crouch backwards")
 		else:
 			anim_player.play("RESET")
-			#print("play reset")
 	mode = new_mode
 
 
@@ -489,16 +480,13 @@ func server_mode(new_mode: MOVE.MODE):
 	if !actions.action or [MOVE.MODE.CROUCH, MOVE.MODE.WALK].has(new_mode):
 		mode = new_mode
 
-
+##server code
 @rpc("any_peer")
 func time_warp(minutes: int):
 	if !multiplayer.is_server():
 		return
 
 	extra_age = extra_age + 1000 * 60 * minutes
-
-	# emit an even for the world/game node to handle
-	Signals.TimeWarp.emit(minutes, get_zones())
 
 
 #this is the function that runs on the server that any peer can call
@@ -507,7 +495,6 @@ func server_chat(message: String):
 	if !multiplayer.is_server():
 		return
 	if message.begins_with("/"):
-		#print("command", self)
 		game.command(message, self)
 	else:
 		client_chat.rpc(message)
@@ -568,10 +555,8 @@ func interact():
 		return
 	if raycast.is_colliding():
 		var entity = raycast.get_collider()
-		#print('found:', entity)
 
 		if entity.has_method("start_trade"):
-			print("start trade")
 			start_trade(entity)
 			entity.start_trade(self)
 
@@ -597,22 +582,18 @@ func interact():
 func add_to_inventory(loot: Dictionary):
 	if !multiplayer.is_server():
 		return
-	# print('add_to_inventory:', loot)
 	for item in loot.values():
 		inventory[item.name] = item
-	# inventory=inventory
 
 
 ##loot is {item_name:{item}}
 func remove_from_inventory(loot: Dictionary) -> bool:
-	#print("remove_from_inventory:", loot)
 	if !multiplayer.is_server():
 		return false
 	for item in loot.values():
 		if item.name not in inventory:
 			return false
 		inventory.erase(item.name)
-		print("removed %s" % item.name)
 
 	return true
 
