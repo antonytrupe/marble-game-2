@@ -1,8 +1,8 @@
 class_name DayNightCycle
 extends Node
 @export var intensity: Curve
-@export var chunks: Array[Chunk]
-#set = _set_chunks
+@export var chunks: Array[Chunk]:
+	set = _set_chunks
 
 @onready var sun = %Sun
 @onready var game: Game = $/root/Game
@@ -10,13 +10,11 @@ extends Node
 
 func _set_chunks(value):
 	if !chunks or chunks.size() == 0:
-		print("jump to final position")
-		var total = get_target_position(chunks)
+		var total = get_target_position(value)
 		var rotation_x: float = fposmod(total.angle(), PI * 2)
 		var light_energy = intensity.sample(fposmod(rotation_x - PI / 2.0, PI * 2) / (PI * 2))
 
 		set_angle_and_intensity(rotation_x, light_energy)
-	print(chunks)
 	chunks = value
 
 
@@ -42,7 +40,7 @@ func set_angle_and_intensity(rotation_x, light_energy):
 
 
 func _process(_delta: float) -> void:
-	if chunks.size() == 0:
+	if !chunks or chunks.size() == 0:
 		#print("no chunks %s"%[game.player_id])
 		return
 	var total = get_target_position(chunks)

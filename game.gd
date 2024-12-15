@@ -458,7 +458,7 @@ func load_client():
 			node = load(node_data["scene_file_path"]).instantiate()
 		elif !node and node_data["class"]:
 			node = ClassDB.instantiate(node_data.class)
-		else:
+		elif !node:
 			print("did not find node in tree and not enough info to instantiate")
 			print(node_data)
 		# Check the node has a load function.

@@ -42,9 +42,6 @@ func get_flora_fauna() -> Array[Node3D]:
 	var entities: Array[Node3D] = []
 	for area: Area3D in areas:
 		entities.append(area.get_parent())
-
-	#print("flora_fauna:", entities)
-
 	return entities
 
 

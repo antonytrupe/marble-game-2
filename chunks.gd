@@ -11,6 +11,7 @@ func _ready() -> void:
 	Signals.PlayerZoned.connect(_on_player_zoned)
 
 
+##chunk could be the old chunk or new chunk
 func _on_player_zoned(player: MarbleCharacter, chunk: Chunk):
 	print("_on_player_zoned %s in %s on %s" % [player.name, chunk.name, game.player_id])
 	if game.player_id == player.name:
@@ -18,12 +19,12 @@ func _on_player_zoned(player: MarbleCharacter, chunk: Chunk):
 		var chunks: Array[Chunk] = player.get_chunks()
 		if !chunks:
 			print("%s not in any chunks at %s" % [player.name, player.position])
-			print("using zoned chunk")
-			chunks = [chunk]
+			#print("using zoned chunk")
+			#chunks = [chunk]
 		# tell the daynightcycle node what chunks the player is in
 		else:
-			print("%s in chunks %s at %s" % [player.name, chunks, player.position])
-
+			#print("%s in chunks %s at %s" % [player.name, chunks, player.position])
+			pass
 		day_night_cycle.chunks = chunks
 
 	# check if we're the server

@@ -231,10 +231,10 @@ environment = SubResource("Environment_cqcki")
 
 [node name="Sun" type="DirectionalLight3D" parent="World/DayNightCycle"]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, -0.866025, 0.5, 0, -0.5, -0.866025, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 1, 0)
 layers = 0
 light_color = Color(0.961513, 0.961513, 2.31028e-06, 1)
-light_angular_distance = 5.0
+light_angular_distance = 0.5
 shadow_enabled = true
 
 [node name="Terra" type="Node3D" parent="World"]

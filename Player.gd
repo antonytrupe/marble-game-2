@@ -428,7 +428,7 @@ func play_animation(animation_name):
 func load_node(node_data):
 	player_id = node_data["player_id"]
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
-	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
+	#transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
 	for p in node_data:
 		if p in self and p not in ["transform"]:
 			self[p] = node_data[p]
