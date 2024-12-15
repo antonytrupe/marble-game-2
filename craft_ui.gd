@@ -18,7 +18,7 @@ func _unhandled_input(event):
 
 
 func reset():
-	game.inventory_ui.update()
+	game.inventory_ui.reset()
 	reagent_slots = {}
 	reagent_inventory = {}
 	tool_slots = {}

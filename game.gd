@@ -20,7 +20,7 @@ var player_id: String
 #var players = {}
 var rng = RandomNumberGenerator.new()
 
-@onready var inventory_ui = %InventoryUI
+@onready var inventory_ui:PlayerInventory = %InventoryUI
 @onready var inventory_ui_window = %InventoryUIWindow
 @onready var craft_ui = %CraftUI
 @onready var craft_ui_window = %CraftUIWindow
@@ -35,6 +35,7 @@ var rng = RandomNumberGenerator.new()
 @onready var server_camera = $CameraPivot/ServerCamera3D
 @onready var world = %World
 @onready var players = %Players
+@onready var cross_hair = %CrossHair
 
 
 func _ready():
@@ -91,6 +92,7 @@ func _ready():
 func _unhandled_input(_event):
 	var player: MarbleCharacter = get_player(player_id)
 
+	#TODO this isn't the right way to do this
 	var something_visible = false
 
 	if Input.is_action_just_pressed("inventory"):
@@ -133,6 +135,11 @@ func _unhandled_input(_event):
 				save_client()
 			get_tree().quit()
 
+	if craft_ui_window.visible or inventory_ui_window.visible or trade_ui_window.visible:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		cross_hair.visible = false
+	else:
+		cross_hair.visible = true
 
 func _process(_delta):
 	var now = Time.get_ticks_msec()
