@@ -5,7 +5,6 @@ const INVENTORY_SLOT_SCENE = preload("res://inventory_slot.tscn")
 const QUEST_HEADER_SCENE = preload("res://QuestHeader.tscn")
 
 @export var me: MarbleCharacter
-#@export var other:MarbleCharacter
 @export var other_player_trade: Dictionary = {}
 @export var other_player_quests: Dictionary = {}
 
@@ -19,20 +18,14 @@ var selected_quest = {}
 @onready var other_trade_items = %OtherPlayerTrades
 @onready var other_quests_ui = %OtherPlayerQuests
 @onready var quest_details = %QuestDetails
-
-
-func _ready() -> void:
-	update()
+@onready var game: Game = $/root/Game
 
 
 func _unhandled_input(event):
 	me._unhandled_input(event)
 
-
-@rpc("any_peer")
+##client code
 func add_item_to_trade(item: Dictionary):
-	if not multiplayer.is_server():
-		return
 
 	if !(item.name in my_trade_slots):
 		var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
@@ -40,23 +33,22 @@ func add_item_to_trade(item: Dictionary):
 		new_slot.src = my_trade_items.get_parent()
 		my_trade_slots[item.name] = new_slot
 		my_trade_items.add_child(new_slot)
-		#update current player
-		me.my_trade_inventory[item.name] = item
-		#update other player
-		me.trade_partner.other_trade_inventory = me.my_trade_inventory
+		me.add_to_trade.rpc_id(1,item)
 
 
-@rpc("any_peer")
-func remove_item_from_trade(item_name: String):
+
+#client code
+func remove_item_from_trade(item: Dictionary):
 	if not multiplayer.is_server():
 		return
-	var slot: InventorySlot = my_trade_slots[item_name]
+	var slot: InventorySlot = my_trade_slots[item.name]
 	slot.hide()
 	slot.queue_free()
-	my_trade_slots.erase(item_name)
+	my_trade_slots.erase(item.name)
 	my_trade_items.remove_child(slot)
 	#update current player
-	me.my_trade_inventory.erase(item_name)
+	me.my_trade_inventory.erase(item.name)
+	me.remove_from_trade.rpc_id(1,item)
 	#update other player
 	if me.trade_partner:
 		me.trade_partner.other_trade_inventory = me.my_trade_inventory
@@ -72,7 +64,7 @@ func select_quest(quest: Dictionary):
 		have = me.my_trade_inventory[category].items.size()
 	quest_details.text = "%s of %s %s" % [have, need, category]
 
-
+@rpc("authority")
 func update() -> void:
 	#print('player interactions update',me.inventory)
 
@@ -91,16 +83,17 @@ func update() -> void:
 	if selected_quest:
 		select_quest(selected_quest)
 
-	##my trades
-	for item_name in me.my_trade_inventory:
-		var item = me.my_trade_inventory[item_name]
-		if !item_name in my_trade_slots:
-			var new_slot = INVENTORY_SLOT_SCENE.instantiate()
-			new_slot.item = item
-			new_slot.src = my_trade_items.get_parent()
-			my_trade_slots[item_name] = new_slot
+	#my trades
+	if me:
+		for item_name in me.my_trade_inventory:
+			var item = me.my_trade_inventory[item_name]
+			if !item_name in my_trade_slots:
+				var new_slot = INVENTORY_SLOT_SCENE.instantiate()
+				new_slot.item = item
+				new_slot.src = my_trade_items.get_parent()
+				my_trade_slots[item_name] = new_slot
 
-			my_trade_items.add_child(new_slot)
+				my_trade_items.add_child(new_slot)
 
 	#other player trade
 	#print(me.other_trade_inventory)
@@ -108,14 +101,15 @@ func update() -> void:
 		other_trade_items.remove_child(slot)
 		slot.queue_free()
 	other_trade_slots.clear()
-	for item_name in me.other_trade_inventory:
-		var item = me.other_trade_inventory[item_name]
-		if !item_name in other_trade_slots:
-			var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
-			new_slot.item = item
-			new_slot.src = my_trade_items
-			other_trade_slots[item_name] = new_slot
-			other_trade_items.add_child(new_slot)
+	if me:
+		for item_name in me.other_trade_inventory:
+			var item = me.other_trade_inventory[item_name]
+			if !item_name in other_trade_slots:
+				var new_slot: InventorySlot = INVENTORY_SLOT_SCENE.instantiate()
+				new_slot.item = item
+				new_slot.src = my_trade_items
+				other_trade_slots[item_name] = new_slot
+				other_trade_items.add_child(new_slot)
 
 
 func _on_accept_pressed() -> void:
@@ -126,7 +120,31 @@ func _on_hidden() -> void:
 	reset()
 
 func reset():
-	me.reset_inventory_ui()
 
-	for item in me.my_trade_inventory.values():
-		remove_item_from_trade.rpc_id(1,item.name)
+	#clear local data structures
+	my_trade_slots = {}
+	other_trade_slots = {}
+	quest_to_ui = {}
+	selected_quest = {}
+
+	game.inventory_ui.reset()
+
+	#clear ui
+	for child in my_trade_items.get_children():
+		my_trade_items.remove_child(child)
+		child.queue_free()
+
+	for child in other_trade_items.get_children():
+		other_trade_items.remove_child(child)
+		child.queue_free()
+
+	for child in other_quests_ui.get_children():
+		other_quests_ui.remove_child(child)
+		child.queue_free()
+
+	for child in quest_details.get_children():
+		quest_details.remove_child(child)
+		child.queue_free()
+
+	#rebuild
+	update()

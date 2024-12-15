@@ -1,8 +1,9 @@
-[gd_scene load_steps=18 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=23 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" path="res://game.gd" id="1_2iwba"]
 [ext_resource type="Script" path="res://world.gd" id="1_6tkge"]
 [ext_resource type="Script" path="res://chat_input.gd" id="3_3e53o"]
+[ext_resource type="Texture2D" uid="uid://2jputlhry6c" path="res://crosshair.png" id="3_cajfn"]
 [ext_resource type="PackedScene" uid="uid://cgfpsf73dbmvb" path="res://chunk.tscn" id="3_pdr6q"]
 [ext_resource type="Script" path="res://day_night_cycle.gd" id="3_qlg17"]
 [ext_resource type="PackedScene" uid="uid://damvmfs7dqebu" path="res://bush/bush.tscn" id="3_u0r5y"]
@@ -10,6 +11,10 @@
 [ext_resource type="PackedScene" uid="uid://di4ln3kjrvrgq" path="res://acorn/acorn.tscn" id="7_1i78u"]
 [ext_resource type="Script" path="res://chunks.gd" id="7_eouhd"]
 [ext_resource type="Script" path="res://startupProbe.gd" id="10_mnyh5"]
+[ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://inventory.tscn" id="12_pmfyc"]
+[ext_resource type="PackedScene" uid="uid://np5o15k15boe" path="res://window_scene.tscn" id="13_d8uop"]
+[ext_resource type="PackedScene" uid="uid://cyyfjbicwvflj" path="res://craft_ui.tscn" id="14_sxr83"]
+[ext_resource type="PackedScene" uid="uid://b4c105b3jd8a8" path="res://PlayerInteraction.tscn" id="15_xo6pa"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_vl0i4"]
 properties/0/path = NodePath(".:turn_number")
@@ -38,56 +43,12 @@ background_mode = 2
 sky = SubResource("Sky_bq4b2")
 volumetric_fog_density = 0.0434
 
-[node name="Game" type="Node3D" groups=["persist"]]
+[node name="Game" type="Node" groups=["persist"]]
 script = ExtResource("1_2iwba")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
-[node name="MainMenu" type="PanelContainer" parent="UI"]
-visible = false
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 423.0
-offset_top = 227.0
-offset_right = -423.0
-offset_bottom = -227.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 4
-
-[node name="MarginContainer" type="MarginContainer" parent="UI/MainMenu"]
-layout_mode = 2
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 15
-theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = 15
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/MainMenu/MarginContainer"]
-layout_mode = 2
-theme_override_constants/separation = 15
-
-[node name="Label" type="Label" parent="UI/MainMenu/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "Main Menu"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="HostButton" type="Button" parent="UI/MainMenu/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "Host"
-
-[node name="JoinButton" type="Button" parent="UI/MainMenu/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "Join"
-
-[node name="AddressEntry" type="LineEdit" parent="UI/MainMenu/MarginContainer/VBoxContainer"]
-layout_mode = 2
-placeholder_text = "Enter Address to Join Here"
-alignment = 1
-
 [node name="HUD" type="Control" parent="UI"]
-visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -116,11 +77,11 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="UI/HUD/MarginContainer/VBoxContainer"]
-visible = false
 layout_mode = 2
 
 [node name="WorldTimeLabel" type="Label" parent="UI/HUD/MarginContainer/VBoxContainer/PanelContainer"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_vertical = 8
 text = "World Time Label"
@@ -164,6 +125,24 @@ offset_right = 219.0
 grow_horizontal = 2
 grow_vertical = 0
 script = ExtResource("3_3e53o")
+
+[node name="CrossHair" type="TextureRect" parent="UI"]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -32.0
+offset_top = -32.0
+offset_right = 32.0
+offset_bottom = 32.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("3_cajfn")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_vl0i4")
@@ -268,5 +247,42 @@ spawn_path = NodePath("..")
 [node name="startupProbe" type="Node" parent="."]
 script = ExtResource("10_mnyh5")
 
-[connection signal="pressed" from="UI/MainMenu/MarginContainer/VBoxContainer/HostButton" to="." method="_on_host_button_pressed"]
-[connection signal="pressed" from="UI/MainMenu/MarginContainer/VBoxContainer/JoinButton" to="." method="_on_join_button_pressed"]
+[node name="InventoryUIWindow" parent="." groups=["persist-client"] instance=ExtResource("13_d8uop")]
+unique_name_in_owner = true
+title = "Inventory"
+position = Vector2i(540, 100)
+size = Vector2i(400, 400)
+visible = false
+
+[node name="InventoryUI" parent="InventoryUIWindow" instance=ExtResource("12_pmfyc")]
+unique_name_in_owner = true
+
+[node name="CraftUIWindow" parent="." groups=["persist-client"] instance=ExtResource("13_d8uop")]
+unique_name_in_owner = true
+auto_translate_mode = 1
+transparent_bg = true
+title = "Crafting"
+position = Vector2i(100, 100)
+size = Vector2i(400, 400)
+visible = false
+transient = true
+transparent = true
+mouse_passthrough = true
+
+[node name="CraftUI" parent="CraftUIWindow" instance=ExtResource("14_sxr83")]
+unique_name_in_owner = true
+
+[node name="PlayerInteractionWindow" parent="." groups=["persist-client"] instance=ExtResource("13_d8uop")]
+unique_name_in_owner = true
+title = "Trade/Quest"
+visible = false
+
+[node name="PlayerInteractionUI" parent="PlayerInteractionWindow" instance=ExtResource("15_xo6pa")]
+unique_name_in_owner = true
+
+[connection signal="close_requested" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_close_requested"]
+[connection signal="visibility_changed" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_visibility_changed"]
+[connection signal="close_requested" from="CraftUIWindow" to="CraftUIWindow" method="_on_close_requested"]
+[connection signal="visibility_changed" from="CraftUIWindow" to="CraftUIWindow" method="_on_visibility_changed"]
+[connection signal="close_requested" from="PlayerInteractionWindow" to="PlayerInteractionWindow" method="_on_close_requested"]
+[connection signal="visibility_changed" from="PlayerInteractionWindow" to="PlayerInteractionWindow" method="_on_visibility_changed"]

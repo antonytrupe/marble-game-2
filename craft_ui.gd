@@ -11,14 +11,14 @@ var tool_slots = {}
 var tool_inventory = {}
 @onready var tool_container = %ToolSlot
 @onready var reagent_container = %MyCraftReagents
-
+@onready var game: Game = $/root/Game
 
 func _unhandled_input(event):
-	me._unhandled_input(event)
+	game._unhandled_input(event)
 
 
 func reset():
-	me.reset_inventory_ui()
+	game.inventory_ui.reset()
 	reagent_slots = {}
 	reagent_inventory = {}
 	tool_slots = {}

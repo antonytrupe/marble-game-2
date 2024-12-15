@@ -1,5 +1,5 @@
 class_name Game
-extends Node3D
+extends Node
 
 const PORT = 9999
 const PLAYER_SCENE = preload("res://player.tscn")
@@ -20,26 +20,138 @@ var player_id: String
 #var players = {}
 var rng = RandomNumberGenerator.new()
 
-@onready var main_menu = $UI/MainMenu
+@onready var inventory_ui:PlayerInventory = %InventoryUI
+@onready var inventory_ui_window = %InventoryUIWindow
+@onready var craft_ui = %CraftUI
+@onready var craft_ui_window = %CraftUIWindow
+@onready var trade_ui: PlayerInteraction = %PlayerInteractionUI
+@onready var trade_ui_window = %PlayerInteractionWindow
 @onready var hud = $UI/HUD
+#TODO delete global terra and flora
 @onready var terra = %Terra
 @onready var flora = %Flora
 @onready var turn_number_label = %TurnNumber
 @onready var turn_timer = %TurnTimer
 @onready var server_camera = $CameraPivot/ServerCamera3D
 @onready var world = %World
-@onready var world_time = %WorldTimeLabel
 @onready var players = %Players
+@onready var cross_hair = %CrossHair
 
 
-func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
-	print("game _can_drop_data", data)
-	return true
+func _ready():
+	#var signals=load("res://Signals.cs").new()
+
+	var config_file = ConfigFile.new()
+	# Load data from a file.
+	#var err = config.load("user://config.cfg")
+	var err = config_file.load("res://config.cfg")
+	# If the file didn't load, ignore it.
+	if err != OK:
+		print("error reading config file")
+
+	var config = {}
+	config.player_id = config_file.get_value("default", "player_id", "")
+	config.remote_ip = config_file.get_value("default", "remote_ip", "")
+	config.server = config_file.get_value("default", "server", false)
+
+	print("config:", config)
+
+	var arguments = {}
+	for argument in OS.get_cmdline_user_args():
+		if argument.contains("="):
+			var key_value = argument.split("=")
+			arguments[key_value[0].trim_prefix("--")] = key_value[1]
+		else:
+			# Options without an argument will be present in the dictionary,
+			# with the value set to an empty string.
+			arguments[argument.trim_prefix("--")] = ""
+
+	print("arguments:", arguments)
+	config.merge(arguments, true)
+
+	print("merged:", config)
+
+	if config.server:
+		start_server()
+		#main_menu.hide()
+		hud.show()
+		#health_bar.hide()
+		server_camera.show()
+		server_camera.current = true
+		get_viewport().get_window().title += " - SERVER"
+	elif config.has("player_id"):
+		player_id = config["player_id"]
+		start_client()
+		_on_join_button_pressed(config.remote_ip)
+		get_viewport().get_window().title += " - " + player_id
+		print("started client")
+	else:
+		print("not a client nor a server")
 
 
-func _drop_data(_at_position: Vector2, data: Variant) -> void:
-	print("game  _drop_data", data)
-	#craft_ui.add_item_to_reagents(data.item)
+func _unhandled_input(_event):
+	var player: MarbleCharacter = get_player(player_id)
+
+	#TODO this isn't the right way to do this
+	var something_visible = false
+
+	if Input.is_action_just_pressed("inventory"):
+		inventory_ui_window.visible = !inventory_ui_window.visible
+		something_visible = something_visible or inventory_ui_window.visible
+
+	if Input.is_action_just_pressed("craft"):
+		craft_ui_window.visible = !craft_ui_window.visible
+		if craft_ui_window.visible:
+			inventory_ui_window.show()
+		something_visible = something_visible or craft_ui_window.visible
+
+	if Input.is_action_just_pressed("long_rest"):
+		var minutes = 8 * 60
+		if multiplayer.is_server():
+			player.time_warp(minutes)
+		else:
+			player.time_warp.rpc_id(1, minutes)
+
+	if Input.is_action_just_pressed("short_rest"):
+		var minutes = 60
+		if multiplayer.is_server():
+			player.time_warp(minutes)
+		else:
+			player.time_warp.rpc_id(1, minutes)
+
+	if Input.is_action_just_pressed("quit"):
+		if inventory_ui_window.visible:
+			#get_viewport().set_input_as_handled()
+			inventory_ui_window.hide()
+
+		elif craft_ui_window.visible:
+			craft_ui_window.hide()
+			#get_viewport().set_input_as_handled()
+
+		else:
+			if multiplayer.is_server():
+				save_server()
+			else:
+				save_client()
+			get_tree().quit()
+
+	if craft_ui_window.visible or inventory_ui_window.visible or trade_ui_window.visible:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		cross_hair.visible = false
+	else:
+		cross_hair.visible = true
+
+func _process(_delta):
+	var now = Time.get_ticks_msec()
+
+	if multiplayer.is_server():
+		turn_timer.value = (now + world.world_age) % 6000
+		var new_turn_number = (now + world.world_age) / (6 * 1000) + 1
+		if turn_number != new_turn_number:
+			turn_number = new_turn_number
+
+	else:
+		turn_timer.value = (now - turn_start) % 6000
 
 
 func get_chunk(_position: Vector3) -> Chunk:
@@ -134,7 +246,7 @@ func server_disconnected():
 
 func _on_join_button_pressed(ip_address):
 	print("joining ", ip_address)
-	main_menu.hide()
+	#main_menu.hide()
 	hud.show()
 
 	enet_peer.create_client(ip_address, PORT)
@@ -148,10 +260,9 @@ func _on_connected_to_server():
 
 
 @rpc("any_peer", "reliable")
-func register_player(new_player_info):
+func register_player(pid):
 	var peer_id = multiplayer.get_remote_sender_id()
-	#players[peer_id] = new_player_info
-	add_player(peer_id, new_player_info)
+	add_player(peer_id, pid)
 	send_world_age.rpc_id(peer_id, Time.get_ticks_msec() + world.world_age)
 
 
@@ -171,77 +282,11 @@ func add_player(_peer_id, _player_id):
 		player = PLAYER_SCENE.instantiate()
 		player.name = _player_id
 		player.player_id = _player_id
-		#TODO make sure player isn't colliding with existing player
-		#PhysicsServer3D.space_get_direct_state(0)
-		get_world_3d().space.get_id()
-		#As per docs
-		#var params: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
-		#params.shape_rid = player.get_rid()
-		#print(player.get_rid())
-		#print(player.get_shape_owners())
-		#params.shape = player
-		#params.transform = player.transform
-		#params.collide_with_bodies = true
-		#params.collide_with_areas = true
-		#var i = get_world_3d().direct_space_state.intersect_shape(params)
-		#var i = get_world_3d().direct_space_state.collide_shape(params)
-		#print(i)
-		#if i:
-		#print("found overlap")
+
 		player.position.x = RandomNumberGenerator.new().randi_range(-5, 5)
 		player.position.z = RandomNumberGenerator.new().randi_range(-5, 5)
 		players.add_child(player)
-
-
-func _ready():
-	#var signals=load("res://Signals.cs").new()
-
-	var config_file = ConfigFile.new()
-	# Load data from a file.
-	#var err = config.load("user://config.cfg")
-	var err = config_file.load("res://config.cfg")
-	# If the file didn't load, ignore it.
-	if err != OK:
-		print("error reading config file")
-
-	var config = {}
-	config.player_id = config_file.get_value("default", "player_id", "")
-	config.remote_ip = config_file.get_value("default", "remote_ip", "")
-	config.server = config_file.get_value("default", "server", false)
-
-	print("config:", config)
-
-	var arguments = {}
-	for argument in OS.get_cmdline_user_args():
-		if argument.contains("="):
-			var key_value = argument.split("=")
-			arguments[key_value[0].trim_prefix("--")] = key_value[1]
-		else:
-			# Options without an argument will be present in the dictionary,
-			# with the value set to an empty string.
-			arguments[argument.trim_prefix("--")] = ""
-
-	print("arguments:", arguments)
-	config.merge(arguments, true)
-
-	print("merged:", config)
-
-	if config.server:
-		start_server()
-		main_menu.hide()
-		hud.show()
-		#health_bar.hide()
-		server_camera.show()
-		server_camera.current = true
-		get_viewport().get_window().title += " - SERVER"
-	elif config.has("player_id"):
-		player_id = config["player_id"]
-		start_client()
-		_on_join_button_pressed(config.remote_ip)
-		get_viewport().get_window().title += " - " + player_id
-		print("started client")
-	else:
-		print("not a client nor a server")
+	player.peer_id=_peer_id
 
 
 func update_turn_number(value):
@@ -252,38 +297,13 @@ func update_turn_number(value):
 
 
 func _on_host_button_pressed():
-	main_menu.hide()
 	hud.show()
 	start_server()
-	#add_player(multiplayer.get_unique_id())
 
 
-func _unhandled_input(_event):
-	if Input.is_action_just_pressed("quit"):
-		if multiplayer.is_server():
-			save_server()
-		else:
-			save_client()
-		get_tree().quit()
-
-
-func _process(_delta):
-	var now = Time.get_ticks_msec()
-
-	var age = GameTime.get_age_parts(world.calculated_age)
-	world_time.text = (
-		"%d years, %d months, %d days, %02d:%02d:%02d"
-		% [age.years, age.months, age.days, age.hours, age.minutes, age.seconds]
-	)
-
-	if multiplayer.is_server():
-		turn_timer.value = (now + world.world_age) % 6000
-		var new_turn_number = (now + world.world_age) / (6 * 1000) + 1
-		if turn_number != new_turn_number:
-			turn_number = new_turn_number
-
-	else:
-		turn_timer.value = (now - turn_start) % 6000
+func get_player(pid) -> MarbleCharacter:
+	var p = players.get_node_or_null(pid)
+	return p
 
 
 func save_node():
@@ -300,12 +320,14 @@ func load_node(node_data):
 
 
 func save_client():
-	var save_file = FileAccess.open("user://%s.save" %player_id, FileAccess.WRITE)
+	var save_file = FileAccess.open("user://%s.save" % player_id, FileAccess.WRITE)
 	var save_nodes = get_tree().get_nodes_in_group("persist-client")
 	for node in save_nodes:
 		# Check the node has a save function.
 		if !node.has_method("save_node"):
-			print("client persistent node '%s' is missing a save_node() function, skipped" % node.name)
+			print(
+				"client persistent node '%s' is missing a save_node() function, skipped" % node.name
+			)
 			print(node)
 			continue
 
@@ -366,17 +388,16 @@ func save_server():
 
 
 func start_client():
-	pass
-	#load_client()
+	load_client()
 
 
 func load_client():
-	print('load client %s'%player_id)
-	if not FileAccess.file_exists("user://%s.save" %player_id):
+	print("load client %s" % player_id)
+	if not FileAccess.file_exists("user://%s.save" % player_id):
 		print("client save not found")
 		return  # Error! We don't have a save to load.
 
-	var save_file = FileAccess.open("user://%s.save"%player_id, FileAccess.READ)
+	var save_file = FileAccess.open("user://%s.save" % player_id, FileAccess.READ)
 	var json = JSON.new()
 	var parse_result
 	while save_file.get_position() < save_file.get_length():
@@ -406,11 +427,13 @@ func load_client():
 		elif !node and node_data["class"]:
 			node = ClassDB.instantiate(node_data.class)
 		else:
-			print('did not find node in tree and not enough info to instantiate')
+			print("did not find node in tree and not enough info to instantiate")
 			print(node_data)
 		# Check the node has a load function.
 		if !node.has_method("load_node"):
-			print("client persistent node '%s' is missing a load_node() function, skipped" % node.name)
+			print(
+				"client persistent node '%s' is missing a load_node() function, skipped" % node.name
+			)
 			print(node.name)
 			continue
 		node.call("load_node", node_data)

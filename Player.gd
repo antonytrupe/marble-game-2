@@ -36,6 +36,8 @@ const JUMP_VELOCITY = 5.0
 @export var quests = {}:
 	set = _set_quests
 
+@export var peer_id:int
+
 var trade_partner: MarbleCharacter:
 	set = _set_trade_partner
 #we need otherTradeInventory on the client side because we can't sync trade_partner
@@ -44,7 +46,7 @@ var calculated_age: int:
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chat_mode = false
-## Dictionary{string:SkillInfo}
+## Dictionary{string:dictionary}
 var skills = {}
 
 @onready var game: Game = $/root/Game
@@ -55,26 +57,162 @@ var skills = {}
 @onready var camera = %Camera3D
 @onready var raycast = %RayCast3D
 @onready var anim_player = $AnimationPlayer
-@onready var inventory_ui = %InventoryUI
-@onready var inventory_ui_window = %InventoryUIWindow
 @onready var chunk_scanner = %ChunkScanner
 @onready var character_sheet = %CharacterSheet
 @onready var quest_creator_ui: QuestManager = %QuestCreator
 @onready var actions_ui = %ActionsUI
 @onready var fade_anim = %AnimationPlayer
-#@onready var trade_ui = %TradeUI
-@onready var trade_ui: PlayerInteraction = %PlayerInteractionUI
-@onready var trade_ui_window = $PlayerInteractionWindow
-@onready var craft_ui = %CraftUI
-@onready var craft_ui_window = %CraftUIWindow
-@onready var cross_hair = %CrossHair
+
 @onready var quest_indicator = %"?"
+
+
+func _ready():
+	actions_ui.player_id = player_id
+	Signals.NewTurn.connect(_on_new_turn)
+	#if multiplayer.is_server():
+	#Signals.PlayerZoned.connect(_on_player_zoned)
+	if is_current_player():
+		camera.current = true
+		actions_ui.show()
+		game.cross_hair.show()
+		game.inventory_ui.me=self
+		game.craft_ui.me=self
+		game.trade_ui.me=self
+	else:
+		pass
+
+
+func _unhandled_input(event):
+	#print('player _unhandled_input')
+	if game and !is_current_player():
+		return
+
+	var something_visible = false
+
+	if Input.is_action_just_pressed("character_sheet"):
+		character_sheet.visible = !character_sheet.visible
+		something_visible = something_visible or character_sheet.visible
+
+	if Input.is_action_just_pressed("quest_creator"):
+		quest_creator_ui.visible = !quest_creator_ui.visible
+		something_visible = something_visible or quest_creator_ui.visible
+
+
+
+	if event is InputEventMouseMotion:
+		if (
+			Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
+			or Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE)
+		):
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+			if multiplayer.is_server():
+				server_rotate(event.relative)
+			else:
+				server_rotate.rpc_id(1, event.relative)
+		else:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+	if Input.is_action_just_pressed("quit") and chat_mode:
+		#don't let this event bubble up
+		get_viewport().set_input_as_handled()
+		chat_text_edit.hide()
+		chat_text_edit.release_focus()
+		chat_mode = false
+
+	if Input.is_action_just_pressed("quit") and trading:
+		#don't let this event bubble up
+		get_viewport().set_input_as_handled()
+
+		if multiplayer.is_server():
+			cancel_trade()
+		else:
+			cancel_trade.rpc_id(1)
+
+	#if Input.is_action_just_pressed("quit") and inventory_ui_window.visible:
+		##don't let this event bubble up
+		#get_viewport().set_input_as_handled()
+#
+		#inventory_ui_window.hide()
+
+	#if Input.is_action_just_pressed("quit") and craft_ui_window.visible:
+		##don't let this event bubble up
+		#get_viewport().set_input_as_handled()
+
+		#craft_ui_window.hide()
+
+	if Input.is_action_just_pressed("chat"):
+		chat_text_edit.visible = !chat_text_edit.visible
+		chat_mode = !chat_mode
+		if chat_mode:
+			chat_text_edit.grab_focus()
+		else:
+			chat_text_edit.release_focus()
+			server_chat.rpc_id(1, chat_text_edit.text)
+			chat_text_edit.text = ""
+
+
+func _process(_delta):
+	character_sheet.age = calculated_age
+
+
+func _physics_process(delta):
+	# Add the gravity.
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+
+	if is_current_player() and !chat_mode:
+		# TODO check just_press/just_release, or is_pressed?
+		# crouch
+		if Input.is_action_just_pressed("crouch"):
+			if multiplayer.is_server():
+				server_mode(MOVE.MODE.CROUCH)
+			else:
+				server_mode.rpc_id(1, MOVE.MODE.CROUCH)
+		if Input.is_action_just_released("crouch"):
+			if multiplayer.is_server():
+				server_mode(MOVE.MODE.WALK)
+			else:
+				server_mode.rpc_id(1, MOVE.MODE.WALK)
+
+		# run
+		if Input.is_action_just_pressed("run"):
+			if multiplayer.is_server():
+				server_mode(MOVE.MODE.HUSTLE)
+			else:
+				server_mode.rpc_id(1, MOVE.MODE.HUSTLE)
+		if Input.is_action_just_released("run"):
+			if multiplayer.is_server():
+				server_mode(MOVE.MODE.WALK)
+			else:
+				server_mode.rpc_id(1, MOVE.MODE.WALK)
+
+		# Jump
+		if Input.is_action_just_pressed("jump") and is_on_floor():
+			if multiplayer.is_server():
+				server_jump()
+			else:
+				server_jump.rpc_id(1)
+
+		if Input.is_action_just_pressed("action"):
+			if multiplayer.is_server():
+				interact()
+			else:
+				interact.rpc_id(1)
+		# Get the input direction and handle the movement/deceleration.
+		var input_dir = Input.get_vector("left", "right", "up", "down")
+
+		if multiplayer.is_server():
+			server_move(input_dir)
+		else:
+			server_move.rpc_id(1, input_dir)
+
+	move_and_slide()
 
 
 func skillup(skill, amount):
 	if skill not in skills:
 		skills[skill] = {level = 1, xp = 0}
-	skills[skill] += amount
+	skills[skill].xp += amount
 
 
 func _set_trade_partner(partner: MarbleCharacter):
@@ -111,48 +249,45 @@ func delete_quest(quest: Dictionary):
 	quests.erase(quest.name)
 
 
+##server code
 @rpc("any_peer")
 func craft(action: String, tool: Dictionary, reagents: Dictionary):
 	if not multiplayer.is_server():
 		return
 	var scene = load(tool.scene_file_path)
 	var instance = scene.instantiate()
-	instance.load(inventory[tool.name])
+	instance.load_node(inventory[tool.name])
 	var result = instance.call(action, self, reagents)
-	#var result = instance.craft(self, loot)
-	#print(result)
-	#remove_from_inventory({tool.category:{"items":{tool.name:tool}}})
 	remove_from_inventory(reagents)
 
 	add_to_inventory(result)
-	#if loot.keys().size()>0 and loot[loot.keys()[0]].has_method("craft"):
-	#loot[0].craft(loot)
-	#inventory=inventory
-	reset_inventory_ui()
+
+	if peer_id:
+		game.inventory_ui.update.rpc_id(peer_id)
 
 
 func _set_other_player_quests(q):
 	other_player_quests = q
-	if trade_ui:
-		trade_ui.other_player_quests = other_player_quests
-		trade_ui.update()
+	if game and game.trade_ui:
+		game.trade_ui.other_player_quests = other_player_quests
+		game.trade_ui.update()
 
 
 func _set_other_trade_inventory(loot):
 	other_trade_inventory = loot
-	if trade_ui:
-		trade_ui.other_player_trade = other_trade_inventory
-		trade_ui.update()
+	if game and game.trade_ui:
+		game.trade_ui.other_player_trade = other_trade_inventory
+		game.trade_ui.update()
 
 
 func _set_trade_inventory(loot):
 	my_trade_inventory = loot
-	if trade_ui:
-		trade_ui.update()
+	if game and game.trade_ui and is_current_player():
+		game.trade_ui.update()
 	if trade_partner:
 		trade_partner.other_trade_inventory = loot
 
-
+##server code
 @rpc("any_peer")
 func accept_trade():
 	if !multiplayer.is_server():
@@ -173,30 +308,24 @@ func accept_trade():
 		trading = false
 
 
+
+##server code
 @rpc("any_peer")
 func remove_from_trade(loot: Dictionary):
 	if !multiplayer.is_server():
 		return
-	for category in loot:
-		for item in loot[category].items.values():
-			my_trade_inventory[category].items.erase(item.name)
-		if my_trade_inventory[category].items.keys().size() <= 0:
-			my_trade_inventory.erase(category)
+	for item in loot.values():
+		my_trade_inventory.erase(item.name)
 
 
+##server code
 @rpc("any_peer")
-func add_to_trade(loot: Dictionary):
+func add_to_trade(item: Dictionary):
 	if not multiplayer.is_server():
 		return
-	for category in loot:
-		if !my_trade_inventory.has(category):
-			my_trade_inventory[category] = {
-				scene_file_path = loot[category].scene_file_path,
-				items = {},
-			}
-		#var item = loot[item_name]
-		#my_trade_inventory[item_name].quantity += loot[item_name].quantity
-		my_trade_inventory[category].items.merge(loot[category].items)
+	if !my_trade_inventory.has(item.name):
+		my_trade_inventory[item.name] = item
+
 	trade_partner.other_trade_inventory = my_trade_inventory
 	#trade_partner.updateTradeUI.rpc()
 
@@ -209,16 +338,22 @@ func is_current_player():
 func _set_trading(value):
 	trading = value
 	#if the tradeui is ready and this is the current player
-	if trade_ui and is_current_player():
+	if game and game.trade_ui and is_current_player():
 		if trading:
-			trade_ui.other_player_trade = other_trade_inventory
-			trade_ui.other_player_quests = other_player_quests
+			game.trade_ui.other_player_trade = other_trade_inventory
+			game.trade_ui.other_player_quests = other_player_quests
 
-			trade_ui.update()
-			trade_ui_window.show()
-			inventory_ui_window.show()
+			game.trade_ui.update()
+
+			game.trade_ui_window.show()
+			game.inventory_ui_window.show()
 		else:
-			trade_ui_window.hide()
+			game.trade_ui_window.hide()
+			game.inventory_ui_window.hide()
+
+		game.trade_ui.reset()
+		game.inventory_ui.reset()
+
 	if !trading:
 		trade_partner = null
 		trade_accepted = false
@@ -226,19 +361,20 @@ func _set_trading(value):
 		other_trade_inventory = {}
 
 
-func reset_inventory_ui():
-	inventory_ui.update()
+
+#func reset_inventory_ui():
+	#game.inventory_ui.update()
 
 
 func _set_inventory(value: Dictionary):
 	# print('player._set_inventory')
 	inventory = value
-	if inventory_ui:
-		inventory_ui.update()
-	if trade_ui:
-		trade_ui.update()
-	if craft_ui:
-		craft_ui.reset()
+	if game and game.inventory_ui:
+		game.inventory_ui.reset()
+	if game and game.trade_ui:
+		game.trade_ui.update()
+	if game and game.craft_ui:
+		game.craft_ui.reset()
 
 
 #setter, don't call directly
@@ -330,19 +466,6 @@ func _on_new_turn(_turn_id):
 	reset_actions()
 
 
-func _ready():
-	actions_ui.player_id = player_id
-	Signals.NewTurn.connect(_on_new_turn)
-	#if multiplayer.is_server():
-	#Signals.PlayerZoned.connect(_on_player_zoned)
-	if is_current_player():
-		camera.current = true
-		actions_ui.show()
-		cross_hair.show()
-	else:
-		pass
-
-
 #func _on_player_zoned(player: MarbleCharacter, chunk: Node3D):
 #if game.player_id == player.name:
 ##get all the chunks the player is overlapping
@@ -355,157 +478,6 @@ func _ready():
 @rpc("authority")
 func play_fade():
 	fade_anim.play("fade")
-
-
-func _unhandled_input(event):
-	#print('player _unhandled_input')
-	if game and !is_current_player():
-		return
-
-	if Input.is_action_just_pressed("long_rest"):
-		var minutes = 8 * 60
-		if multiplayer.is_server():
-			time_warp(minutes)
-		else:
-			time_warp.rpc_id(1, minutes)
-
-	if Input.is_action_just_pressed("short_rest"):
-		var minutes = 60
-		if multiplayer.is_server():
-			time_warp(minutes)
-		else:
-			time_warp.rpc_id(1, minutes)
-
-	var something_visible = false
-
-	if Input.is_action_just_pressed("inventory"):
-		inventory_ui_window.visible = !inventory_ui_window.visible
-		something_visible = something_visible or inventory_ui_window.visible
-
-	if Input.is_action_just_pressed("craft"):
-		craft_ui_window.visible = !craft_ui_window.visible
-		if craft_ui_window.visible:
-			inventory_ui_window.show()
-		something_visible = something_visible or craft_ui_window.visible
-
-	if Input.is_action_just_pressed("character_sheet"):
-		character_sheet.visible = !character_sheet.visible
-		something_visible = something_visible or character_sheet.visible
-
-	if Input.is_action_just_pressed("quest_creator"):
-		quest_creator_ui.visible = !quest_creator_ui.visible
-		something_visible = something_visible or quest_creator_ui.visible
-
-	cross_hair.visible = !something_visible
-
-	if event is InputEventMouseMotion:
-		if (
-			Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
-			or Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE)
-		):
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-			if multiplayer.is_server():
-				server_rotate(event.relative)
-			else:
-				server_rotate.rpc_id(1, event.relative)
-		else:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-
-	if Input.is_action_just_pressed("quit") and chat_mode:
-		#don't let this event bubble up
-		get_viewport().set_input_as_handled()
-		chat_text_edit.hide()
-		chat_text_edit.release_focus()
-		chat_mode = false
-
-	if Input.is_action_just_pressed("quit") and trading:
-		#don't let this event bubble up
-		get_viewport().set_input_as_handled()
-
-		if multiplayer.is_server():
-			cancel_trade()
-		else:
-			cancel_trade.rpc_id(1)
-
-	if Input.is_action_just_pressed("quit") and inventory_ui_window.visible:
-		#don't let this event bubble up
-		get_viewport().set_input_as_handled()
-
-		inventory_ui_window.hide()
-
-	if Input.is_action_just_pressed("quit") and craft_ui_window.visible:
-		#don't let this event bubble up
-		get_viewport().set_input_as_handled()
-
-		craft_ui_window.hide()
-
-	if Input.is_action_just_pressed("chat"):
-		chat_text_edit.visible = !chat_text_edit.visible
-		chat_mode = !chat_mode
-		if chat_mode:
-			chat_text_edit.grab_focus()
-		else:
-			chat_text_edit.release_focus()
-			server_chat.rpc_id(1, chat_text_edit.text)
-			chat_text_edit.text = ""
-
-
-func _process(_delta):
-	character_sheet.age = calculated_age
-
-
-func _physics_process(delta):
-	# Add the gravity.
-	if not is_on_floor():
-		velocity.y -= gravity * delta
-
-	if is_current_player() and !chat_mode:
-		# TODO check just_press/just_release, or is_pressed?
-		# crouch
-		if Input.is_action_just_pressed("crouch"):
-			if multiplayer.is_server():
-				server_mode(MOVE.MODE.CROUCH)
-			else:
-				server_mode.rpc_id(1, MOVE.MODE.CROUCH)
-		if Input.is_action_just_released("crouch"):
-			if multiplayer.is_server():
-				server_mode(MOVE.MODE.WALK)
-			else:
-				server_mode.rpc_id(1, MOVE.MODE.WALK)
-
-		# run
-		if Input.is_action_just_pressed("run"):
-			if multiplayer.is_server():
-				server_mode(MOVE.MODE.HUSTLE)
-			else:
-				server_mode.rpc_id(1, MOVE.MODE.HUSTLE)
-		if Input.is_action_just_released("run"):
-			if multiplayer.is_server():
-				server_mode(MOVE.MODE.WALK)
-			else:
-				server_mode.rpc_id(1, MOVE.MODE.WALK)
-
-		# Jump
-		if Input.is_action_just_pressed("jump") and is_on_floor():
-			if multiplayer.is_server():
-				server_jump()
-			else:
-				server_jump.rpc_id(1)
-
-		if Input.is_action_just_pressed("action"):
-			if multiplayer.is_server():
-				interact()
-			else:
-				interact.rpc_id(1)
-		# Get the input direction and handle the movement/deceleration.
-		var input_dir = Input.get_vector("left", "right", "up", "down")
-
-		if multiplayer.is_server():
-			server_move(input_dir)
-		else:
-			server_move.rpc_id(1, input_dir)
-
-	move_and_slide()
 
 
 #this is the function that runs on the server that any peer can call
@@ -637,6 +609,8 @@ func remove_from_inventory(loot: Dictionary) -> bool:
 	if !multiplayer.is_server():
 		return false
 	for item in loot.values():
+		if item.name not in inventory:
+			return false
 		inventory.erase(item.name)
 		print("removed %s" % item.name)
 
