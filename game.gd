@@ -36,6 +36,7 @@ var rng = RandomNumberGenerator.new()
 @onready var world = %World
 @onready var players = %Players
 @onready var cross_hair = %CrossHair
+@onready var chunks = %Chunks
 
 
 func _ready():
@@ -161,38 +162,8 @@ func time_warp(minutes, pid):
 	if !multiplayer.is_server():
 		return
 	var player: MarbleCharacter = get_player(pid)
-	var chunks = player.get_chunks()
-	for chunk: Chunk in chunks:
-		chunk.time_warp(minutes)
-
-
-func get_adjacent_coords(coords):
-	var adjacent_coords = []
-
-	for coord in coords:
-		var x = coord.x
-		var y = coord.y
-
-		# Add the 8 adjacent coordinates
-		adjacent_coords.append(Vector2(x - 1, y - 1))
-		adjacent_coords.append(Vector2(x, y - 1))
-		adjacent_coords.append(Vector2(x + 1, y - 1))
-		adjacent_coords.append(Vector2(x - 1, y))
-		adjacent_coords.append(Vector2(x + 1, y))
-		adjacent_coords.append(Vector2(x - 1, y + 1))
-		adjacent_coords.append(Vector2(x, y + 1))
-		adjacent_coords.append(Vector2(x + 1, y + 1))
-
-	return adjacent_coords
-
-
-func get_chunk(_position: Vector3) -> Chunk:
-	return null
-
-
-func get_chunk_name(_p: Vector3) -> String:
-	# var x = p.x / 60
-	return "[0,0,0]"
+	var player_chunks = player.get_chunks()
+	chunks.time_warp(player_chunks, minutes)
 
 
 func spawn_stones(quantity: int, p: Vector3):

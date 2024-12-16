@@ -78,8 +78,6 @@ func _ready():
 		game.inventory_ui.me = self
 		game.craft_ui.me = self
 		game.trade_ui.me = self
-	else:
-		pass
 
 
 func _unhandled_input(event):
@@ -430,7 +428,7 @@ func load_node(node_data):
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
 	#transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
 	for p in node_data:
-		if p in self and p not in ["transform"]:
+		if p in self and p not in ["transform", "parent"]:
 			self[p] = node_data[p]
 	#TODO figure out camera rotation
 

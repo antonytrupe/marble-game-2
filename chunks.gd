@@ -1,3 +1,4 @@
+class_name Chunks
 extends Node3D
 const ChunkResource = preload("res://chunk.tscn")
 
@@ -9,6 +10,59 @@ const ChunkResource = preload("res://chunk.tscn")
 func _ready() -> void:
 	#if !multiplayer.is_server():
 	Signals.PlayerZoned.connect(_on_player_zoned)
+
+
+func time_warp(origin_chunks, minutes):
+	var chunk_warp = get_adjacent_chunks(origin_chunks, minutes)
+	for chunk_name: String in chunk_warp:
+		var chunk: Chunk = get_node_or_null(chunk_name)
+		if chunk:
+			chunk.time_warp(chunk_warp[chunk_name])
+
+
+func vector3_from_chunk_name(chunk_name):
+	var a = JSON.parse_string(chunk_name)
+	var v = Vector3(a[0], a[1], a[2])
+	return v
+
+
+func get_adjacent_chunks(origin_chunks: Array[Chunk], origin_minutes):
+	var step_minutes = 30.0
+	var size = (origin_minutes / step_minutes) - 1
+	var adjacent_chunks = {}
+	var min_x = null
+	var min_z = null
+	var max_x = null
+	var max_z = null
+
+	#get our min and max's for origin_chunks
+	for origin_chunk in origin_chunks:
+		var v = vector3_from_chunk_name(origin_chunk.name)
+		if min_x == null or min_x > v.x:
+			min_x = v.x
+		if min_z == null or min_z > v.z:
+			min_z = v.z
+
+		if max_x == null or max_x < v.x:
+			max_x = v.x
+		if max_z == null or max_z < v.z:
+			max_z = v.z
+
+	print("min_x:", min_x)
+	print("max_x:", max_x)
+	print("min_z:", min_z)
+	print("max_z:", max_z)
+	for x in range(min_x - size, max_x + size + 1):
+		for z in range(min_z - size, max_z + size + 1):
+			#skip origin nodes
+			#if (x < min_x or x > max_x) or (z < min_z or z > max_z):
+			var chunk_name = "[%s,%s,%s]" % [x, 0, z]
+			var x_minutes = min(abs(min_x - x), abs(x - max_x))
+
+			var z_minutes = min(abs(min_z - z), abs(z - max_z))
+			adjacent_chunks[chunk_name] = (size - max(x_minutes, z_minutes) + 1) * step_minutes
+
+	return adjacent_chunks
 
 
 ##chunk could be the old chunk or new chunk
