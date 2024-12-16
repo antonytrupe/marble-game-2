@@ -27,16 +27,13 @@ var rng = RandomNumberGenerator.new()
 @onready var trade_ui: PlayerInteraction = %PlayerInteractionUI
 @onready var trade_ui_window = %PlayerInteractionWindow
 @onready var hud = $UI/HUD
-#TODO delete global terra and flora
-@onready var terra = %Terra
-@onready var flora = %Flora
 @onready var turn_number_label = %TurnNumber
 @onready var turn_timer = %TurnTimer
 @onready var server_camera = $CameraPivot/ServerCamera3D
 @onready var world = %World
 @onready var players = %Players
 @onready var cross_hair = %CrossHair
-@onready var chunks = %Chunks
+@onready var chunks: Chunks = %Chunks
 
 
 func _ready():
@@ -168,13 +165,15 @@ func time_warp(minutes, pid):
 
 func spawn_stones(quantity: int, p: Vector3):
 	quantity = clampi(quantity, 1, 100)
+	print(p)
 	for i in quantity:
 		var stone = STONE_SCENE.instantiate()
 		stone.name = stone.name + "%010d" % rng.randi()
-		stone.position = get_random_vector(10, p)
-		#var chunk_name=get_chunk_name(stone.position)
-		# var chunk=get_chunk(stone.position)
-		terra.add_child(stone)
+		stone.global_position = get_random_vector(10, p)
+		var chunk: Chunk = chunks.get_chunk(stone.global_position)
+		print(stone.global_position)
+		print(chunk.name)
+		chunk.terra.add_child(stone)
 
 
 func command(cmd: String, player: MarbleCharacter):
@@ -200,9 +199,9 @@ func command(cmd: String, player: MarbleCharacter):
 					for i in count:
 						var acorn = ACORN_SCENE.instantiate()
 						acorn.name = acorn.name + "%010d" % rng.randi()
-						acorn.position = get_random_vector(10, player.position)
-						#var chunk = get_chunk(acorn.position)
-						flora.add_child(acorn)
+						acorn.global_position = get_random_vector(10, player.position)
+						var chunk = chunks.get_chunk(acorn.global_position)
+						chunk.flora.add_child(acorn)
 				"bush":
 					var count = 1
 					if parts.size() >= 3:
@@ -211,9 +210,9 @@ func command(cmd: String, player: MarbleCharacter):
 					for i in count:
 						var bush = BUSH_SCENE.instantiate()
 						bush.name = bush.name + "%010d" % rng.randi()
-						bush.position = get_random_vector(10, player.position)
-						#var chunk = get_chunk(bush.position)
-						flora.add_child(bush)
+						bush.global_position = get_random_vector(10, player.position)
+						var chunk = chunks.get_chunk(bush.global_position)
+						chunk.flora.add_child(bush)
 				"tree", "trees":
 					var count = 1
 					if parts.size() >= 3:
@@ -222,9 +221,9 @@ func command(cmd: String, player: MarbleCharacter):
 					for i in count:
 						var tree = TREE_SCENE.instantiate()
 						tree.name = tree.name + "%010d" % rng.randi()
-						tree.position = get_random_vector(10, player.position)
-						#var chunk = get_chunk(tree.position)
-						flora.add_child(tree)
+						tree.global_position = get_random_vector(10, player.position)
+						var chunk = chunks.get_chunk(tree.global_position)
+						chunk.flora.add_child(tree)
 
 
 func get_random_vector(R: float, center: Vector3) -> Vector3:
@@ -488,4 +487,6 @@ func load_server():
 		node.call("load_node", node_data)
 		node.name = node_data.name
 		if !node.get_parent():
-			get_node_or_null(node_data["parent"]).add_child(node)
+			var parent = get_node_or_null(node_data["parent"])
+			if parent:
+				parent.add_child(node)

@@ -26,6 +26,17 @@ func vector3_from_chunk_name(chunk_name):
 	return v
 
 
+func get_chunk_name(p: Vector3):
+	var chunk_name = (
+		"[%s,%s,%s]" % [floor((p.x + 30) / 60), floor((p.y + 30) / 60), floor((p.z + 30) / 60)]
+	)
+	return chunk_name
+
+
+func get_chunk(p: Vector3):
+	return get_node_or_null(get_chunk_name(p))
+
+
 func get_adjacent_chunks(origin_chunks: Array[Chunk], origin_minutes):
 	var step_minutes = 30.0
 	var size = (origin_minutes / step_minutes) - 1
