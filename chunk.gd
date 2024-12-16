@@ -21,20 +21,6 @@ var calculated_age: int:
 @onready var player_scanner = %PlayerScanner
 
 
-func _process(delta):
-	var r = rng.randf_range(0.0, 5000.0)
-	if r * delta / 0.0133 < 1.0:
-		pass
-		# print(delta)
-		#print("spawn stone in chunk %s" % name)
-	#label.text = GameTime.format(calculated_age)
-
-
-# func _ready():
-# 	for player: MarbleCharacter in get_players():
-# 		var zones = player.get_zones()
-
-
 func set_birth_date(value):
 	birth_date = value
 
@@ -56,9 +42,6 @@ func get_flora_fauna() -> Array[Node3D]:
 	var entities: Array[Node3D] = []
 	for area: Area3D in areas:
 		entities.append(area.get_parent())
-
-	#print("flora_fauna:", entities)
-
 	return entities
 
 
@@ -75,7 +58,8 @@ func time_warp(minutes: int):
 
 	# tell all the players there was a timewarp
 	var players = get_players()
-	for p in players:
+	for p: MarbleCharacter in players:
+		p.time_warp(minutes)
 		p.play_fade.rpc()
 
 

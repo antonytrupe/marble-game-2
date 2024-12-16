@@ -1,47 +1,21 @@
-extends Node3D
+class_name DayNightCycle
+extends Node
 @export var intensity: Curve
+@export var chunks: Array[Chunk]:
+	set = _set_chunks
 
 @onready var sun = %Sun
+@onready var game: Game = $/root/Game
 
-@onready var chunks: Array[Chunk] = [%"[0,0,0]"]
 
+func _set_chunks(value):
+	if !chunks or chunks.size() == 0:
+		var total = get_target_position(value)
+		var rotation_x: float = fposmod(total.angle(), PI * 2)
+		var light_energy = intensity.sample(fposmod(rotation_x - PI / 2.0, PI * 2) / (PI * 2))
 
-func _ready() -> void:
-	var a = fposmod(get_vector_from_hour(0).angle(), PI * 2)
-	assert(is_equal_approx(a, PI * 2 / 4), "%f isn't %f" % [a, PI * 2 / 4])
-
-	a = fposmod(get_vector_from_hour(3).angle(), PI * 2)
-	assert(is_equal_approx(a, PI * 3 / 4), "%f isn't %f" % [a, PI * 3 / 4])
-
-	a = fposmod(get_vector_from_hour(6).angle(), PI * 2)
-	assert(is_equal_approx(a, PI * 4 / 4), "%f isn't %f" % [a, PI * 4 / 4])
-
-	a = fposmod(get_vector_from_hour(9).angle(), PI * 2)
-	assert(is_equal_approx(a, PI * 5 / 4), "%f isn't %f" % [a, PI * 5 / 4])
-
-	a = fposmod(get_vector_from_hour(12).angle(), PI * 2)
-	assert(is_equal_approx(a, PI * 6 / 4), "%f isn't %f" % [a, PI * 6 / 4])
-
-	a = fposmod(get_vector_from_hour(15).angle(), PI * 2)
-	assert(is_equal_approx(a, PI * 7 / 4), "%f isn't %f" % [a, PI * 7 / 4])
-
-	a = fposmod(get_vector_from_hour(18).angle(), PI * 2)
-	assert(is_equal_approx(a, PI * 0 / 4), "%f isn't %f" % [a, PI * 0 / 4])
-
-	a = fposmod(get_vector_from_hour(21).angle(), PI * 2)
-	assert(is_equal_approx(a, PI * 1 / 4), "%f isn't %f" % [a, PI * 1 / 4])
-
-	a = fposmod(get_vector_from_hour(24).angle(), PI * 2)
-	assert(is_equal_approx(a, PI * 2 / 4), "%f isn't %f" % [a, PI * 2 / 4])
-
-	a = fposmod((get_vector_from_hour(6) + get_vector_from_hour(12)).angle(), PI * 2)
-	assert(is_equal_approx(a, PI * 5 / 4), "%f isn't %f" % [a, PI * 5 / 4])
-
-	a = lerp_angle(1, 2, .0001)
-	assert(is_equal_approx(a, 1.0001), "%f isn't %f" % [a, 1.0001])
-
-	a = lerp_angle(2, 1, .0001)
-	assert(is_equal_approx(a, 1.9999), "%f isn't %f" % [a, 1.9999])
+		set_angle_and_intensity(rotation_x, light_energy)
+	chunks = value
 
 
 func get_vector_from_hour(hour: float):
@@ -50,16 +24,26 @@ func get_vector_from_hour(hour: float):
 	return v
 
 
-func _process(_delta: float) -> void:
-	if chunks.size() == 0:
-		#print('no chunks')
-		return
+func get_target_position(_chunks):
 	var total = Vector2(0.0, 0.0)
-	for c in chunks:
+	for c in _chunks:
 		var t = GameTime.get_age_parts(c.calculated_age)
 		var hour = t.hours + t.minutes / 60.0 + t.seconds / (60.0 * 60.0)
 		var v = get_vector_from_hour(hour)
 		total = total + v
+	return total
+
+
+func set_angle_and_intensity(rotation_x, light_energy):
+	sun.rotation.x = rotation_x
+	sun.light_energy = light_energy
+
+
+func _process(_delta: float) -> void:
+	if !chunks or chunks.size() == 0:
+		#print("no chunks %s"%[game.player_id])
+		return
+	var total = get_target_position(chunks)
 
 	#0 is sunset
 	#1/2pi is midnight
@@ -71,16 +55,11 @@ func _process(_delta: float) -> void:
 	var start = fposmod(sun.rotation.x, PI * 2)
 
 	#.001 is a little slow
-	var l = lerp_angle(start, end, .001)
-	#intensity.sample(_lerp/24.0)
-	sun.light_energy = intensity.sample(fposmod(l - PI / 2.0, PI * 2) / (PI * 2))
-	#print("start:%f end:%f lerp:%f" % [start, end, _lerp])
-	if is_equal_approx(l, end):
-		l = end
-	else:
-		pass
-		#print("lerping")
-		#print("start:%f end:%f lerp:%f" % [start, end, _lerp])
+	var rotation_x = lerp_angle(start, end, .001)
 
-	sun.rotation.x = l
-	#print(sun.rotation.x)
+	if is_equal_approx(rotation_x, end):
+		rotation_x = end
+
+	var light_energy = intensity.sample(fposmod(rotation_x - PI / 2.0, PI * 2) / (PI * 2))
+
+	set_angle_and_intensity(rotation_x, light_energy)

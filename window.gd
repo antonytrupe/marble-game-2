@@ -9,8 +9,6 @@ func _on_close_requested() -> void:
 
 
 func save_node():
-	print(position)
-	#print(saved_position)
 	var save_dict = {
 		#
 		position = JSON3D.Vector2ToDictionary(position),

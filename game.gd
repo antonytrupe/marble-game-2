@@ -20,22 +20,20 @@ var player_id: String
 #var players = {}
 var rng = RandomNumberGenerator.new()
 
-@onready var inventory_ui:PlayerInventory = %InventoryUI
+@onready var inventory_ui: PlayerInventory = %InventoryUI
 @onready var inventory_ui_window = %InventoryUIWindow
 @onready var craft_ui = %CraftUI
 @onready var craft_ui_window = %CraftUIWindow
 @onready var trade_ui: PlayerInteraction = %PlayerInteractionUI
 @onready var trade_ui_window = %PlayerInteractionWindow
 @onready var hud = $UI/HUD
-#TODO delete global terra and flora
-@onready var terra = %Terra
-@onready var flora = %Flora
 @onready var turn_number_label = %TurnNumber
 @onready var turn_timer = %TurnTimer
 @onready var server_camera = $CameraPivot/ServerCamera3D
 @onready var world = %World
 @onready var players = %Players
 @onready var cross_hair = %CrossHair
+@onready var chunks: Chunks = %Chunks
 
 
 func _ready():
@@ -90,7 +88,7 @@ func _ready():
 
 
 func _unhandled_input(_event):
-	var player: MarbleCharacter = get_player(player_id)
+	#var player: MarbleCharacter = get_player(player_id)
 
 	#TODO this isn't the right way to do this
 	var something_visible = false
@@ -108,16 +106,16 @@ func _unhandled_input(_event):
 	if Input.is_action_just_pressed("long_rest"):
 		var minutes = 8 * 60
 		if multiplayer.is_server():
-			player.time_warp(minutes)
+			time_warp(minutes, player_id)
 		else:
-			player.time_warp.rpc_id(1, minutes)
+			time_warp.rpc_id(1, minutes, player_id)
 
 	if Input.is_action_just_pressed("short_rest"):
 		var minutes = 60
 		if multiplayer.is_server():
-			player.time_warp(minutes)
+			time_warp(minutes, player_id)
 		else:
-			player.time_warp.rpc_id(1, minutes)
+			time_warp.rpc_id(1, minutes, player_id)
 
 	if Input.is_action_just_pressed("quit"):
 		if inventory_ui_window.visible:
@@ -141,6 +139,7 @@ func _unhandled_input(_event):
 	else:
 		cross_hair.visible = true
 
+
 func _process(_delta):
 	var now = Time.get_ticks_msec()
 
@@ -154,24 +153,27 @@ func _process(_delta):
 		turn_timer.value = (now - turn_start) % 6000
 
 
-func get_chunk(_position: Vector3) -> Chunk:
-	return null
-
-
-func get_chunk_name(_p: Vector3) -> String:
-	# var x = p.x / 60
-	return "[0,0,0]"
+##server code
+@rpc("any_peer")
+func time_warp(minutes, pid):
+	if !multiplayer.is_server():
+		return
+	var player: MarbleCharacter = get_player(pid)
+	var player_chunks = player.get_chunks()
+	chunks.time_warp(player_chunks, minutes)
 
 
 func spawn_stones(quantity: int, p: Vector3):
 	quantity = clampi(quantity, 1, 100)
+	print(p)
 	for i in quantity:
 		var stone = STONE_SCENE.instantiate()
 		stone.name = stone.name + "%010d" % rng.randi()
-		stone.position = get_random_vector(10, p)
-		#var chunk_name=get_chunk_name(stone.position)
-		# var chunk=get_chunk(stone.position)
-		terra.add_child(stone)
+		stone.global_position = get_random_vector(10, p)
+		var chunk: Chunk = chunks.get_chunk(stone.global_position)
+		print(stone.global_position)
+		print(chunk.name)
+		chunk.terra.add_child(stone)
 
 
 func command(cmd: String, player: MarbleCharacter):
@@ -197,9 +199,9 @@ func command(cmd: String, player: MarbleCharacter):
 					for i in count:
 						var acorn = ACORN_SCENE.instantiate()
 						acorn.name = acorn.name + "%010d" % rng.randi()
-						acorn.position = get_random_vector(10, player.position)
-						#var chunk = get_chunk(acorn.position)
-						flora.add_child(acorn)
+						acorn.global_position = get_random_vector(10, player.position)
+						var chunk = chunks.get_chunk(acorn.global_position)
+						chunk.flora.add_child(acorn)
 				"bush":
 					var count = 1
 					if parts.size() >= 3:
@@ -208,9 +210,9 @@ func command(cmd: String, player: MarbleCharacter):
 					for i in count:
 						var bush = BUSH_SCENE.instantiate()
 						bush.name = bush.name + "%010d" % rng.randi()
-						bush.position = get_random_vector(10, player.position)
-						#var chunk = get_chunk(bush.position)
-						flora.add_child(bush)
+						bush.global_position = get_random_vector(10, player.position)
+						var chunk = chunks.get_chunk(bush.global_position)
+						chunk.flora.add_child(bush)
 				"tree", "trees":
 					var count = 1
 					if parts.size() >= 3:
@@ -219,9 +221,9 @@ func command(cmd: String, player: MarbleCharacter):
 					for i in count:
 						var tree = TREE_SCENE.instantiate()
 						tree.name = tree.name + "%010d" % rng.randi()
-						tree.position = get_random_vector(10, player.position)
-						#var chunk = get_chunk(tree.position)
-						flora.add_child(tree)
+						tree.global_position = get_random_vector(10, player.position)
+						var chunk = chunks.get_chunk(tree.global_position)
+						chunk.flora.add_child(tree)
 
 
 func get_random_vector(R: float, center: Vector3) -> Vector3:
@@ -286,7 +288,7 @@ func add_player(_peer_id, _player_id):
 		player.position.x = RandomNumberGenerator.new().randi_range(-5, 5)
 		player.position.z = RandomNumberGenerator.new().randi_range(-5, 5)
 		players.add_child(player)
-	player.peer_id=_peer_id
+	player.peer_id = _peer_id
 
 
 func update_turn_number(value):
@@ -426,7 +428,7 @@ func load_client():
 			node = load(node_data["scene_file_path"]).instantiate()
 		elif !node and node_data["class"]:
 			node = ClassDB.instantiate(node_data.class)
-		else:
+		elif !node:
 			print("did not find node in tree and not enough info to instantiate")
 			print(node_data)
 		# Check the node has a load function.
@@ -485,4 +487,6 @@ func load_server():
 		node.call("load_node", node_data)
 		node.name = node_data.name
 		if !node.get_parent():
-			get_node_or_null(node_data["parent"]).add_child(node)
+			var parent = get_node_or_null(node_data["parent"])
+			if parent:
+				parent.add_child(node)

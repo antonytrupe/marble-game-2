@@ -21,6 +21,7 @@ chopping trees
 saplings
 
 terrain heightmaps
+making stone walls
 making log walls
 making fire
 

@@ -36,7 +36,7 @@ const JUMP_VELOCITY = 5.0
 @export var quests = {}:
 	set = _set_quests
 
-@export var peer_id:int
+@export var peer_id: int
 
 var trade_partner: MarbleCharacter:
 	set = _set_trade_partner
@@ -57,7 +57,7 @@ var skills = {}
 @onready var camera = %Camera3D
 @onready var raycast = %RayCast3D
 @onready var anim_player = $AnimationPlayer
-@onready var chunk_scanner = %ChunkScanner
+@onready var chunk_scanner: Area3D = %ChunkScanner
 @onready var character_sheet = %CharacterSheet
 @onready var quest_creator_ui: QuestManager = %QuestCreator
 @onready var actions_ui = %ActionsUI
@@ -75,15 +75,12 @@ func _ready():
 		camera.current = true
 		actions_ui.show()
 		game.cross_hair.show()
-		game.inventory_ui.me=self
-		game.craft_ui.me=self
-		game.trade_ui.me=self
-	else:
-		pass
+		game.inventory_ui.me = self
+		game.craft_ui.me = self
+		game.trade_ui.me = self
 
 
 func _unhandled_input(event):
-	#print('player _unhandled_input')
 	if game and !is_current_player():
 		return
 
@@ -96,8 +93,6 @@ func _unhandled_input(event):
 	if Input.is_action_just_pressed("quest_creator"):
 		quest_creator_ui.visible = !quest_creator_ui.visible
 		something_visible = something_visible or quest_creator_ui.visible
-
-
 
 	if event is InputEventMouseMotion:
 		if (
@@ -129,16 +124,16 @@ func _unhandled_input(event):
 			cancel_trade.rpc_id(1)
 
 	#if Input.is_action_just_pressed("quit") and inventory_ui_window.visible:
-		##don't let this event bubble up
-		#get_viewport().set_input_as_handled()
+	##don't let this event bubble up
+	#get_viewport().set_input_as_handled()
 #
-		#inventory_ui_window.hide()
+	#inventory_ui_window.hide()
 
 	#if Input.is_action_just_pressed("quit") and craft_ui_window.visible:
-		##don't let this event bubble up
-		#get_viewport().set_input_as_handled()
+	##don't let this event bubble up
+	#get_viewport().set_input_as_handled()
 
-		#craft_ui_window.hide()
+	#craft_ui_window.hide()
 
 	if Input.is_action_just_pressed("chat"):
 		chat_text_edit.visible = !chat_text_edit.visible
@@ -236,7 +231,6 @@ func _set_quests(value: Dictionary):
 func create_quest(quest: Dictionary):
 	if not multiplayer.is_server():
 		return
-	print(quest)
 	quests[quest.name] = quest
 	quest_creator_ui.update()
 
@@ -245,7 +239,6 @@ func create_quest(quest: Dictionary):
 func delete_quest(quest: Dictionary):
 	if not multiplayer.is_server():
 		return
-	print("deleting quest")
 	quests.erase(quest.name)
 
 
@@ -287,12 +280,12 @@ func _set_trade_inventory(loot):
 	if trade_partner:
 		trade_partner.other_trade_inventory = loot
 
+
 ##server code
 @rpc("any_peer")
 func accept_trade():
 	if !multiplayer.is_server():
 		return
-	print("accept_trade")
 	trade_accepted = true
 	if trade_accepted and trade_partner.trade_accepted:
 		#TODO make sure the whole trade will succeed before doing any part
@@ -306,7 +299,6 @@ func accept_trade():
 		trade_partner.trading = false
 
 		trading = false
-
 
 
 ##server code
@@ -361,13 +353,11 @@ func _set_trading(value):
 		other_trade_inventory = {}
 
 
-
 #func reset_inventory_ui():
-	#game.inventory_ui.update()
+#game.inventory_ui.update()
 
 
 func _set_inventory(value: Dictionary):
-	# print('player._set_inventory')
 	inventory = value
 	if game and game.inventory_ui:
 		game.inventory_ui.reset()
@@ -396,7 +386,7 @@ func reset_actions():
 	actions = {"move": null, "action": null}
 
 
-func get_zones() -> Array[Chunk]:
+func get_chunks() -> Array[Chunk]:
 	var areas = chunk_scanner.get_overlapping_areas()
 	var chunks: Array[Chunk] = []
 	for area: Area3D in areas:
@@ -417,18 +407,14 @@ func calculate_age():
 
 
 func _set_mode(new_mode):
-	#print(new_mode)
 	#TODO animations and stuff
 	if mode != new_mode:
 		if new_mode == MOVE.MODE.CROUCH:
 			anim_player.play("crouch")
-			#print("play crouch")
 		elif mode == MOVE.MODE.CROUCH:
 			anim_player.play_backwards("crouch")
-			#print("play crouch backwards")
 		else:
 			anim_player.play("RESET")
-			#print("play reset")
 	mode = new_mode
 
 
@@ -440,9 +426,9 @@ func play_animation(animation_name):
 func load_node(node_data):
 	player_id = node_data["player_id"]
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
-	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
+	#transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
 	for p in node_data:
-		if p in self and p not in ["transform"]:
+		if p in self and p not in ["transform", "parent"]:
 			self[p] = node_data[p]
 	#TODO figure out camera rotation
 
@@ -490,15 +476,13 @@ func server_mode(new_mode: MOVE.MODE):
 		mode = new_mode
 
 
+##server code
 @rpc("any_peer")
 func time_warp(minutes: int):
 	if !multiplayer.is_server():
 		return
 
 	extra_age = extra_age + 1000 * 60 * minutes
-
-	# emit an even for the world/game node to handle
-	Signals.TimeWarp.emit(minutes, get_zones())
 
 
 #this is the function that runs on the server that any peer can call
@@ -507,7 +491,6 @@ func server_chat(message: String):
 	if !multiplayer.is_server():
 		return
 	if message.begins_with("/"):
-		#print("command", self)
 		game.command(message, self)
 	else:
 		client_chat.rpc(message)
@@ -568,10 +551,8 @@ func interact():
 		return
 	if raycast.is_colliding():
 		var entity = raycast.get_collider()
-		#print('found:', entity)
 
 		if entity.has_method("start_trade"):
-			print("start trade")
 			start_trade(entity)
 			entity.start_trade(self)
 
@@ -597,22 +578,18 @@ func interact():
 func add_to_inventory(loot: Dictionary):
 	if !multiplayer.is_server():
 		return
-	# print('add_to_inventory:', loot)
 	for item in loot.values():
 		inventory[item.name] = item
-	# inventory=inventory
 
 
 ##loot is {item_name:{item}}
 func remove_from_inventory(loot: Dictionary) -> bool:
-	#print("remove_from_inventory:", loot)
 	if !multiplayer.is_server():
 		return false
 	for item in loot.values():
 		if item.name not in inventory:
 			return false
 		inventory.erase(item.name)
-		print("removed %s" % item.name)
 
 	return true
 
