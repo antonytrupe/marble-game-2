@@ -48,10 +48,6 @@ func get_adjacent_chunks(origin_chunks: Array[Chunk], origin_minutes):
 		if max_z == null or max_z < v.z:
 			max_z = v.z
 
-	print("min_x:", min_x)
-	print("max_x:", max_x)
-	print("min_z:", min_z)
-	print("max_z:", max_z)
 	for x in range(min_x - size, max_x + size + 1):
 		for z in range(min_z - size, max_z + size + 1):
 			#skip origin nodes
