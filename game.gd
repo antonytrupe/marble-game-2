@@ -7,9 +7,12 @@ const STONE_SCENE = preload("res://stone/stone.tscn")
 const ACORN_SCENE = preload("res://acorn/acorn.tscn")
 const BUSH_SCENE = preload("res://bush/bush.tscn")
 const TREE_SCENE = preload("res://tree/tree.tscn")
+const WARP_VOTE_SCENE = preload("res://warp_vote.gd")
 
 @export var turn_number = 1:
 	set = update_turn_number
+
+@export var warp_votes: Dictionary = {}
 
 var enet_peer = ENetMultiplayerPeer.new()
 
@@ -38,6 +41,21 @@ var rng = RandomNumberGenerator.new()
 
 func _ready():
 	#var signals=load("res://Signals.cs").new()
+
+	#ProjectSettings.set_setting("display/window/subwindows/embed_subwindows", false)
+	#var view_port:Window
+	#view_port=get_tree().get_root().get_window()
+	#view_port.visible=false
+	#view_port.initial_position=Window.WINDOW_INITIAL_POSITION_ABSOLUTE
+	#view_port.mode=Window.MODE_WINDOWED
+	##view_port.size *= 0.5
+#
+	#view_port.position.x=100
+	#view_port.position.y=100
+	#view_port.size.x=400
+	#view_port.size.y=400
+	#view_port.current_screen=0
+	#view_port.visible=true
 
 	var config_file = ConfigFile.new()
 	# Load data from a file.
@@ -106,16 +124,16 @@ func _unhandled_input(_event):
 	if Input.is_action_just_pressed("long_rest"):
 		var minutes = 8 * 60
 		if multiplayer.is_server():
-			time_warp(minutes, player_id)
+			call_time_warp(minutes, player_id)
 		else:
-			time_warp.rpc_id(1, minutes, player_id)
+			call_time_warp.rpc_id(1, minutes, player_id)
 
 	if Input.is_action_just_pressed("short_rest"):
 		var minutes = 60
 		if multiplayer.is_server():
-			time_warp(minutes, player_id)
+			call_time_warp(minutes, player_id)
 		else:
-			time_warp.rpc_id(1, minutes, player_id)
+			call_time_warp.rpc_id(1, minutes, player_id)
 
 	if Input.is_action_just_pressed("quit"):
 		if inventory_ui_window.visible:
@@ -155,12 +173,59 @@ func _process(_delta):
 
 ##server code
 @rpc("any_peer")
-func time_warp(minutes, pid):
+func call_time_warp(minutes, pid):
 	if !multiplayer.is_server():
 		return
 	var player: MarbleCharacter = get_player(pid)
-	var player_chunks = player.get_chunks()
-	chunks.time_warp(player_chunks, minutes)
+	if player.warp_vote:
+		print("player already has a warp vote")
+		return
+	var player_chunks: Array[Chunk] = player.get_chunks()
+	var warp_chunks = chunks.get_adjacent_chunks(player_chunks, minutes)
+	var vote_id = create_warp_vote(warp_chunks, pid)
+	player.warp_vote = vote_id
+	approve_warp(vote_id, pid)
+
+
+func approve_warp(vote_id, pid):
+	var vote: WarpVote = warp_votes[vote_id]
+	vote.players[pid] = true
+	#var p=get_player(pid)
+	#p.warp_votes[vote_id]=true
+	if not vote.players.values().any(func(value): return !value):
+		#do the warp now
+		chunks.time_warp(vote)
+
+
+func create_warp_vote(warp_chunks: Dictionary, pid) -> int:
+	var guid = randi_range(10000, 99999)
+	#get the players in the chunks
+	var warp_players = {}
+	for chunk_name: String in warp_chunks:
+		print("looking for players in chunk %s" % [chunk_name])
+		var chunk: Chunk = chunks.get_node_or_null(chunk_name)
+		if chunk:
+			print("found the chunk in the scene tree")
+			#add the info to the chunk
+			chunk.warp_votes.append(guid)
+			var ps = chunk.get_players()
+			for p: MarbleCharacter in ps:
+				warp_players[p.player_id] = p.player_id == pid
+				#add the info to the player
+				p.warp_votes.append(guid)
+				p.warp_votes = p.warp_votes
+		else:
+			print("did not find the chunk in the scene tree")
+	var v = WARP_VOTE_SCENE.new()
+	v.id = guid
+	v.players = warp_players
+	v.chunks = warp_chunks
+
+	warp_votes[guid] = v
+	print(v.id)
+	print(v.players)
+	print(v.chunks)
+	return guid
 
 
 func spawn_stones(quantity: int, p: Vector3):
@@ -309,16 +374,21 @@ func get_player(pid) -> MarbleCharacter:
 
 
 func save_node():
+	# print(get_viewport().get_window().position)
+	# print(get_viewport().get_window().current_screen)
 	var save_dict = {
 		#
-		"host_player_id": player_id
+		host_player_id = player_id,
+		position = 0,
+		warp_votes = warp_votes
 	}
 	return save_dict
 
 
 func load_node(node_data):
-	if "host_player_id" in node_data:
-		player_id = node_data.host_player_id
+	for p in node_data:
+		if p in self and p not in ["transform", "parent"]:
+			self[p] = node_data[p]
 
 
 func save_client():

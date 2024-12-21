@@ -12,12 +12,15 @@ func _ready() -> void:
 	Signals.PlayerZoned.connect(_on_player_zoned)
 
 
-func time_warp(origin_chunks, minutes):
-	var chunk_warp = get_adjacent_chunks(origin_chunks, minutes)
-	for chunk_name: String in chunk_warp:
+func time_warp(warp_vote:WarpVote):
+	#var chunk_warp = get_adjacent_chunks(origin_chunks, minutes)
+	for chunk_name: String in warp_vote.chunks:
 		var chunk: Chunk = get_node_or_null(chunk_name)
+		var m=warp_vote.chunks[chunk_name]
 		if chunk:
-			chunk.time_warp(chunk_warp[chunk_name])
+			chunk.time_warp(m)
+
+	#clean up the warp_vote
 
 
 func vector3_from_chunk_name(chunk_name):
@@ -74,7 +77,7 @@ func get_adjacent_chunks(origin_chunks: Array[Chunk], origin_minutes):
 
 ##chunk could be the old chunk or new chunk
 func _on_player_zoned(player: MarbleCharacter, chunk: Chunk):
-	print("_on_player_zoned %s in %s on %s" % [player.name, chunk.name, game.player_id])
+	#print("_on_player_zoned %s in %s on %s" % [player.name, chunk.name, game.player_id])
 	if game.player_id == player.name:
 		#get all the chunks the player is overlapping
 		var chunks: Array[Chunk] = player.get_chunks()

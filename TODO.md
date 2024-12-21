@@ -2,7 +2,6 @@ inventory based on volume
 inventory based on weight
 
 time warping voting
-time warping area smoothing
 
 queing actions
 action menu
@@ -14,7 +13,9 @@ NPC actions
 skills
 dropping items out of inventory
 
-remember window positions
+remember main window position
+
+lock fov to be independant of window size/ratio
 
 head look
 chopping trees

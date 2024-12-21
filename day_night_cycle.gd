@@ -52,10 +52,11 @@ func _process(_delta: float) -> void:
 	#pi*2 is sunset
 	#offset by a quarter circle to get midnight to be down
 	var end: float = fposmod(total.angle(), PI * 2)
-	var start = fposmod(sun.rotation.x, PI * 2)
+	var current = fposmod(sun.rotation.x, PI * 2)
 
 	#.001 is a little slow
-	var rotation_x = lerp_angle(start, end, .001)
+	var rotation_x = lerp_angle(current, end, .01)
+	#TODO make sure the sun doesn't go backwards
 
 	if is_equal_approx(rotation_x, end):
 		rotation_x = end

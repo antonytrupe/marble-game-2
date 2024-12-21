@@ -15,6 +15,9 @@ var rng = RandomNumberGenerator.new()
 var calculated_age: int:
 	get = calculate_age
 
+##list of warp_vote id's
+var warp_votes: Array = []
+
 @onready var label = %AgeLabel
 @onready var world = $/root/Game/World
 @onready var flora_fauna_scanner = %FloraFaunaScanner
@@ -33,7 +36,7 @@ func calculate_age():
 	return world.world_age + extra_age + Time.get_ticks_msec() - birth_date
 
 
-func get_players():
+func get_players() -> Array[Node3D]:
 	return player_scanner.get_overlapping_bodies()
 
 
@@ -65,9 +68,10 @@ func time_warp(minutes: int):
 
 func save_node():
 	var save_dict = {
-		"transform": JSON3D.Transform3DtoDictionary(transform),
-		"birth_date": birth_date,
-		"extra_age": extra_age,
+		transform = JSON3D.Transform3DtoDictionary(transform),
+		birth_date = birth_date,
+		extra_age = extra_age,
+		warp_votes = warp_votes,
 	}
 	return save_dict
 

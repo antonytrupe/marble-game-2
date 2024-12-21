@@ -38,6 +38,13 @@ const JUMP_VELOCITY = 5.0
 
 @export var peer_id: int
 
+@export var skills = {}
+##the warp vote this player called
+@export var warp_vote: int
+##the warp votes this player is in range of
+@export var warp_votes = []:
+	set = _set_warp_votes
+
 var trade_partner: MarbleCharacter:
 	set = _set_trade_partner
 #we need otherTradeInventory on the client side because we can't sync trade_partner
@@ -46,8 +53,6 @@ var calculated_age: int:
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chat_mode = false
-## Dictionary{string:dictionary}
-var skills = {}
 
 @onready var game: Game = $/root/Game
 @onready var world: World = $/root/Game/World
@@ -202,6 +207,11 @@ func _physics_process(delta):
 			server_move.rpc_id(1, input_dir)
 
 	move_and_slide()
+
+
+func _set_warp_votes(value):
+	warp_votes = value
+	# print(warp_votes)
 
 
 func skillup(skill, amount):
@@ -444,6 +454,8 @@ func save_node():
 		inventory = inventory,
 		skills = skills,
 		quests = quests,
+		warp_vote = warp_vote,
+		warp_votes = warp_votes,
 	}
 	return save_dict
 
