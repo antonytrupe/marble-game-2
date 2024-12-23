@@ -206,6 +206,7 @@ unique_name_in_owner = true
 title = "Inventory"
 position = Vector2i(520, 100)
 size = Vector2i(400, 400)
+visible = false
 
 [node name="InventoryUI" parent="InventoryUIWindow" instance=ExtResource("12_pmfyc")]
 unique_name_in_owner = true
@@ -217,6 +218,7 @@ transparent_bg = true
 title = "Crafting"
 position = Vector2i(100, 100)
 size = Vector2i(400, 400)
+visible = false
 transient = true
 transparent = true
 mouse_passthrough = true
@@ -229,6 +231,7 @@ unique_name_in_owner = true
 title = "Trade/Quest"
 position = Vector2i(100, 100)
 size = Vector2i(800, 400)
+visible = false
 
 [node name="PlayerInteractionUI" parent="PlayerInteractionWindow" instance=ExtResource("15_xo6pa")]
 unique_name_in_owner = true
@@ -239,6 +242,7 @@ auto_translate_mode = 1
 title = "Warp Votes"
 position = Vector2i(800, 100)
 size = Vector2i(200, 400)
+visible = false
 
 [node name="WarpVoteUI" parent="WarpVoteWindow" instance=ExtResource("13_3x44d")]
 unique_name_in_owner = true
