@@ -3,6 +3,20 @@
 [ext_resource type="Script" path="res://chunk.gd" id="1_icme5"]
 [ext_resource type="PackedScene" uid="uid://cc70lwfyjqg1d" path="res://age.tscn" id="2_1nrve"]
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_3g0se"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:birth_date")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:extra_age")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:warp_votes")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+
 [sub_resource type="PlaneMesh" id="PlaneMesh_asbb7"]
 size = Vector2(60, 60)
 
@@ -18,17 +32,6 @@ map_data = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 resource_local_to_scene = true
 size = Vector3(60, 60, 60)
 
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_3g0se"]
-properties/0/path = NodePath(".:position")
-properties/0/spawn = true
-properties/0/replication_mode = 2
-properties/1/path = NodePath(".:birth_date")
-properties/1/spawn = true
-properties/1/replication_mode = 2
-properties/2/path = NodePath(".:extra_age")
-properties/2/spawn = true
-properties/2/replication_mode = 2
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_p2tpf"]
 size = Vector3(60, 60, 60)
 
@@ -37,6 +40,9 @@ script = ExtResource("1_icme5")
 flora = NodePath("Flora")
 fauna = NodePath("Fauna")
 terra = NodePath("Terra")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_3g0se")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_asbb7")
@@ -54,9 +60,6 @@ collision_mask = 2
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerScanner"]
 shape = SubResource("BoxShape3D_gvo6u")
-
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
-replication_config = SubResource("SceneReplicationConfig_3g0se")
 
 [node name="AgeLabel" parent="." node_paths=PackedStringArray("entity") instance=ExtResource("2_1nrve")]
 unique_name_in_owner = true

@@ -9,14 +9,13 @@ extends Node3D
 @export var flora: Node3D
 @export var fauna: Node3D
 @export var terra: Node3D
+##list of warp_vote id's
+@export var warp_votes: Array = []
 
 var rng = RandomNumberGenerator.new()
 
 var calculated_age: int:
 	get = calculate_age
-
-##list of warp_vote id's
-var warp_votes: Array = []
 
 @onready var label = %AgeLabel
 @onready var world = $/root/Game/World

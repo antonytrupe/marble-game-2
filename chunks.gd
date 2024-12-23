@@ -12,15 +12,13 @@ func _ready() -> void:
 	Signals.PlayerZoned.connect(_on_player_zoned)
 
 
-func time_warp(warp_vote:WarpVote):
+func time_warp(warp_vote: WarpVote):
 	#var chunk_warp = get_adjacent_chunks(origin_chunks, minutes)
 	for chunk_name: String in warp_vote.chunks:
 		var chunk: Chunk = get_node_or_null(chunk_name)
-		var m=warp_vote.chunks[chunk_name]
+		var m = warp_vote.chunks[chunk_name]
 		if chunk:
 			chunk.time_warp(m)
-
-	#clean up the warp_vote
 
 
 func vector3_from_chunk_name(chunk_name):
@@ -75,27 +73,43 @@ func get_adjacent_chunks(origin_chunks: Array[Chunk], origin_minutes):
 	return adjacent_chunks
 
 
+func update_day_night_cycle(player: MarbleCharacter):
+	#get all the chunks the player is overlapping
+	var chunks: Array[Chunk] = player.get_chunks()
+	if !chunks:
+		print("%s not in any chunks at %s" % [player.name, player.position])
+		#print("using zoned chunk")
+		#chunks = [chunk]
+	# tell the daynightcycle node what chunks the player is in
+	else:
+		#print("%s in chunks %s at %s" % [player.name, chunks, player.position])
+		pass
+	day_night_cycle.chunks = chunks
+
+
 ##chunk could be the old chunk or new chunk
 func _on_player_zoned(player: MarbleCharacter, chunk: Chunk):
 	#print("_on_player_zoned %s in %s on %s" % [player.name, chunk.name, game.player_id])
+	#this should probably be somewhere else
 	if game.player_id == player.name:
-		#get all the chunks the player is overlapping
-		var chunks: Array[Chunk] = player.get_chunks()
-		if !chunks:
-			print("%s not in any chunks at %s" % [player.name, player.position])
-			#print("using zoned chunk")
-			#chunks = [chunk]
-		# tell the daynightcycle node what chunks the player is in
-		else:
-			#print("%s in chunks %s at %s" % [player.name, chunks, player.position])
-			pass
-		day_night_cycle.chunks = chunks
+		update_day_night_cycle(player)
 
 	# check if we're the server
 	if !multiplayer.is_server():
 		return
 
 	#only generate chunks on the server
+	generate_chunks(chunk)
+
+	update_warp_votes(player, chunk)
+
+
+func update_warp_votes(player: MarbleCharacter, chunk: Chunk):
+	print(player)
+	print(chunk)
+
+
+func generate_chunks(chunk: Chunk):
 	var chunk_json = JSON.parse_string(chunk.name)
 	for x in range(-1, 1 + 1):
 		for z in range(-1, 1 + 1):

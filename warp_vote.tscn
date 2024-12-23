@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://7uo4tekqeki4"]
+
+[ext_resource type="Script" path="res://warp_vote.gd" id="1_hpwqv"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_idjl2"]
+properties/0/path = NodePath(".:players")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:chunks")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+
+[node name="WarpVote" type="Node" groups=["persist"]]
+script = ExtResource("1_hpwqv")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_idjl2")

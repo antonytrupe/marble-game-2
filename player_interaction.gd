@@ -22,7 +22,7 @@ var selected_quest = {}
 
 
 func _unhandled_input(event):
-	me._unhandled_input(event)
+	game._unhandled_input(event)
 
 ##client code
 func add_item_to_trade(item: Dictionary):

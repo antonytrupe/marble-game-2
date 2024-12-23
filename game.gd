@@ -7,12 +7,10 @@ const STONE_SCENE = preload("res://stone/stone.tscn")
 const ACORN_SCENE = preload("res://acorn/acorn.tscn")
 const BUSH_SCENE = preload("res://bush/bush.tscn")
 const TREE_SCENE = preload("res://tree/tree.tscn")
-const WARP_VOTE_SCENE = preload("res://warp_vote.gd")
+const WARP_VOTE_SCENE = preload("res://warp_vote.tscn")
 
 @export var turn_number = 1:
 	set = update_turn_number
-
-@export var warp_votes: Dictionary = {}
 
 var enet_peer = ENetMultiplayerPeer.new()
 
@@ -25,6 +23,8 @@ var rng = RandomNumberGenerator.new()
 
 @onready var inventory_ui: PlayerInventory = %InventoryUI
 @onready var inventory_ui_window = %InventoryUIWindow
+@onready var warp_vote_ui = %WarpVoteUI
+@onready var warp_vote_window = %WarpVoteWindow
 @onready var craft_ui = %CraftUI
 @onready var craft_ui_window = %CraftUIWindow
 @onready var trade_ui: PlayerInteraction = %PlayerInteractionUI
@@ -37,6 +37,7 @@ var rng = RandomNumberGenerator.new()
 @onready var players = %Players
 @onready var cross_hair = %CrossHair
 @onready var chunks: Chunks = %Chunks
+@onready var warp_votes = %WarpVotes
 
 
 func _ready():
@@ -109,31 +110,33 @@ func _unhandled_input(_event):
 	#var player: MarbleCharacter = get_player(player_id)
 
 	#TODO this isn't the right way to do this
-	var something_visible = false
+	#var something_visible = false
 
 	if Input.is_action_just_pressed("inventory"):
 		inventory_ui_window.visible = !inventory_ui_window.visible
-		something_visible = something_visible or inventory_ui_window.visible
 
 	if Input.is_action_just_pressed("craft"):
 		craft_ui_window.visible = !craft_ui_window.visible
 		if craft_ui_window.visible:
 			inventory_ui_window.show()
-		something_visible = something_visible or craft_ui_window.visible
+
+	if Input.is_action_just_pressed("warp_vote"):
+		warp_vote_ui.update()
+		warp_vote_window.visible = !warp_vote_window.visible
 
 	if Input.is_action_just_pressed("long_rest"):
 		var minutes = 8 * 60
 		if multiplayer.is_server():
-			call_time_warp(minutes, player_id)
+			call_warp_vote(minutes, player_id)
 		else:
-			call_time_warp.rpc_id(1, minutes, player_id)
+			call_warp_vote.rpc_id(1, minutes, player_id)
 
 	if Input.is_action_just_pressed("short_rest"):
 		var minutes = 60
 		if multiplayer.is_server():
-			call_time_warp(minutes, player_id)
+			call_warp_vote(minutes, player_id)
 		else:
-			call_time_warp.rpc_id(1, minutes, player_id)
+			call_warp_vote.rpc_id(1, minutes, player_id)
 
 	if Input.is_action_just_pressed("quit"):
 		if inventory_ui_window.visible:
@@ -151,7 +154,14 @@ func _unhandled_input(_event):
 				save_client()
 			get_tree().quit()
 
-	if craft_ui_window.visible or inventory_ui_window.visible or trade_ui_window.visible:
+	if (craft_ui_window.visible or
+		#
+		inventory_ui_window.visible or
+		#
+		trade_ui_window.visible or
+		#
+		warp_vote_window.visible
+		):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		cross_hair.visible = false
 	else:
@@ -173,7 +183,7 @@ func _process(_delta):
 
 ##server code
 @rpc("any_peer")
-func call_time_warp(minutes, pid):
+func call_warp_vote(minutes, pid):
 	if !multiplayer.is_server():
 		return
 	var player: MarbleCharacter = get_player(pid)
@@ -187,25 +197,50 @@ func call_time_warp(minutes, pid):
 	approve_warp(vote_id, pid)
 
 
-func approve_warp(vote_id, pid):
-	var vote: WarpVote = warp_votes[vote_id]
+##server code
+@rpc("any_peer")
+func approve_warp(vote_id: String, pid:String):
+	if !multiplayer.is_server():
+		return
+	var vote: WarpVote = warp_votes.get_node_or_null(vote_id)
 	vote.players[pid] = true
-	#var p=get_player(pid)
-	#p.warp_votes[vote_id]=true
+
 	if not vote.players.values().any(func(value): return !value):
 		#do the warp now
 		chunks.time_warp(vote)
+		#clean up the warp_vote
+		delete_warp_vote(vote_id)
 
 
-func create_warp_vote(warp_chunks: Dictionary, pid) -> int:
-	var guid = randi_range(10000, 99999)
+func delete_warp_vote(vote_id:String):
+	print('deleting warp vote %s' %vote_id)
+	var vote: WarpVote = warp_votes.get_node_or_null(vote_id)
+	#clean up player data
+	for p in vote.players.keys():
+		var pp = get_player(p)
+		pp.warp_votes.erase(vote_id)
+		if pp.warp_vote == vote_id:
+			pp.warp_vote = ""
+
+	#clean up chunk data
+	for c in vote.chunks.keys():
+		var cc = get_chunk(c)
+		if cc:
+			cc.warp_votes.erase(vote_id)
+
+	warp_votes.remove_child(vote)
+	vote.queue_free()
+
+
+func create_warp_vote(warp_chunks: Dictionary, pid) -> String:
+	var guid = str(randi_range(10000, 99999))
 	#get the players in the chunks
 	var warp_players = {}
 	for chunk_name: String in warp_chunks:
-		print("looking for players in chunk %s" % [chunk_name])
+		#print("looking for players in chunk %s" % chunk_name)
 		var chunk: Chunk = chunks.get_node_or_null(chunk_name)
 		if chunk:
-			print("found the chunk in the scene tree")
+			#print("found the chunk in the scene tree")
 			#add the info to the chunk
 			chunk.warp_votes.append(guid)
 			var ps = chunk.get_players()
@@ -215,41 +250,36 @@ func create_warp_vote(warp_chunks: Dictionary, pid) -> int:
 				p.warp_votes.append(guid)
 				p.warp_votes = p.warp_votes
 		else:
-			print("did not find the chunk in the scene tree")
-	var v = WARP_VOTE_SCENE.new()
-	v.id = guid
+			pass
+			#print("did not find the chunk in the scene tree")
+	var v = WARP_VOTE_SCENE.instantiate()
+	v.name = str(guid)
 	v.players = warp_players
 	v.chunks = warp_chunks
 
-	warp_votes[guid] = v
-	print(v.id)
-	print(v.players)
-	print(v.chunks)
+	warp_votes.add_child(v)
+	# print(v.name)
+	# print(v.players)
+	# print(v.chunks)
 	return guid
 
 
 func spawn_stones(quantity: int, p: Vector3):
 	quantity = clampi(quantity, 1, 100)
-	print(p)
 	for i in quantity:
 		var stone = STONE_SCENE.instantiate()
 		stone.name = stone.name + "%010d" % rng.randi()
 		stone.global_position = get_random_vector(10, p)
 		var chunk: Chunk = chunks.get_chunk(stone.global_position)
-		print(stone.global_position)
-		print(chunk.name)
 		chunk.terra.add_child(stone)
 
 
 func command(cmd: String, player: MarbleCharacter):
 	if !multiplayer.is_server():
 		return
-	#print("server game command:", cmd)
 	var parts = cmd.replace("/", "").split(" ")
-	#print(parts)
 	match parts[0]:
 		"spawn", "/spawn":
-			#print("spawn")
 			match parts[1]:
 				"stone", "stones":
 					var count = 1
@@ -368,9 +398,14 @@ func _on_host_button_pressed():
 	start_server()
 
 
-func get_player(pid) -> MarbleCharacter:
-	var p = players.get_node_or_null(pid)
+func get_player(id) -> MarbleCharacter:
+	var p = players.get_node_or_null(id)
 	return p
+
+
+func get_chunk(id) -> Chunk:
+	var c = chunks.get_node_or_null(id)
+	return c
 
 
 func save_node():
@@ -380,7 +415,6 @@ func save_node():
 		#
 		host_player_id = player_id,
 		position = 0,
-		warp_votes = warp_votes
 	}
 	return save_dict
 
@@ -441,6 +475,7 @@ func save_server():
 
 		node_data.name = node.name
 		node_data.parent = node.get_parent().get_path()
+		#class only returns native classes, not custom class_name
 		node_data.class = node.get_class()
 		node_data.scene_file_path = node.get_scene_file_path()
 

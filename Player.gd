@@ -40,7 +40,7 @@ const JUMP_VELOCITY = 5.0
 
 @export var skills = {}
 ##the warp vote this player called
-@export var warp_vote: int
+@export var warp_vote: String
 ##the warp votes this player is in range of
 @export var warp_votes = []:
 	set = _set_warp_votes
@@ -83,6 +83,8 @@ func _ready():
 		game.inventory_ui.me = self
 		game.craft_ui.me = self
 		game.trade_ui.me = self
+		game.warp_vote_ui.me = self
+		game.warp_vote_ui.game=game
 
 
 func _unhandled_input(event):
@@ -211,7 +213,9 @@ func _physics_process(delta):
 
 func _set_warp_votes(value):
 	warp_votes = value
-	# print(warp_votes)
+	if game and game.warp_vote_ui:
+		game.warp_vote_ui.update()
+	#print()
 
 
 func skillup(skill, amount):
@@ -486,6 +490,10 @@ func server_mode(new_mode: MOVE.MODE):
 	#if we've used an action, no hustling/running
 	if !actions.action or [MOVE.MODE.CROUCH, MOVE.MODE.WALK].has(new_mode):
 		mode = new_mode
+
+
+func approve_warp_vote(vote_id:String):
+	game.approve_warp.rpc_id(1,vote_id,player_id)
 
 
 ##server code

@@ -3,5 +3,4 @@
 [ext_resource type="Script" path="res://window_scene.gd" id="1_ty0ev"]
 
 [node name="Window" type="Window"]
-initial_position = 1
 script = ExtResource("1_ty0ev")

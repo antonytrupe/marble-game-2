@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=21 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" path="res://game.gd" id="1_2iwba"]
 [ext_resource type="Script" path="res://world.gd" id="1_6tkge"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://chunks.gd" id="7_eouhd"]
 [ext_resource type="Script" path="res://startupProbe.gd" id="10_mnyh5"]
 [ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://inventory.tscn" id="12_pmfyc"]
+[ext_resource type="PackedScene" uid="uid://dih5jvxkn0uk0" path="res://warp_votes_ui.tscn" id="13_3x44d"]
 [ext_resource type="PackedScene" uid="uid://np5o15k15boe" path="res://window_scene.tscn" id="13_d8uop"]
 [ext_resource type="PackedScene" uid="uid://cyyfjbicwvflj" path="res://craft_ui.tscn" id="14_sxr83"]
 [ext_resource type="PackedScene" uid="uid://b4c105b3jd8a8" path="res://PlayerInteraction.tscn" id="15_xo6pa"]
@@ -17,9 +18,6 @@
 properties/0/path = NodePath(".:turn_number")
 properties/0/spawn = true
 properties/0/replication_mode = 2
-properties/1/path = NodePath(".:warp_votes")
-properties/1/spawn = true
-properties/1/replication_mode = 1
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_pnarc"]
 
@@ -65,8 +63,9 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -100.5
+offset_top = 18.0
 offset_right = 100.5
-offset_bottom = 73.0
+offset_bottom = 50.0
 grow_horizontal = 2
 theme_override_constants/margin_left = 4
 theme_override_constants/margin_top = 4
@@ -76,37 +75,26 @@ theme_override_constants/margin_bottom = 4
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/HUD/MarginContainer"]
 layout_mode = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="UI/HUD/MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="WorldTimeLabel" type="Label" parent="UI/HUD/MarginContainer/VBoxContainer/PanelContainer"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_vertical = 8
-text = "World Time Label"
-
-[node name="PanelContainer2" type="PanelContainer" parent="UI/HUD/MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="TurnTimer" type="ProgressBar" parent="UI/HUD/MarginContainer/VBoxContainer/PanelContainer2"]
+[node name="TurnTimer" type="ProgressBar" parent="UI/HUD/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_vertical = 1
 max_value = 6000.0
 step = 1.0
+value = 3000.0
 show_percentage = false
 
-[node name="MarginContainer" type="MarginContainer" parent="UI/HUD/MarginContainer/VBoxContainer/PanelContainer2/TurnTimer"]
+[node name="MarginContainer" type="MarginContainer" parent="UI/HUD/MarginContainer/VBoxContainer/TurnTimer"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 6
 
-[node name="TurnNumber" type="Label" parent="UI/HUD/MarginContainer/VBoxContainer/PanelContainer2/TurnTimer/MarginContainer"]
+[node name="TurnNumber" type="Label" parent="UI/HUD/MarginContainer/VBoxContainer/TurnTimer/MarginContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Turn 1"
@@ -209,7 +197,6 @@ script = ExtResource("10_mnyh5")
 [node name="InventoryUIWindow" parent="." groups=["persist-client"] instance=ExtResource("13_d8uop")]
 unique_name_in_owner = true
 title = "Inventory"
-position = Vector2i(540, 100)
 size = Vector2i(400, 400)
 visible = false
 
@@ -221,7 +208,6 @@ unique_name_in_owner = true
 auto_translate_mode = 1
 transparent_bg = true
 title = "Crafting"
-position = Vector2i(100, 100)
 size = Vector2i(400, 400)
 visible = false
 transient = true
@@ -239,9 +225,28 @@ visible = false
 [node name="PlayerInteractionUI" parent="PlayerInteractionWindow" instance=ExtResource("15_xo6pa")]
 unique_name_in_owner = true
 
+[node name="WarpVoteWindow" parent="." groups=["persist-client"] instance=ExtResource("13_d8uop")]
+unique_name_in_owner = true
+auto_translate_mode = 1
+title = "Warp Votes"
+size = Vector2i(400, 400)
+visible = false
+
+[node name="WarpVoteUI" parent="WarpVoteWindow" instance=ExtResource("13_3x44d")]
+unique_name_in_owner = true
+
+[node name="WarpVotes" type="Node" parent="."]
+unique_name_in_owner = true
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="WarpVotes"]
+_spawnable_scenes = PackedStringArray("res://warp_vote.tscn")
+spawn_path = NodePath("..")
+
 [connection signal="close_requested" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_close_requested"]
 [connection signal="visibility_changed" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_visibility_changed"]
 [connection signal="close_requested" from="CraftUIWindow" to="CraftUIWindow" method="_on_close_requested"]
 [connection signal="visibility_changed" from="CraftUIWindow" to="CraftUIWindow" method="_on_visibility_changed"]
 [connection signal="close_requested" from="PlayerInteractionWindow" to="PlayerInteractionWindow" method="_on_close_requested"]
 [connection signal="visibility_changed" from="PlayerInteractionWindow" to="PlayerInteractionWindow" method="_on_visibility_changed"]
+[connection signal="close_requested" from="WarpVoteWindow" to="WarpVoteWindow" method="_on_close_requested"]
+[connection signal="visibility_changed" from="WarpVoteWindow" to="WarpVoteWindow" method="_on_visibility_changed"]
