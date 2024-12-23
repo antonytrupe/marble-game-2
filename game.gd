@@ -8,6 +8,7 @@ const ACORN_SCENE = preload("res://acorn/acorn.tscn")
 const BUSH_SCENE = preload("res://bush/bush.tscn")
 const TREE_SCENE = preload("res://tree/tree.tscn")
 const WARP_VOTE_SCENE = preload("res://warp_vote.tscn")
+const ROOT_WINDOW_SCRIPT = preload("res://root_window.gd")
 
 @export var turn_number = 1:
 	set = update_turn_number
@@ -41,22 +42,10 @@ var rng = RandomNumberGenerator.new()
 
 
 func _ready():
-	#var signals=load("res://Signals.cs").new()
-
-	#ProjectSettings.set_setting("display/window/subwindows/embed_subwindows", false)
-	#var view_port:Window
-	#view_port=get_tree().get_root().get_window()
-	#view_port.visible=false
-	#view_port.initial_position=Window.WINDOW_INITIAL_POSITION_ABSOLUTE
-	#view_port.mode=Window.MODE_WINDOWED
-	##view_port.size *= 0.5
-#
-	#view_port.position.x=100
-	#view_port.position.y=100
-	#view_port.size.x=400
-	#view_port.size.y=400
-	#view_port.current_screen=0
-	#view_port.visible=true
+	var view_port: Window
+	view_port = get_tree().get_root().get_window()
+	view_port.set_script(ROOT_WINDOW_SCRIPT)
+	view_port.add_to_group("persist-client")
 
 	var config_file = ConfigFile.new()
 	# Load data from a file.
@@ -156,14 +145,12 @@ func _unhandled_input(_event):
 				save_client()
 			get_tree().quit()
 
-	if (craft_ui_window.visible or
-		#
-		inventory_ui_window.visible or
-		#
-		trade_ui_window.visible or
-		#
-		warp_vote_window.visible
-		):
+	if (
+		craft_ui_window.visible
+		or inventory_ui_window.visible
+		or trade_ui_window.visible
+		or warp_vote_window.visible
+	):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		cross_hair.visible = false
 	else:
@@ -201,7 +188,7 @@ func call_warp_vote(minutes, pid):
 
 ##server code
 @rpc("any_peer")
-func approve_warp(vote_id: String, pid:String):
+func approve_warp(vote_id: String, pid: String):
 	if !multiplayer.is_server():
 		return
 	var vote: WarpVote = warp_votes.get_node_or_null(vote_id)
@@ -214,8 +201,8 @@ func approve_warp(vote_id: String, pid:String):
 		delete_warp_vote(vote_id)
 
 
-func delete_warp_vote(vote_id:String):
-	print('deleting warp vote %s' %vote_id)
+func delete_warp_vote(vote_id: String):
+	print("deleting warp vote %s" % vote_id)
 	var vote: WarpVote = warp_votes.get_node_or_null(vote_id)
 	#clean up player data
 	for p in vote.players.keys():
@@ -443,7 +430,10 @@ func save_client():
 		var node_data: Dictionary = node.call("save_node")
 
 		node_data.name = node.name
-		node_data.parent = node.get_parent().get_path()
+		if node.get_parent():
+			node_data.parent = node.get_parent().get_path()
+		else:
+			node_data.parent = ""
 		node_data.class = node.get_class()
 		node_data.scene_file_path = node.get_scene_file_path()
 
@@ -476,7 +466,10 @@ func save_server():
 		var node_data: Dictionary = node.call("save_node")
 
 		node_data.name = node.name
-		node_data.parent = node.get_parent().get_path()
+		if node.get_parent():
+			node_data.parent = node.get_parent().get_path()
+		else:
+			node_data.parent = ""
 		#class only returns native classes, not custom class_name
 		node_data.class = node.get_class()
 		node_data.scene_file_path = node.get_scene_file_path()
@@ -547,7 +540,7 @@ func load_client():
 			continue
 		node.call("load_node", node_data)
 		node.name = node_data.name
-		if !node.get_parent():
+		if !node.get_parent() and node_data.parent:
 			get_node_or_null(node_data["parent"]).add_child(node)
 
 
