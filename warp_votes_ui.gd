@@ -38,4 +38,5 @@ func update():
 			s.approved=v.players[me.player_id]
 			#var chunks=me.get_chunks()
 			#if chunks:
-			s.display_name="%s minutes" % 60
+			#TODO figure out how to get the name/length of the warp for this player
+			#s.display_name="%s minutes" % 60

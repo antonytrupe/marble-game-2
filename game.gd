@@ -119,6 +119,8 @@ func _unhandled_input(_event):
 		craft_ui_window.visible = !craft_ui_window.visible
 		if craft_ui_window.visible:
 			inventory_ui_window.show()
+		else:
+			inventory_ui_window.hide()
 
 	if Input.is_action_just_pressed("warp_vote"):
 		warp_vote_ui.update()
