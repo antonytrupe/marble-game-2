@@ -1,7 +1,7 @@
+remember main window position
+
 inventory based on volume
 inventory based on weight
-
-time warping voting
 
 queing actions
 action menu
@@ -12,8 +12,6 @@ faction
 NPC actions
 skills
 dropping items out of inventory
-
-remember main window position
 
 lock fov to be independant of window size/ratio
 
