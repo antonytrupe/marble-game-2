@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=22 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" path="res://game.gd" id="1_2iwba"]
 [ext_resource type="Script" path="res://world.gd" id="1_6tkge"]
@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://inventory.tscn" id="12_pmfyc"]
 [ext_resource type="PackedScene" uid="uid://dih5jvxkn0uk0" path="res://warp_votes_ui.tscn" id="13_3x44d"]
 [ext_resource type="PackedScene" uid="uid://np5o15k15boe" path="res://window_scene.tscn" id="13_d8uop"]
+[ext_resource type="PackedScene" uid="uid://cxvp48ihr6wkw" path="res://window_bar.tscn" id="14_dqtqv"]
 [ext_resource type="PackedScene" uid="uid://cyyfjbicwvflj" path="res://craft_ui.tscn" id="14_sxr83"]
 [ext_resource type="PackedScene" uid="uid://b4c105b3jd8a8" path="res://PlayerInteraction.tscn" id="15_xo6pa"]
 
@@ -246,6 +247,17 @@ visible = false
 
 [node name="WarpVoteUI" parent="WarpVoteWindow" instance=ExtResource("13_3x44d")]
 unique_name_in_owner = true
+
+[node name="Window" parent="." instance=ExtResource("13_d8uop")]
+position = Vector2i(400, 40)
+size = Vector2i(304, 128)
+
+[node name="WindowBar" parent="Window" instance=ExtResource("14_dqtqv")]
+anchors_preset = 15
+anchor_bottom = 1.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_vertical = 2
 
 [connection signal="close_requested" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_close_requested"]
 [connection signal="visibility_changed" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_visibility_changed"]

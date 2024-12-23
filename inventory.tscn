@@ -26,8 +26,8 @@ patch_margin_left = 22
 patch_margin_top = 22
 patch_margin_right = 23
 patch_margin_bottom = 22
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
+axis_stretch_horizontal = 2
+axis_stretch_vertical = 2
 script = ExtResource("3_roy6r")
 inventory_ui = NodePath("..")
 

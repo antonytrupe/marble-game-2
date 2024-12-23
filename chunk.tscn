@@ -63,7 +63,6 @@ shape = SubResource("BoxShape3D_gvo6u")
 
 [node name="AgeLabel" parent="." node_paths=PackedStringArray("entity") instance=ExtResource("2_1nrve")]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
 entity = NodePath("..")
 
 [node name="FloraFaunaScanner" type="Area3D" parent="."]

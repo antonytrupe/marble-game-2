@@ -96,11 +96,6 @@ func _ready():
 
 
 func _unhandled_input(_event):
-	#var player: MarbleCharacter = get_player(player_id)
-
-	#TODO this isn't the right way to do this
-	#var something_visible = false
-
 	if Input.is_action_just_pressed("inventory"):
 		inventory_ui_window.visible = !inventory_ui_window.visible
 
