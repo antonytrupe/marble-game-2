@@ -17,9 +17,7 @@ var enet_peer = ENetMultiplayerPeer.new()
 
 var turn_start = 0
 var player_id: String
-# This will contain player info for every player,
-# with the keys being each player's unique IDs.
-#var players = {}
+var is_server: bool = false
 var rng = RandomNumberGenerator.new()
 
 @onready var inventory_ui: PlayerInventory = %InventoryUI
@@ -55,10 +53,10 @@ func _ready():
 	if err != OK:
 		print("error reading config file")
 
-	var config = {}
-	config.player_id = config_file.get_value("default", "player_id", "")
-	config.remote_ip = config_file.get_value("default", "remote_ip", "")
-	config.server = config_file.get_value("default", "server", false)
+	var config = {server = false}
+
+	for key in config_file.get_section_keys("default"):
+		config[key] = config_file.get_value("default", key, "")
 
 	print("config:", config)
 
@@ -78,6 +76,7 @@ func _ready():
 	print("merged:", config)
 
 	if config.server:
+		is_server = true
 		start_server()
 		#main_menu.hide()
 		hud.show()
@@ -85,6 +84,7 @@ func _ready():
 		server_camera.show()
 		server_camera.current = true
 		get_viewport().get_window().title += " - SERVER"
+	#TODO make this an if
 	elif config.has("player_id"):
 		player_id = config["player_id"]
 		start_client()
@@ -139,10 +139,10 @@ func _unhandled_input(_event):
 			#get_viewport().set_input_as_handled()
 
 		else:
-			if multiplayer.is_server():
+			if is_server:
 				save_server()
-			else:
-				save_client()
+
+			save_client()
 			get_tree().quit()
 
 	if (
@@ -327,12 +327,12 @@ func start_server():
 
 
 func server_disconnected():
+	save_client()
 	get_tree().quit()
 
 
 func _on_join_button_pressed(ip_address):
 	print("joining ", ip_address)
-	#main_menu.hide()
 	hud.show()
 
 	enet_peer.create_client(ip_address, PORT)
@@ -446,10 +446,11 @@ func save_client():
 	#save_file.close()
 	save_file.flush()
 	print("saved ", save_file.get_path_absolute())
-	DirAccess.copy_absolute(
-		save_file.get_path_absolute(),
-		"user://savegame_" + str(Time.get_ticks_msec() + world.world_age) + ".save"
-	)
+	#TODO backup client saves
+	#DirAccess.copy_absolute(
+	#save_file.get_path_absolute(),
+	#"user://savegame_" + str(Time.get_ticks_msec() + world.world_age) + ".save"
+	#)
 
 
 func save_server():
