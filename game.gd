@@ -275,39 +275,55 @@ func command(cmd: String, player: MarbleCharacter):
 					if parts.size() >= 3:
 						count = int(parts[2])
 					spawn_stones(count, player.position)
-				"acorn":
+
+				"acorn", "acorns":
 					var count = 1
 					if parts.size() >= 3:
 						count = int(parts[2])
-					count = clampi(count, 1, 10)
-					for i in count:
-						var acorn = ACORN_SCENE.instantiate()
-						acorn.name = acorn.name + "%010d" % rng.randi()
-						acorn.global_position = get_random_vector(10, player.position)
-						var chunk = chunks.get_chunk(acorn.global_position)
-						chunk.flora.add_child(acorn)
-				"bush":
+					count = clampi(count, 1, 100)
+					spawn_acorns(count, player.position)
+
+				"bush", "bushes":
 					var count = 1
 					if parts.size() >= 3:
 						count = int(parts[2])
-					count = clampi(count, 1, 10)
-					for i in count:
-						var bush = BUSH_SCENE.instantiate()
-						bush.name = bush.name + "%010d" % rng.randi()
-						bush.global_position = get_random_vector(10, player.position)
-						var chunk = chunks.get_chunk(bush.global_position)
-						chunk.flora.add_child(bush)
+					spawn_bushes(count, player.position)
+
 				"tree", "trees":
 					var count = 1
 					if parts.size() >= 3:
 						count = int(parts[2])
-					count = clampi(count, 1, 10)
-					for i in count:
-						var tree = TREE_SCENE.instantiate()
-						tree.name = tree.name + "%010d" % rng.randi()
-						tree.global_position = get_random_vector(10, player.position)
-						var chunk = chunks.get_chunk(tree.global_position)
-						chunk.flora.add_child(tree)
+					spawn_trees(count, player.position)
+
+
+func spawn_acorns(count: int, center: Vector3):
+	count = clampi(count, 1, 100)
+	for i in count:
+		var acorn = ACORN_SCENE.instantiate()
+		acorn.name = acorn.name + "%010d" % rng.randi()
+		acorn.global_position = get_random_vector(10, center)
+		var chunk = chunks.get_chunk(acorn.global_position)
+		chunk.flora.add_child(acorn)
+
+
+func spawn_bushes(count: int, center: Vector3):
+	count = clampi(count, 1, 100)
+	for i in count:
+		var bush = BUSH_SCENE.instantiate()
+		bush.name = bush.name + "%010d" % rng.randi()
+		bush.global_position = get_random_vector(10, center)
+		var chunk = chunks.get_chunk(bush.global_position)
+		chunk.flora.add_child(bush)
+
+
+func spawn_trees(count: int, center: Vector3):
+	count = clampi(count, 1, 100)
+	for i in count:
+		var tree = TREE_SCENE.instantiate()
+		tree.name = tree.name + "%010d" % rng.randi()
+		tree.global_position = get_random_vector(10, center)
+		var chunk = chunks.get_chunk(tree.global_position)
+		chunk.flora.add_child(tree)
 
 
 func get_random_vector(R: float, center: Vector3) -> Vector3:

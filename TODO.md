@@ -1,5 +1,3 @@
-remember main window position
-
 inventory based on volume
 inventory based on weight
 
