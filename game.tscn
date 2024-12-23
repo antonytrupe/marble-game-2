@@ -194,11 +194,18 @@ shadow_enabled = true
 [node name="startupProbe" type="Node" parent="."]
 script = ExtResource("10_mnyh5")
 
+[node name="WarpVotes" type="Node" parent="."]
+unique_name_in_owner = true
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="WarpVotes"]
+_spawnable_scenes = PackedStringArray("res://warp_vote.tscn")
+spawn_path = NodePath("..")
+
 [node name="InventoryUIWindow" parent="." groups=["persist-client"] instance=ExtResource("13_d8uop")]
 unique_name_in_owner = true
 title = "Inventory"
+position = Vector2i(520, 100)
 size = Vector2i(400, 400)
-visible = false
 
 [node name="InventoryUI" parent="InventoryUIWindow" instance=ExtResource("12_pmfyc")]
 unique_name_in_owner = true
@@ -208,8 +215,8 @@ unique_name_in_owner = true
 auto_translate_mode = 1
 transparent_bg = true
 title = "Crafting"
+position = Vector2i(100, 100)
 size = Vector2i(400, 400)
-visible = false
 transient = true
 transparent = true
 mouse_passthrough = true
@@ -220,7 +227,8 @@ unique_name_in_owner = true
 [node name="PlayerInteractionWindow" parent="." groups=["persist-client"] instance=ExtResource("13_d8uop")]
 unique_name_in_owner = true
 title = "Trade/Quest"
-visible = false
+position = Vector2i(100, 100)
+size = Vector2i(800, 400)
 
 [node name="PlayerInteractionUI" parent="PlayerInteractionWindow" instance=ExtResource("15_xo6pa")]
 unique_name_in_owner = true
@@ -229,18 +237,11 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 auto_translate_mode = 1
 title = "Warp Votes"
-size = Vector2i(400, 400)
-visible = false
+position = Vector2i(800, 100)
+size = Vector2i(200, 400)
 
 [node name="WarpVoteUI" parent="WarpVoteWindow" instance=ExtResource("13_3x44d")]
 unique_name_in_owner = true
-
-[node name="WarpVotes" type="Node" parent="."]
-unique_name_in_owner = true
-
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="WarpVotes"]
-_spawnable_scenes = PackedStringArray("res://warp_vote.tscn")
-spawn_path = NodePath("..")
 
 [connection signal="close_requested" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_close_requested"]
 [connection signal="visibility_changed" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_visibility_changed"]
