@@ -11,7 +11,7 @@ const WARP_VOTE_SCENE = preload("res://warp_vote.tscn")
 const ROOT_WINDOW_SCRIPT = preload("res://root_window.gd")
 
 @export var turn_number = 1:
-	set = update_turn_number
+	set = _update_turn_number
 
 var enet_peer = ENetMultiplayerPeer.new()
 
@@ -77,7 +77,7 @@ func _ready():
 
 	if config.server:
 		is_server = true
-		start_server()
+		_start_server()
 		#main_menu.hide()
 		hud.show()
 		#health_bar.hide()
@@ -87,7 +87,7 @@ func _ready():
 	#TODO make this an if
 	elif config.has("player_id"):
 		player_id = config["player_id"]
-		start_client()
+		_start_client()
 		_on_join_button_pressed(config.remote_ip)
 		get_viewport().get_window().title += " - " + player_id
 		print("started client")
@@ -140,9 +140,9 @@ func _unhandled_input(_event):
 
 		else:
 			if is_server:
-				save_server()
+				_save_server()
 
-			save_client()
+			_save_client()
 			get_tree().quit()
 
 	if (
@@ -181,7 +181,7 @@ func call_warp_vote(minutes, pid):
 		return
 	var player_chunks: Array[Chunk] = player.get_chunks()
 	var warp_chunks = chunks.get_adjacent_chunks(player_chunks, minutes)
-	var vote_id = create_warp_vote(warp_chunks, pid)
+	var vote_id = _create_warp_vote(warp_chunks, pid)
 	player.warp_vote = vote_id
 	approve_warp(vote_id, pid)
 
@@ -198,10 +198,10 @@ func approve_warp(vote_id: String, pid: String):
 		#do the warp now
 		chunks.time_warp(vote)
 		#clean up the warp_vote
-		delete_warp_vote(vote_id)
+		_delete_warp_vote(vote_id)
 
 
-func delete_warp_vote(vote_id: String):
+func _delete_warp_vote(vote_id: String):
 	print("deleting warp vote %s" % vote_id)
 	var vote: WarpVote = warp_votes.get_node_or_null(vote_id)
 	#clean up player data
@@ -221,7 +221,7 @@ func delete_warp_vote(vote_id: String):
 	vote.queue_free()
 
 
-func create_warp_vote(warp_chunks: Dictionary, pid) -> String:
+func _create_warp_vote(warp_chunks: Dictionary, pid) -> String:
 	var guid = str(randi_range(10000, 99999))
 	#get the players in the chunks
 	var warp_players = {}
@@ -253,12 +253,12 @@ func create_warp_vote(warp_chunks: Dictionary, pid) -> String:
 	return guid
 
 
-func spawn_stones(quantity: int, p: Vector3):
+func _spawn_stones(quantity: int, p: Vector3):
 	quantity = clampi(quantity, 1, 100)
 	for i in quantity:
 		var stone = STONE_SCENE.instantiate()
 		stone.name = stone.name + "%010d" % rng.randi()
-		stone.global_position = get_random_vector(10, p)
+		stone.global_position = _get_random_vector(10, p)
 		var chunk: Chunk = chunks.get_chunk(stone.global_position)
 		chunk.terra.add_child(stone)
 
@@ -274,76 +274,76 @@ func command(cmd: String, player: MarbleCharacter):
 					var count = 1
 					if parts.size() >= 3:
 						count = int(parts[2])
-					spawn_stones(count, player.position)
+					_spawn_stones(count, player.position)
 
 				"acorn", "acorns":
 					var count = 1
 					if parts.size() >= 3:
 						count = int(parts[2])
 					count = clampi(count, 1, 100)
-					spawn_acorns(count, player.position)
+					_spawn_acorns(count, player.position)
 
 				"bush", "bushes":
 					var count = 1
 					if parts.size() >= 3:
 						count = int(parts[2])
-					spawn_bushes(count, player.position)
+					_spawn_bushes(count, player.position)
 
 				"tree", "trees":
 					var count = 1
 					if parts.size() >= 3:
 						count = int(parts[2])
-					spawn_trees(count, player.position)
+					_spawn_trees(count, player.position)
 
 
-func spawn_acorns(count: int, center: Vector3):
+func _spawn_acorns(count: int, center: Vector3):
 	count = clampi(count, 1, 100)
 	for i in count:
 		var acorn = ACORN_SCENE.instantiate()
 		acorn.name = acorn.name + "%010d" % rng.randi()
-		acorn.global_position = get_random_vector(10, center)
+		acorn.global_position = _get_random_vector(10, center)
 		var chunk = chunks.get_chunk(acorn.global_position)
 		chunk.flora.add_child(acorn)
 
 
-func spawn_bushes(count: int, center: Vector3):
+func _spawn_bushes(count: int, center: Vector3):
 	count = clampi(count, 1, 100)
 	for i in count:
 		var bush = BUSH_SCENE.instantiate()
 		bush.name = bush.name + "%010d" % rng.randi()
-		bush.global_position = get_random_vector(10, center)
+		bush.global_position = _get_random_vector(10, center)
 		var chunk = chunks.get_chunk(bush.global_position)
 		chunk.flora.add_child(bush)
 
 
-func spawn_trees(count: int, center: Vector3):
+func _spawn_trees(count: int, center: Vector3):
 	count = clampi(count, 1, 100)
 	for i in count:
 		var tree = TREE_SCENE.instantiate()
 		tree.name = tree.name + "%010d" % rng.randi()
-		tree.global_position = get_random_vector(10, center)
+		tree.global_position = _get_random_vector(10, center)
 		var chunk = chunks.get_chunk(tree.global_position)
 		chunk.flora.add_child(tree)
 
 
-func get_random_vector(R: float, center: Vector3) -> Vector3:
+func _get_random_vector(radius: float, center: Vector3) -> Vector3:
 	#var rng = RandomNumberGenerator.new()
-	var r = R * sqrt(rng.randf())
+	var r = radius * sqrt(rng.randf())
 	var theta = rng.randf() * 2 * PI
 	var x = center.x + r * cos(theta)
 	var z = center.z + r * sin(theta)
 	return Vector3(x, 0, z)
 
 
-func start_server():
+func _start_server():
 	enet_peer.create_server(PORT)
 	multiplayer.multiplayer_peer = enet_peer
-	load_server()
+	_load_server()
 	print("started server")
 
 
-func server_disconnected():
-	save_client()
+func _server_disconnected():
+	_save_client()
 	get_tree().quit()
 
 
@@ -353,18 +353,18 @@ func _on_join_button_pressed(ip_address):
 
 	enet_peer.create_client(ip_address, PORT)
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
-	multiplayer.server_disconnected.connect(server_disconnected)
+	multiplayer.server_disconnected.connect(_server_disconnected)
 	multiplayer.multiplayer_peer = enet_peer
 
 
 func _on_connected_to_server():
-	register_player.rpc_id(1, player_id)
+	_register_player.rpc_id(1, player_id)
 
 
 @rpc("any_peer", "reliable")
-func register_player(pid):
+func _register_player(pid):
 	var peer_id = multiplayer.get_remote_sender_id()
-	add_player(peer_id, pid)
+	_add_player(peer_id, pid)
 	send_world_age.rpc_id(peer_id, Time.get_ticks_msec() + world.world_age)
 
 
@@ -376,7 +376,7 @@ func send_world_age(_world_age):
 	world.world_age = _world_age
 
 
-func add_player(_peer_id, _player_id):
+func _add_player(_peer_id, _player_id):
 	print("%s connected" % _player_id)
 	#first check if this player already has a node
 	var player = players.get_node_or_null(_player_id)
@@ -391,7 +391,7 @@ func add_player(_peer_id, _player_id):
 	player.peer_id = _peer_id
 
 
-func update_turn_number(value):
+func _update_turn_number(value):
 	turn_number = value
 	turn_number_label.text = "turn " + str(value)
 	turn_start = Time.get_ticks_msec()
@@ -400,7 +400,7 @@ func update_turn_number(value):
 
 func _on_host_button_pressed():
 	hud.show()
-	start_server()
+	_start_server()
 
 
 func get_player(id) -> MarbleCharacter:
@@ -430,7 +430,7 @@ func load_node(node_data):
 			self[p] = node_data[p]
 
 
-func save_client():
+func _save_client():
 	var save_file = FileAccess.open("user://%s.save" % player_id, FileAccess.WRITE)
 	var save_nodes = get_tree().get_nodes_in_group("persist-client")
 	for node in save_nodes:
@@ -469,7 +469,7 @@ func save_client():
 	#)
 
 
-func save_server():
+func _save_server():
 	var save_file = FileAccess.open("user://savegame.save", FileAccess.WRITE)
 
 	var save_nodes = get_tree().get_nodes_in_group("persist")
@@ -506,11 +506,11 @@ func save_server():
 	)
 
 
-func start_client():
-	load_client()
+func _start_client():
+	_load_client()
 
 
-func load_client():
+func _load_client():
 	print("load client %s" % player_id)
 	if not FileAccess.file_exists("user://%s.save" % player_id):
 		print("client save not found")
@@ -561,7 +561,7 @@ func load_client():
 			get_node_or_null(node_data["parent"]).add_child(node)
 
 
-func load_server():
+func _load_server():
 	if not FileAccess.file_exists("user://savegame.save"):
 		print("save not found")
 		return  # Error! We don't have a save to load.
