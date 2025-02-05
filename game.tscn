@@ -248,22 +248,19 @@ visible = false
 [node name="WarpVoteUI" parent="WarpVoteWindow" instance=ExtResource("13_3x44d")]
 unique_name_in_owner = true
 
-[node name="Window" parent="." instance=ExtResource("13_d8uop")]
+[node name="WindowListWindow" parent="." instance=ExtResource("13_d8uop")]
 position = Vector2i(400, 40)
 size = Vector2i(304, 128)
 
-[node name="WindowBar" parent="Window" instance=ExtResource("14_dqtqv")]
+[node name="WindowBar" parent="WindowListWindow" node_paths=PackedStringArray("game") instance=ExtResource("14_dqtqv")]
 anchors_preset = 15
 anchor_bottom = 1.0
 offset_right = 0.0
 offset_bottom = 0.0
 grow_vertical = 2
+game = NodePath("../..")
 
-[connection signal="close_requested" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_close_requested"]
 [connection signal="visibility_changed" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_visibility_changed"]
-[connection signal="close_requested" from="CraftUIWindow" to="CraftUIWindow" method="_on_close_requested"]
 [connection signal="visibility_changed" from="CraftUIWindow" to="CraftUIWindow" method="_on_visibility_changed"]
-[connection signal="close_requested" from="PlayerInteractionWindow" to="PlayerInteractionWindow" method="_on_close_requested"]
 [connection signal="visibility_changed" from="PlayerInteractionWindow" to="PlayerInteractionWindow" method="_on_visibility_changed"]
-[connection signal="close_requested" from="WarpVoteWindow" to="WarpVoteWindow" method="_on_close_requested"]
 [connection signal="visibility_changed" from="WarpVoteWindow" to="WarpVoteWindow" method="_on_visibility_changed"]

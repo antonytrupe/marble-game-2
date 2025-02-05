@@ -96,3 +96,7 @@ grow_vertical = 2
 layout_mode = 2
 text = "Warp
 (Y)"
+
+[connection signal="pressed" from="NinePatchRect/MarginContainer/BoxContainer/Panel/MarginContainer/InventoryButton" to="." method="_on_inventory_button_pressed"]
+[connection signal="pressed" from="NinePatchRect/MarginContainer/BoxContainer/Panel2/MarginContainer2/CraftButton" to="." method="_on_craft_button_pressed"]
+[connection signal="pressed" from="NinePatchRect/MarginContainer/BoxContainer/Panel3/MarginContainer2/WarpButton" to="." method="_on_warp_button_pressed"]

@@ -4,3 +4,5 @@
 
 [node name="Window" type="Window"]
 script = ExtResource("1_ty0ev")
+
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
