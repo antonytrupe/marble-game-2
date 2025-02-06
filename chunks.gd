@@ -38,7 +38,7 @@ func get_chunk(p: Vector3):
 	return get_node_or_null(get_chunk_name(p))
 
 
-func get_adjacent_chunks(origin_chunks: Array[Chunk], origin_minutes):
+func get_adjacent_chunks(origin_chunks: Array[Chunk], origin_minutes)->Dictionary:
 	var step_minutes = 30.0
 	var size = (origin_minutes / step_minutes) - 1
 	var adjacent_chunks = {}

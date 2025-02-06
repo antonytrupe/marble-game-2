@@ -175,7 +175,7 @@ func call_warp_vote(minutes, pid):
 		print("player already has a warp vote")
 		return
 	var player_chunks: Array[Chunk] = player.get_chunks()
-	var warp_chunks = chunks.get_adjacent_chunks(player_chunks, minutes)
+	var warp_chunks: Dictionary = chunks.get_adjacent_chunks(player_chunks, minutes)
 	var vote_id = _create_warp_vote(warp_chunks, pid)
 	player.warp_vote = vote_id
 	approve_warp(vote_id, pid)
