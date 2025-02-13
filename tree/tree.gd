@@ -1,19 +1,19 @@
 #@tool
 extends Node3D
 
-#10 years
-@export var maturity: int = int(1000 * 60 * 60 * 24 * 360 * (10 * .001))
+#50 years
+@export var maturity: int = int(1000 * 60 * 60 * 24 * 360 * (50))
 
 @export var birth_date: int = 0:
 	set = set_birth_date
 @export var extra_age: int = 0:
 	set = set_extra_age
 
-@onready var world = $/root/Game/World
-@onready var ageLabel = $Node3D
-
 var calculated_age: int:
 	get = calculate_age
+
+@onready var world = $/root/Game/World
+@onready var ageLabel = $Node3D
 
 
 func save_node():
@@ -40,9 +40,7 @@ func time_warp(minutes):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	#rotation.y += PI * delta * .1
 	var s = clampf(float(calculated_age) / maturity, .1, 1.0)
-	#s = .5
 	scale = Vector3(s, s, s)
 
 

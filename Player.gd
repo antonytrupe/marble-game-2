@@ -26,7 +26,7 @@ const JUMP_VELOCITY = 5.0
 @export var extra_age: int = 0:
 	set = _set_extra_age
 
-@export var actions = {"move": null, "action": null}:
+@export var current_turn_actions = {"move": null, "action": null}:
 	set = _set_action
 
 #map of name:item
@@ -70,6 +70,18 @@ var chat_mode = false
 
 @onready var quest_indicator = %"?"
 
+#var actions:Array[QuantityAction]=[]
+
+
+func add_action():
+	var a = QuantityAction.new()
+	a.remaining = 5
+	a.frequency = 1
+	a.start_turn = game.turn_number + 1
+	a.game = game
+	a.player = self
+	add_child(a)
+
 
 func _ready():
 	actions_ui.player_id = player_id
@@ -84,7 +96,7 @@ func _ready():
 		game.craft_ui.me = self
 		game.trade_ui.me = self
 		game.warp_vote_ui.me = self
-		game.warp_vote_ui.game=game
+		game.warp_vote_ui.game = game
 
 
 func _unhandled_input(event):
@@ -383,21 +395,24 @@ func _set_inventory(value: Dictionary):
 
 #setter, don't call directly
 func _set_action(value):
-	actions = value
-	Signals.Actions.emit(player_id, actions)
+	current_turn_actions = value
+	Signals.Actions.emit(player_id, current_turn_actions)
 
 
 # use reset_actions to clear this and skip internal logic
 func set_action(value: Dictionary):
 	if value.has("action") and value.action:
-		actions.action = value.action
+		current_turn_actions.action = value.action
 	# only update move if we went faster
-	if value.has("move") and (actions.move == null or value.move > actions.move):
-		actions.move = value.move
+	if (
+		value.has("move")
+		and (current_turn_actions.move == null or value.move > current_turn_actions.move)
+	):
+		current_turn_actions.move = value.move
 
 
 func reset_actions():
-	actions = {"move": null, "action": null}
+	current_turn_actions = {"move": null, "action": null}
 
 
 func get_chunks() -> Array[Chunk]:
@@ -488,12 +503,12 @@ func server_mode(new_mode: MOVE.MODE):
 	if !multiplayer.is_server():
 		return
 	#if we've used an action, no hustling/running
-	if !actions.action or [MOVE.MODE.CROUCH, MOVE.MODE.WALK].has(new_mode):
+	if !current_turn_actions.action or [MOVE.MODE.CROUCH, MOVE.MODE.WALK].has(new_mode):
 		mode = new_mode
 
 
-func approve_warp_vote(vote_id:String):
-	game.approve_warp.rpc_id(1,vote_id,player_id)
+func approve_warp_vote(vote_id: String):
+	game.approve_warp.rpc_id(1, vote_id, player_id)
 
 
 ##server code
@@ -579,7 +594,7 @@ func interact():
 		if entity.has_method("pick_berry"):
 			var action = "pick_berry"
 			# make actions.action always a string
-			if actions.action != null and actions.action != action:
+			if current_turn_actions.action != null and current_turn_actions.action != action:
 				return
 			var loot = entity.pick_berry()
 			add_to_inventory(loot)
@@ -588,7 +603,7 @@ func interact():
 		if entity.has_method("pick_up"):
 			var action = "pick_up"
 			# make actions.action always a string
-			if actions.action != null and actions.action != action:
+			if current_turn_actions.action != null and current_turn_actions.action != action:
 				return
 			var loot = entity.pick_up()
 			add_to_inventory(loot)
@@ -598,18 +613,18 @@ func interact():
 func add_to_inventory(loot: Dictionary):
 	if !multiplayer.is_server():
 		return
-	for item in loot.values():
-		inventory[item.name] = item
+	for item in loot.keys():
+		inventory[item] = loot[item]
 
 
 ##loot is {item_name:{item}}
 func remove_from_inventory(loot: Dictionary) -> bool:
 	if !multiplayer.is_server():
 		return false
-	for item in loot.values():
-		if item.name not in inventory:
+	for item in loot.keys():
+		if item not in inventory:
 			return false
-		inventory.erase(item.name)
+		inventory.erase(item)
 
 	return true
 

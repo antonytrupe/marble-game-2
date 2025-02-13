@@ -263,6 +263,9 @@ func command(cmd: String, player: MarbleCharacter):
 		return
 	var parts = cmd.replace("/", "").split(" ")
 	match parts[0]:
+		"action":
+			#todo create the action
+			player.add_action()
 		"spawn", "/spawn":
 			match parts[1]:
 				"stone", "stones":

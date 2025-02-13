@@ -4,6 +4,10 @@ extends Window
 @export var me: MarbleCharacter
 
 
+func _unhandled_input(_event):
+	print("UIWindow _unhandled_input")
+
+
 func _on_close_requested() -> void:
 	visible = false
 

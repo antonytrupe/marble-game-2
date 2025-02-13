@@ -1,5 +1,8 @@
 extends Node3D
 
+#10 years
+@export var maturity: int = int(1000 * 60 * 60 * 24 * 360 * (10))
+
 @export var berries = 9:
 	set(value):
 		berries = value
@@ -28,8 +31,9 @@ var rng = RandomNumberGenerator.new()
 	$BushMeshInstance3D/BerryMeshInstance3D9,
 ]
 
+
 func get_actions():
-	return ['pick_berry']
+	return ["pick_berry"]
 
 
 func set_birth_date(value):
@@ -89,6 +93,9 @@ func setup():
 
 
 func _process(_delta):
+	var s = clampf(float(calculated_age) / maturity, .1, 1.0)
+	scale = Vector3(s, s, s)
+
 	if multiplayer.is_server():
 		if berries < 9:
 			if rng.randi_range(0, 1000) <= 1:
