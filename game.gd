@@ -261,11 +261,22 @@ func _spawn_stones(quantity: int, p: Vector3):
 func command(cmd: String, player: MarbleCharacter):
 	if !multiplayer.is_server():
 		return
-	var parts = cmd.replace("/", "").split(" ")
+	var parts:PackedStringArray = cmd.replace("/", "").split(" ")
 	match parts[0]:
+		"wander":
+			var angle=0
+			if parts.size() >= 2:
+				angle = int(parts[1])
+			player.wander(1,1,angle)
 		"action":
 			#todo create the action
-			player.add_action()
+			var count=1
+			var frequency=1
+			if parts.size() >= 2:
+				count = int(parts[1])
+				if parts.size() >= 3:
+					frequency = int(parts[2])
+			player.add_action(count,frequency)
 		"spawn", "/spawn":
 			match parts[1]:
 				"stone", "stones":

@@ -70,13 +70,23 @@ var chat_mode = false
 
 @onready var quest_indicator = %"?"
 
-#var actions:Array[QuantityAction]=[]
+func wander(count:int, frequency:int,angle:int):
+	var w = Wander.new()
+	w.remaining = 1
+	w.frequency = 1
+	w.angle=angle
+	#print('a.remaining:',a.remaining)
+	w.start_turn = game.turn_number
+	w.game = game
+	w.player = self
+	add_child(w)
 
 
-func add_action():
+func add_action(count:int, frequency:int):
 	var a = QuantityAction.new()
-	a.remaining = 5
-	a.frequency = 1
+	a.remaining = count
+	a.frequency = frequency
+	#print('a.remaining:',a.remaining)
 	a.start_turn = game.turn_number + 1
 	a.game = game
 	a.player = self
@@ -213,8 +223,7 @@ func _physics_process(delta):
 			else:
 				interact.rpc_id(1)
 		# Get the input direction and handle the movement/deceleration.
-		var input_dir = Input.get_vector("left", "right", "up", "down")
-
+		var input_dir:Vector2 = Input.get_vector("left", "right", "up", "down")
 		if multiplayer.is_server():
 			server_move(input_dir)
 		else:
@@ -545,6 +554,7 @@ func client_chat(message):
 func server_rotate(value: Vector2):
 	if !multiplayer.is_server():
 		return
+	print(value)
 	rotate_y(-value.x * .005)
 	camera_pivot.rotate_x(-value.y * .005)
 	camera_pivot.rotation.x = clamp(camera_pivot.rotation.x, -PI / 2, PI / 2)
@@ -638,9 +648,10 @@ func server_jump():
 
 #this is the function that runs on the server that any peer can call
 @rpc("any_peer")
-func server_move(d):
+func server_move(d:Vector2):
 	if !multiplayer.is_server():
 		return
+	#print(d)
 	var direction = (transform.basis * Vector3(d.x, 0, d.y)).normalized()
 
 	#m*SPEED_MULTIPLIER*speed

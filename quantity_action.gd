@@ -14,21 +14,21 @@ func _ready():
 
 
 func do():
-	print("do action")
+	print("QuantityAction.do")
 	#player.current_turn_actions.action='generic action'
 
 
 func _process(_delta):
 	#if we aren't supposed to start yet
 	if game.turn_number < start_turn:
-		print("wait for first turn")
+		#print("wait for first turn")
 		return
 	#if we already did it this turn
 	#if game.turn_number<=last_turn:
 	#return
 	#if its not time to do it again
 	if last_turn != null and last_turn + frequency > game.turn_number:
-		print("wait for next turn")
+		#print("wait for next turn")
 		#print('last turn',last_turn)
 		return
 
