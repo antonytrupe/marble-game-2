@@ -1,9 +1,9 @@
 [gd_scene load_steps=19 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_2v3wm"]
-[ext_resource type="PackedScene" uid="uid://dyx3xv5lckl7h" path="res://character_sheet.tscn" id="3_eahd0"]
-[ext_resource type="PackedScene" uid="uid://d35hxvmomxu3p" path="res://actions.tscn" id="4_72q5g"]
-[ext_resource type="PackedScene" uid="uid://cblqeddvc1mon" path="res://quest_creator.tscn" id="8_cvl0s"]
+[ext_resource type="PackedScene" uid="uid://dyx3xv5lckl7h" path="res://ui/character_sheet/character_sheet.tscn" id="3_eahd0"]
+[ext_resource type="PackedScene" uid="uid://d35hxvmomxu3p" path="res://ui/actions/actions.tscn" id="4_72q5g"]
+[ext_resource type="PackedScene" uid="uid://cblqeddvc1mon" path="res://ui/quests/quest_creator.tscn" id="8_cvl0s"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_hn37q"]
 properties/0/path = NodePath(".:position")

@@ -1,0 +1,253 @@
+[gd_scene load_steps=4 format=3 uid="uid://b4c105b3jd8a8"]
+
+[ext_resource type="Script" path="res://ui/trade/player_interaction.gd" id="1_qf4sp"]
+[ext_resource type="Texture2D" uid="uid://dvbfdyrl8lg37" path="res://ui/inventory/inventory9patch.png" id="2_mr5kh"]
+[ext_resource type="Script" path="res://trade_drop.gd" id="3_pi0pd"]
+
+[node name="PlayerInteractionUI" type="Panel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+script = ExtResource("1_qf4sp")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="QuestListPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestListPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="NinePatchRect" type="NinePatchRect" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestListPanel/MarginContainer"]
+light_mask = 0
+layout_mode = 2
+texture = ExtResource("2_mr5kh")
+patch_margin_left = 22
+patch_margin_top = 22
+patch_margin_right = 23
+patch_margin_bottom = 22
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestListPanel/MarginContainer/NinePatchRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 23
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestListPanel/MarginContainer/NinePatchRect/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestListPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+text = "Quests"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestListPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="OtherPlayerQuests" type="GridContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestListPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="QuestDetailsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="OtherPlayerContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestDetailsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="NinePatchRect" type="NinePatchRect" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestDetailsPanel/OtherPlayerContainer"]
+light_mask = 0
+layout_mode = 2
+texture = ExtResource("2_mr5kh")
+patch_margin_left = 22
+patch_margin_top = 22
+patch_margin_right = 23
+patch_margin_bottom = 22
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestDetailsPanel/OtherPlayerContainer/NinePatchRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 23
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestDetailsPanel/OtherPlayerContainer/NinePatchRect/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestDetailsPanel/OtherPlayerContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+text = "Quest Details"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestDetailsPanel/OtherPlayerContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="OtherPlayerQuestDetails" type="GridContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestDetailsPanel/OtherPlayerContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="QuestDetails" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/QuestDetailsPanel/OtherPlayerContainer/NinePatchRect/MarginContainer/VBoxContainer/OtherPlayerQuestDetails"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 2
+
+[node name="OtherPlayerPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="NinePatchRect" type="NinePatchRect" parent="MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/MarginContainer"]
+layout_mode = 2
+texture = ExtResource("2_mr5kh")
+patch_margin_left = 22
+patch_margin_top = 22
+patch_margin_right = 22
+patch_margin_bottom = 22
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/MarginContainer/NinePatchRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/MarginContainer/NinePatchRect/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+text = "Other Player Items"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="OtherPlayerTrades" type="GridContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OtherPlayerPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MyTradesPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel"]
+layout_mode = 2
+
+[node name="NinePatchRect" type="NinePatchRect" parent="MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MarginContainer"]
+layout_mode = 2
+texture = ExtResource("2_mr5kh")
+patch_margin_left = 22
+patch_margin_top = 22
+patch_margin_right = 22
+patch_margin_bottom = 22
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MarginContainer/NinePatchRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MarginContainer/NinePatchRect/MarginContainer" node_paths=PackedStringArray("trade_ui")]
+layout_mode = 2
+script = ExtResource("3_pi0pd")
+trade_ui = NodePath("../../../../../../../..")
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+text = "My  Items"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MyTrades" type="GridContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MyTradesPanel/MarginContainer/NinePatchRect/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Accept" type="Button" parent="MarginContainer/VBoxContainer/ButtonsContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+text = "Accept"
+
+[connection signal="hidden" from="." to="." method="_on_hidden"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsContainer/Accept" to="." method="_on_accept_pressed"]

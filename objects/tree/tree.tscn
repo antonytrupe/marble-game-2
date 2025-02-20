@@ -1,0 +1,94 @@
+[gd_scene load_steps=10 format=3 uid="uid://c1e46m2pfqiji"]
+
+[ext_resource type="Script" path="res://objects/tree/tree.gd" id="1_2omd0"]
+[ext_resource type="PackedScene" uid="uid://cc70lwfyjqg1d" path="res://age.tscn" id="2_1dq1d"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_an22n"]
+top_radius = 0.8
+bottom_radius = 1.0
+height = 10.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_staie"]
+albedo_color = Color(0.328111, 0.280385, 0.0655001, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7gadc"]
+albedo_color = Color(0.0784314, 0.301961, 0.160784, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_7felh"]
+material = SubResource("StandardMaterial3D_7gadc")
+radius = 3.0
+height = 6.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_entft"]
+albedo_color = Color(0.0797826, 0.302502, 0.161847, 1)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_k6sc6"]
+height = 10.0
+radius = 1.0
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_cbetc"]
+properties/0/path = NodePath(".:maturity")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:birth_date")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:extra_age")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:position")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:rotation")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+
+[node name="Tree" type="Node3D" groups=["flora", "persist"]]
+script = ExtResource("1_2omd0")
+
+[node name="Trunk" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+mesh = SubResource("CylinderMesh_an22n")
+surface_material_override/0 = SubResource("StandardMaterial3D_staie")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Trunk"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 6, 0)
+mesh = SubResource("SphereMesh_7felh")
+surface_material_override/0 = SubResource("StandardMaterial3D_entft")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Trunk"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 6, 0)
+mesh = SubResource("SphereMesh_7felh")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="Trunk"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 2.5)
+mesh = SubResource("SphereMesh_7felh")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="Trunk"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -2.5)
+mesh = SubResource("SphereMesh_7felh")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="Trunk"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+mesh = SubResource("SphereMesh_7felh")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="TrunkCollision" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+shape = SubResource("CylinderShape3D_k6sc6")
+
+[node name="Area3D" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="TrunkCollision" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("CylinderShape3D_k6sc6")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_cbetc")
+
+[node name="Node3D" parent="." node_paths=PackedStringArray("entity") instance=ExtResource("2_1dq1d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16.213, 0)
+entity = NodePath("..")

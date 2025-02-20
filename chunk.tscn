@@ -77,7 +77,7 @@ shape = SubResource("BoxShape3D_p2tpf")
 unique_name_in_owner = true
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Flora"]
-_spawnable_scenes = PackedStringArray("res://bush/bush.tscn", "res://acorn/acorn.tscn", "res://tree/tree.tscn")
+_spawnable_scenes = PackedStringArray("res://objects/acorn/acorn.tscn", "res://objects/bush/bush.tscn", "res://objects/tree/tree.tscn")
 spawn_path = NodePath("..")
 
 [node name="Fauna" type="Node3D" parent="."]
@@ -90,7 +90,7 @@ spawn_path = NodePath("..")
 unique_name_in_owner = true
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Terra"]
-_spawnable_scenes = PackedStringArray("res://stone/stone.tscn")
+_spawnable_scenes = PackedStringArray("res://objects/stone/stone.tscn")
 spawn_path = NodePath("..")
 
 [connection signal="body_entered" from="PlayerScanner" to="." method="_on_area_3d_body_entered"]

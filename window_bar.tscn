@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cxvp48ihr6wkw"]
 
 [ext_resource type="Script" path="res://window_bar.gd" id="1_0ipso"]
-[ext_resource type="Texture2D" uid="uid://dvbfdyrl8lg37" path="res://inventory9patch.png" id="1_t8omc"]
+[ext_resource type="Texture2D" uid="uid://dvbfdyrl8lg37" path="res://ui/inventory/inventory9patch.png" id="1_t8omc"]
 
 [node name="WindowBar" type="Panel"]
 anchors_preset = 10

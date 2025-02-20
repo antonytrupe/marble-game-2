@@ -3,11 +3,11 @@ extends Node
 
 const PORT = 9999
 const PLAYER_SCENE = preload("res://player.tscn")
-const STONE_SCENE = preload("res://stone/stone.tscn")
-const ACORN_SCENE = preload("res://acorn/acorn.tscn")
-const BUSH_SCENE = preload("res://bush/bush.tscn")
-const TREE_SCENE = preload("res://tree/tree.tscn")
-const WARP_VOTE_SCENE = preload("res://warp_vote.tscn")
+const STONE_SCENE = preload("res://objects/stone/stone.tscn")
+const ACORN_SCENE = preload("res://objects/acorn/acorn.tscn")
+const BUSH_SCENE = preload("res://objects/bush/bush.tscn")
+const TREE_SCENE = preload("res://objects/tree/tree.tscn")
+const WARP_VOTE_SCENE = preload("res://ui/warp_vote/warp_vote.tscn")
 const ROOT_WINDOW_SCRIPT = preload("res://root_window.gd")
 
 @export var turn_number = 1:

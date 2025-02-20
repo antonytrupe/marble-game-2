@@ -2,18 +2,18 @@
 
 [ext_resource type="Script" path="res://game.gd" id="1_2iwba"]
 [ext_resource type="Script" path="res://world.gd" id="1_6tkge"]
-[ext_resource type="Script" path="res://chat_input.gd" id="3_3e53o"]
+[ext_resource type="Script" path="res://ui/chat/chat_input.gd" id="3_3e53o"]
 [ext_resource type="Texture2D" uid="uid://2jputlhry6c" path="res://crosshair.png" id="3_cajfn"]
 [ext_resource type="PackedScene" uid="uid://cgfpsf73dbmvb" path="res://chunk.tscn" id="3_pdr6q"]
 [ext_resource type="Script" path="res://day_night_cycle.gd" id="3_qlg17"]
 [ext_resource type="Script" path="res://chunks.gd" id="7_eouhd"]
 [ext_resource type="Script" path="res://startupProbe.gd" id="10_mnyh5"]
-[ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://inventory.tscn" id="12_pmfyc"]
-[ext_resource type="PackedScene" uid="uid://dih5jvxkn0uk0" path="res://warp_votes_ui.tscn" id="13_3x44d"]
+[ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://ui/inventory/inventory.tscn" id="12_pmfyc"]
+[ext_resource type="PackedScene" uid="uid://dih5jvxkn0uk0" path="res://ui/warp_vote/warp_votes_ui.tscn" id="13_3x44d"]
 [ext_resource type="PackedScene" uid="uid://np5o15k15boe" path="res://window_scene.tscn" id="13_d8uop"]
 [ext_resource type="PackedScene" uid="uid://cxvp48ihr6wkw" path="res://window_bar.tscn" id="14_dqtqv"]
-[ext_resource type="PackedScene" uid="uid://cyyfjbicwvflj" path="res://craft_ui.tscn" id="14_sxr83"]
-[ext_resource type="PackedScene" uid="uid://b4c105b3jd8a8" path="res://PlayerInteraction.tscn" id="15_xo6pa"]
+[ext_resource type="PackedScene" uid="uid://cyyfjbicwvflj" path="res://ui/craft/craft_ui.tscn" id="14_sxr83"]
+[ext_resource type="PackedScene" uid="uid://b4c105b3jd8a8" path="res://ui/trade/PlayerInteraction.tscn" id="15_xo6pa"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_vl0i4"]
 properties/0/path = NodePath(".:turn_number")
@@ -198,7 +198,6 @@ script = ExtResource("10_mnyh5")
 unique_name_in_owner = true
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="WarpVotes"]
-_spawnable_scenes = PackedStringArray("res://warp_vote.tscn")
 spawn_path = NodePath("..")
 
 [node name="InventoryUIWindow" parent="." groups=["persist-client"] instance=ExtResource("13_d8uop")]
