@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=23 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" path="res://game.gd" id="1_2iwba"]
 [ext_resource type="Script" path="res://world.gd" id="1_6tkge"]
@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://np5o15k15boe" path="res://window_scene.tscn" id="13_d8uop"]
 [ext_resource type="PackedScene" uid="uid://cxvp48ihr6wkw" path="res://window_bar.tscn" id="14_dqtqv"]
 [ext_resource type="PackedScene" uid="uid://cyyfjbicwvflj" path="res://ui/craft/craft_ui.tscn" id="14_sxr83"]
+[ext_resource type="PackedScene" uid="uid://0uges5c52oep" path="res://warp_settings.tscn" id="15_friog"]
 [ext_resource type="PackedScene" uid="uid://b4c105b3jd8a8" path="res://ui/trade/PlayerInteraction.tscn" id="15_xo6pa"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_vl0i4"]
@@ -258,6 +259,8 @@ offset_right = 0.0
 offset_bottom = 0.0
 grow_vertical = 2
 game = NodePath("../..")
+
+[node name="WarpSettings" parent="." instance=ExtResource("15_friog")]
 
 [connection signal="visibility_changed" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_visibility_changed"]
 [connection signal="visibility_changed" from="CraftUIWindow" to="CraftUIWindow" method="_on_visibility_changed"]

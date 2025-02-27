@@ -11,7 +11,8 @@ const WARP_VOTE_SCENE = preload("res://ui/warp_vote/warp_vote.tscn")
 const ROOT_WINDOW_SCRIPT = preload("res://root_window.gd")
 
 @export var turn_number = 1:
-	set = _update_turn_number
+	set = _update_turn_number,
+	get = _get_turn_number
 
 var enet_peer = ENetMultiplayerPeer.new()
 
@@ -267,7 +268,7 @@ func command(cmd: String, player: MarbleCharacter):
 			var angle=0
 			if parts.size() >= 2:
 				angle = int(parts[1])
-			player.wander(1,1,angle)
+			player.wander(5)
 		"action":
 			#todo create the action
 			var count=1
@@ -405,6 +406,10 @@ func _update_turn_number(value):
 	turn_number_label.text = "turn " + str(value)
 	turn_start = Time.get_ticks_msec()
 	Signals.NewTurn.emit(turn_number)
+
+
+func _get_turn_number():
+	return turn_number
 
 
 func _on_host_button_pressed():

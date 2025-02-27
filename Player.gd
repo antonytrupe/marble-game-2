@@ -70,16 +70,12 @@ var chat_mode = false
 
 @onready var quest_indicator = %"?"
 
-func wander(count:int, frequency:int,angle:int):
+func wander(count:int):
 	var w = Wander.new()
-	w.remaining = 1
-	w.frequency = 1
-	w.angle=angle
-	#print('a.remaining:',a.remaining)
+	w.remaining = count
 	w.start_turn = game.turn_number
 	w.game = game
 	w.player = self
-	add_child(w)
 
 
 func add_action(count:int, frequency:int):
@@ -90,13 +86,12 @@ func add_action(count:int, frequency:int):
 	a.start_turn = game.turn_number + 1
 	a.game = game
 	a.player = self
-	add_child(a)
 
 
 func _ready():
 	actions_ui.player_id = player_id
 	Signals.NewTurn.connect(_on_new_turn)
-	#if multiplayer.is_server():
+	#if is_server():
 	#Signals.PlayerZoned.connect(_on_player_zoned)
 	if is_current_player():
 		camera.current = true
@@ -129,7 +124,7 @@ func _unhandled_input(event):
 			or Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE)
 		):
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-			if multiplayer.is_server():
+			if is_server():
 				server_rotate(event.relative)
 			else:
 				server_rotate.rpc_id(1, event.relative)
@@ -147,7 +142,7 @@ func _unhandled_input(event):
 		#don't let this event bubble up
 		get_viewport().set_input_as_handled()
 
-		if multiplayer.is_server():
+		if is_server():
 			cancel_trade()
 		else:
 			cancel_trade.rpc_id(1)
@@ -188,49 +183,52 @@ func _physics_process(delta):
 		# TODO check just_press/just_release, or is_pressed?
 		# crouch
 		if Input.is_action_just_pressed("crouch"):
-			if multiplayer.is_server():
+			if is_server():
 				server_mode(MOVE.MODE.CROUCH)
 			else:
 				server_mode.rpc_id(1, MOVE.MODE.CROUCH)
 		if Input.is_action_just_released("crouch"):
-			if multiplayer.is_server():
+			if is_server():
 				server_mode(MOVE.MODE.WALK)
 			else:
 				server_mode.rpc_id(1, MOVE.MODE.WALK)
 
 		# run
 		if Input.is_action_just_pressed("run"):
-			if multiplayer.is_server():
+			if is_server():
 				server_mode(MOVE.MODE.HUSTLE)
 			else:
 				server_mode.rpc_id(1, MOVE.MODE.HUSTLE)
 		if Input.is_action_just_released("run"):
-			if multiplayer.is_server():
+			if is_server():
 				server_mode(MOVE.MODE.WALK)
 			else:
 				server_mode.rpc_id(1, MOVE.MODE.WALK)
 
 		# Jump
 		if Input.is_action_just_pressed("jump") and is_on_floor():
-			if multiplayer.is_server():
+			if is_server():
 				server_jump()
 			else:
 				server_jump.rpc_id(1)
 
 		if Input.is_action_just_pressed("action"):
-			if multiplayer.is_server():
+			if is_server():
 				interact()
 			else:
 				interact.rpc_id(1)
 		# Get the input direction and handle the movement/deceleration.
 		var input_dir:Vector2 = Input.get_vector("left", "right", "up", "down")
-		if multiplayer.is_server():
+		if is_server():
 			server_move(input_dir)
 		else:
 			server_move.rpc_id(1, input_dir)
 
 	move_and_slide()
 
+
+func is_server()->bool:
+	return multiplayer.is_server()
 
 func _set_warp_votes(value):
 	warp_votes = value
@@ -264,7 +262,7 @@ func _set_quests(value: Dictionary):
 
 @rpc("any_peer")
 func create_quest(quest: Dictionary):
-	if not multiplayer.is_server():
+	if not is_server():
 		return
 	quests[quest.name] = quest
 	quest_creator_ui.update()
@@ -272,7 +270,7 @@ func create_quest(quest: Dictionary):
 
 @rpc("any_peer")
 func delete_quest(quest: Dictionary):
-	if not multiplayer.is_server():
+	if not is_server():
 		return
 	quests.erase(quest.name)
 
@@ -280,7 +278,7 @@ func delete_quest(quest: Dictionary):
 ##server code
 @rpc("any_peer")
 func craft(action: String, tool: Dictionary, reagents: Dictionary):
-	if not multiplayer.is_server():
+	if not is_server():
 		return
 	var scene = load(tool.scene_file_path)
 	var instance = scene.instantiate()
@@ -319,7 +317,7 @@ func _set_trade_inventory(loot):
 ##server code
 @rpc("any_peer")
 func accept_trade():
-	if !multiplayer.is_server():
+	if !is_server():
 		return
 	trade_accepted = true
 	if trade_accepted and trade_partner.trade_accepted:
@@ -339,7 +337,7 @@ func accept_trade():
 ##server code
 @rpc("any_peer")
 func remove_from_trade(loot: Dictionary):
-	if !multiplayer.is_server():
+	if !is_server():
 		return
 	for item in loot.values():
 		my_trade_inventory.erase(item.name)
@@ -348,7 +346,7 @@ func remove_from_trade(loot: Dictionary):
 ##server code
 @rpc("any_peer")
 func add_to_trade(item: Dictionary):
-	if not multiplayer.is_server():
+	if not is_server():
 		return
 	if !my_trade_inventory.has(item.name):
 		my_trade_inventory[item.name] = item
@@ -509,7 +507,7 @@ func play_fade():
 #this is the function that runs on the server that any peer can call
 @rpc("any_peer")
 func server_mode(new_mode: MOVE.MODE):
-	if !multiplayer.is_server():
+	if !is_server():
 		return
 	#if we've used an action, no hustling/running
 	if !current_turn_actions.action or [MOVE.MODE.CROUCH, MOVE.MODE.WALK].has(new_mode):
@@ -523,7 +521,7 @@ func approve_warp_vote(vote_id: String):
 ##server code
 @rpc("any_peer")
 func time_warp(minutes: int):
-	if !multiplayer.is_server():
+	if !is_server():
 		return
 
 	extra_age = extra_age + 1000 * 60 * minutes
@@ -532,7 +530,7 @@ func time_warp(minutes: int):
 #this is the function that runs on the server that any peer can call
 @rpc("any_peer", "call_remote", "reliable", 1)
 func server_chat(message: String):
-	if !multiplayer.is_server():
+	if !is_server():
 		return
 	if message.begins_with("/"):
 		game.command(message, self)
@@ -552,16 +550,21 @@ func client_chat(message):
 
 @rpc("any_peer")
 func server_rotate(value: Vector2):
-	if !multiplayer.is_server():
+	if !is_server():
 		return
-	print(value)
+	#print(value)
 	rotate_y(-value.x * .005)
+	#print(value.x)
+	rotate_camera(value)
+
+
+func rotate_camera(value: Vector2):
 	camera_pivot.rotate_x(-value.y * .005)
 	camera_pivot.rotation.x = clamp(camera_pivot.rotation.x, -PI / 2, PI / 2)
 
 
 func start_trade(player: MarbleCharacter):
-	if !multiplayer.is_server():
+	if !is_server():
 		return
 	#open the trade window
 	trade_partner = player
@@ -573,7 +576,7 @@ func start_trade(player: MarbleCharacter):
 
 @rpc("any_peer")
 func cancel_trade():
-	if !multiplayer.is_server():
+	if !is_server():
 		return
 
 	trade_partner.trading = false
@@ -588,7 +591,7 @@ func get_actions():
 
 @rpc("any_peer")
 func interact():
-	if !multiplayer.is_server():
+	if !is_server():
 		return
 
 	if trading:
@@ -621,7 +624,7 @@ func interact():
 
 
 func add_to_inventory(loot: Dictionary):
-	if !multiplayer.is_server():
+	if !is_server():
 		return
 	for item in loot.keys():
 		inventory[item] = loot[item]
@@ -629,7 +632,7 @@ func add_to_inventory(loot: Dictionary):
 
 ##loot is {item_name:{item}}
 func remove_from_inventory(loot: Dictionary) -> bool:
-	if !multiplayer.is_server():
+	if !is_server():
 		return false
 	for item in loot.keys():
 		if item not in inventory:
@@ -641,7 +644,7 @@ func remove_from_inventory(loot: Dictionary) -> bool:
 
 @rpc("any_peer")
 func server_jump():
-	if !multiplayer.is_server():
+	if !is_server():
 		return
 	velocity.y = JUMP_VELOCITY
 
@@ -649,7 +652,7 @@ func server_jump():
 #this is the function that runs on the server that any peer can call
 @rpc("any_peer")
 func server_move(d:Vector2):
-	if !multiplayer.is_server():
+	if !is_server():
 		return
 	#print(d)
 	var direction = (transform.basis * Vector3(d.x, 0, d.y)).normalized()
