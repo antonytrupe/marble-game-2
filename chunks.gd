@@ -1,6 +1,6 @@
 class_name Chunks
 extends Node3D
-const ChunkResource = preload("res://chunk.tscn")
+const ChunkResource = preload("res://chunk/chunk.tscn")
 
 @onready var game = $"/root/Game"
 @onready var world = %World
@@ -84,15 +84,15 @@ func update_day_night_cycle(player: MarbleCharacter):
 	else:
 		#print("%s in chunks %s at %s" % [player.name, chunks, player.position])
 		pass
-	day_night_cycle.chunks = chunks
+	#day_night_cycle.chunks = chunks
 
 
 ##chunk could be the old chunk or new chunk
 func _on_player_zoned(player: MarbleCharacter, chunk: Chunk):
 	#print("_on_player_zoned %s in %s on %s" % [player.name, chunk.name, game.player_id])
 	#this should probably be somewhere else
-	if game.player_id == player.name:
-		update_day_night_cycle(player)
+	#if game.player_id == player.name:
+		#update_day_night_cycle(player)
 
 	# check if we're the server
 	if !multiplayer.is_server():
@@ -124,6 +124,6 @@ func generate_chunks(chunk: Chunk):
 				var new_chunk = ChunkResource.instantiate()
 				new_chunk.position = Vector3(adj_x * 60, adj_y * 60, adj_z * 60)
 				new_chunk.name = adj_chunk_name
-				new_chunk.birth_date = Time.get_ticks_msec() + world.world_age
+				#new_chunk.birth_date = Time.get_ticks_msec() + world.world_age
 				#new_chunk.extra_age=
 				add_child(new_chunk)

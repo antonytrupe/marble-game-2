@@ -1,36 +1,54 @@
 class_name World
 extends Node3D
 
-const CHUNK_SCENE = preload("res://chunk.tscn")
+##the date this world was created in seconds
+@export var age: float = 0
 
-@export var world_age: int = 0
+@export var warp_speed:float=1.0
 
-var calculated_age: int:
-	get = calculate_age
-
-var turn_start: int = 0
+@export var turn_number:int=1
 
 
-func _ready() -> void:
-	Signals.TimeWarp.connect(_on_time_warp)
+func is_server()->bool:
+	return multiplayer.is_server()
 
 
-func calculate_age():
-	return world_age + Time.get_ticks_msec()
+@rpc("any_peer")
+func set_warp_speed(value:float) -> void:
+	print('world.set_warp_speed')
+	if is_server():
+		print('setting world warp speed')
+		warp_speed=value
+
+
+func _physics_process(delta):
+	if multiplayer.is_server():
+		age = age + delta * warp_speed
+		#print(age)
+		var new_turn_number:int = age / 6  + 1
+		#print(new_turn_number)
+		if turn_number != new_turn_number:
+			#print('new turn:',new_turn_number)
+			turn_number = new_turn_number
 
 
 func save_node():
 	var save_dict = {
-		#
-		"world_age": calculated_age
+		"age": age,
+		"warp_speed": warp_speed,
+		"turn_number": turn_number,
 	}
 	return save_dict
 
 
 func load_node(node_data):
 	name = node_data["name"]
-	if "world_age" in node_data:
-		world_age = node_data.world_age
+	if "age" in node_data:
+		age = node_data.age
+	if "warp_speed" in node_data:
+		warp_speed = node_data.warp_speed
+	if "turn_number" in node_data:
+		turn_number = node_data.turn_number
 
 
 func get_chunk_cirle(_center: Array[Chunk], _ring: int):
@@ -44,14 +62,3 @@ func _on_time_warp(minutes: int, chunks: Array[Chunk]):
 		chunk.time_warp(minutes)
 
 	#TODO time warp adjacent chunks
-
-
-func remove_player(peer_id):
-	var player = get_node_or_null(str(peer_id))
-	if player:
-		player.queue_free()
-
-
-func update_health_bar(_health_value):
-	#health_bar.value = health_value
-	pass

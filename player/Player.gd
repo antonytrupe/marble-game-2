@@ -20,11 +20,18 @@ const JUMP_VELOCITY = 5.0
 @export var mode: MOVE.MODE = MOVE.MODE.WALK:
 	set = _set_mode
 @export var speed = 30.0
-@export var birth_date: int = 0:
-	set = _set_birth_date
+#@export var birth_date: int = 0:
+	#set = _set_birth_date
 
-@export var extra_age: int = 0:
-	set = _set_extra_age
+##seconds
+@export var age: float = 0.0:
+	set = _set_age
+
+@export var warp_speed:float=1.0:
+	set=_set_warp_speed
+
+@export var turn_number:int=1:
+	set= _set_turn_number
 
 @export var current_turn_actions = {"move": null, "action": null}:
 	set = _set_action
@@ -48,8 +55,8 @@ const JUMP_VELOCITY = 5.0
 var trade_partner: MarbleCharacter:
 	set = _set_trade_partner
 #we need otherTradeInventory on the client side because we can't sync trade_partner
-var calculated_age: int:
-	get = calculate_age
+#var calculated_age: int:
+	#get = calculate_age
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chat_mode = false
@@ -69,6 +76,12 @@ var chat_mode = false
 @onready var fade_anim = %AnimationPlayer
 
 @onready var quest_indicator = %"?"
+@onready var warp_scanner:CollisionShape3D=%WarpScanner
+
+func _set_warp_speed(value:float):
+	warp_speed=value
+	#(warp_scanner.shape as SphereShape3D).radius=(warp_speed-1)*300
+
 
 func wander(count:int):
 	var w = Wander.new()
@@ -90,10 +103,11 @@ func add_action(count:int, frequency:int):
 
 func _ready():
 	actions_ui.player_id = player_id
-	Signals.NewTurn.connect(_on_new_turn)
+	#Signals.NewTurn.connect(_on_new_turn)
 	#if is_server():
 	#Signals.PlayerZoned.connect(_on_player_zoned)
 	if is_current_player():
+		Signals.CurrentPlayer.emit(self)
 		camera.current = true
 		actions_ui.show()
 		game.cross_hair.show()
@@ -169,15 +183,21 @@ func _unhandled_input(event):
 			server_chat.rpc_id(1, chat_text_edit.text)
 			chat_text_edit.text = ""
 
-
-func _process(_delta):
-	character_sheet.age = calculated_age
-
-
+#delta is in seconds
 func _physics_process(delta):
 	# Add the gravity.
 	if not is_on_floor():
 		velocity.y -= gravity * delta
+
+	if multiplayer.is_server():
+		age = age + delta * warp_speed
+		#print(age)
+		var new_turn_number:int = age / 6  + 1
+		#print(new_turn_number)
+		if turn_number != new_turn_number:
+			#print('new turn:',new_turn_number)
+			turn_number = new_turn_number
+			reset_actions()
 
 	if is_current_player() and !chat_mode:
 		# TODO check just_press/just_release, or is_pressed?
@@ -430,16 +450,20 @@ func get_chunks() -> Array[Chunk]:
 	return chunks
 
 
-func _set_birth_date(value):
-	birth_date = value
+@rpc("any_peer")
+func set_warp_speed(value:float):
+	print('player.set_warp_speed')
+	if is_server():
+		print('setting world warp speed')
+		warp_speed = value
 
 
-func _set_extra_age(value):
-	extra_age = value
+func _set_turn_number(value):
+	turn_number=value
 
 
-func calculate_age():
-	return world.world_age + extra_age + Time.get_ticks_msec() - birth_date
+func _set_age(value:float):
+	age = value
 
 
 func _set_mode(new_mode):
@@ -475,8 +499,8 @@ func save_node():
 		player_id = player_id,
 		transform = JSON3D.Transform3DtoDictionary(transform),
 		health = health,
-		birth_date = birth_date,
-		extra_age = extra_age,
+		warp_speed = warp_speed,
+		age = age,
 		inventory = inventory,
 		skills = skills,
 		quests = quests,
@@ -486,8 +510,8 @@ func save_node():
 	return save_dict
 
 
-func _on_new_turn(_turn_id):
-	reset_actions()
+#func _on_new_turn(_turn_id):
+	#reset_actions()
 
 
 #func _on_player_zoned(player: MarbleCharacter, chunk: Node3D):
@@ -524,7 +548,8 @@ func time_warp(minutes: int):
 	if !is_server():
 		return
 
-	extra_age = extra_age + 1000 * 60 * minutes
+	age = age + 1000 * 60 * minutes
+	#TODO update turn number too
 
 
 #this is the function that runs on the server that any peer can call
@@ -672,3 +697,11 @@ func server_move(d:Vector2):
 	#else:
 	#TODO animation state machine so that walk and crouch can play at the same time
 	#play_animation.rpc("RESET")
+
+
+func _on_area_3d_body_entered(body: Node3D) -> void:
+	print('found a body:',body.name)
+
+
+func _on_area_3d_body_exited(body: Node3D) -> void:
+	print('unfound a body:',body.name)

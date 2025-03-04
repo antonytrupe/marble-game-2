@@ -11,4 +11,4 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	label.text = GameTime.format(entity.calculated_age)
+	label.text = GameTime.format(entity.age)

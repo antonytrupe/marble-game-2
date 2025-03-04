@@ -14,19 +14,13 @@
 [ext_resource type="PackedScene" uid="uid://np5o15k15boe" path="res://window_scene.tscn" id="13_d8uop"]
 [ext_resource type="PackedScene" uid="uid://cxvp48ihr6wkw" path="res://window_bar.tscn" id="14_dqtqv"]
 [ext_resource type="PackedScene" uid="uid://cyyfjbicwvflj" path="res://ui/craft/craft_ui.tscn" id="14_sxr83"]
-[ext_resource type="PackedScene" uid="uid://0uges5c52oep" path="res://ui/warp_controls/warp_settings.tscn" id="15_friog"]
+[ext_resource type="PackedScene" uid="uid://0uges5c52oep" path="res://warp_settings.tscn" id="15_friog"]
 [ext_resource type="PackedScene" uid="uid://b4c105b3jd8a8" path="res://ui/trade/PlayerInteraction.tscn" id="15_xo6pa"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_vl0i4"]
-properties/0/path = NodePath("World:age")
+properties/0/path = NodePath(".:turn_number")
 properties/0/spawn = true
 properties/0/replication_mode = 2
-properties/1/path = NodePath("World:warp_speed")
-properties/1/spawn = true
-properties/1/replication_mode = 2
-properties/2/path = NodePath("World:turn_number")
-properties/2/spawn = true
-properties/2/replication_mode = 2
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_pnarc"]
 
@@ -81,18 +75,17 @@ grow_horizontal = 2
 grow_vertical = 0
 script = ExtResource("3_3e53o")
 
-[node name="TurnTimer" parent="UI/HUD" node_paths=PackedStringArray("world") instance=ExtResource("3_pr48h")]
-unique_name_in_owner = true
+[node name="TurnTimer" parent="UI/HUD" node_paths=PackedStringArray("chunk") instance=ExtResource("3_pr48h")]
 layout_mode = 0
 anchors_preset = 0
 anchor_left = 0.0
 anchor_right = 0.0
-offset_left = 553.0
-offset_top = 25.0
-offset_right = 754.0
-offset_bottom = 57.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 201.0
+offset_bottom = 32.0
 grow_horizontal = 1
-world = NodePath("../../../World")
+chunk = NodePath("../../../World/Chunks/[0,0,0]")
 
 [node name="CrossHair" type="TextureRect" parent="UI"]
 unique_name_in_owner = true
@@ -112,6 +105,9 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 texture = ExtResource("3_cajfn")
 
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_vl0i4")
+
 [node name="CameraPivot" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 200, 0)
 
@@ -123,10 +119,6 @@ current = true
 unique_name_in_owner = true
 script = ExtResource("1_6tkge")
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="World"]
-root_path = NodePath("../..")
-replication_config = SubResource("SceneReplicationConfig_vl0i4")
-
 [node name="FloorStaticBody" type="StaticBody3D" parent="World"]
 
 [node name="FloorCollisionShape3D" type="CollisionShape3D" parent="World/FloorStaticBody"]
@@ -136,18 +128,21 @@ shape = SubResource("WorldBoundaryShape3D_pnarc")
 unique_name_in_owner = true
 script = ExtResource("7_eouhd")
 
-[node name="ChunkSpawner" type="MultiplayerSpawner" parent="World/Chunks"]
-_spawnable_scenes = PackedStringArray("res://chunk/chunk.tscn")
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="World/Chunks"]
 spawn_path = NodePath("..")
 
 [node name="[0,0,0]" parent="World/Chunks" instance=ExtResource("3_pdr6q")]
 unique_name_in_owner = true
+birth_date = null
+extra_age = null
+warp_speed = null
+warp_votes = null
 
 [node name="Players" type="Node3D" parent="World"]
 unique_name_in_owner = true
 
-[node name="PlayerSpawner" type="MultiplayerSpawner" parent="World/Players"]
-_spawnable_scenes = PackedStringArray("res://player/player.tscn")
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="World/Players"]
+_spawnable_scenes = PackedStringArray("res://player.tscn")
 spawn_path = NodePath("..")
 
 [node name="30ftRuler" type="MeshInstance3D" parent="World"]
@@ -224,9 +219,8 @@ position = Vector2i(800, 100)
 size = Vector2i(200, 400)
 visible = false
 
-[node name="WarpVoteUI" parent="WarpVoteWindow" node_paths=PackedStringArray("game") instance=ExtResource("13_3x44d")]
+[node name="WarpVoteUI" parent="WarpVoteWindow" instance=ExtResource("13_3x44d")]
 unique_name_in_owner = true
-game = NodePath("../..")
 
 [node name="WindowListWindow" parent="." instance=ExtResource("13_d8uop")]
 position = Vector2i(400, 40)
@@ -241,14 +235,7 @@ offset_bottom = 0.0
 grow_vertical = 2
 game = NodePath("../..")
 
-[node name="WarpSettings" parent="." node_paths=PackedStringArray("game", "world") instance=ExtResource("15_friog")]
-unique_name_in_owner = true
-offset_left = 176.0
-offset_top = 21.0
-offset_right = 430.0
-offset_bottom = 154.0
-game = NodePath("..")
-world = NodePath("../World")
+[node name="WarpSettings" parent="." instance=ExtResource("15_friog")]
 
 [connection signal="visibility_changed" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_visibility_changed"]
 [connection signal="visibility_changed" from="CraftUIWindow" to="CraftUIWindow" method="_on_visibility_changed"]

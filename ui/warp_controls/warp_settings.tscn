@@ -1,0 +1,52 @@
+[gd_scene load_steps=3 format=3 uid="uid://0uges5c52oep"]
+
+[ext_resource type="Script" path="res://ui/warp_controls/warp_settings.gd" id="1_k4yft"]
+[ext_resource type="Script" path="res://ui/warp_controls/warp_slider.gd" id="1_xsg02"]
+
+[node name="WarpSettings" type="PanelContainer"]
+offset_right = 254.0
+offset_bottom = 69.0
+script = ExtResource("1_k4yft")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Panel2" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="VBoxContainer/Panel2"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Current Warp Speed"
+
+[node name="Panel" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="PlayerWarpSlider" type="HSlider" parent="VBoxContainer/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.1
+tick_count = 19
+ticks_on_borders = true
+script = ExtResource("1_xsg02")
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ShortRestButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Short Rest"
+
+[node name="LongRestButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Long Rest"
+
+[connection signal="custom_value_changed" from="VBoxContainer/Panel/PlayerWarpSlider" to="." method="_on_player_warp_slider_value_changed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/ShortRestButton" to="." method="_on_short_rest_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/LongRestButton" to="." method="_on_long_rest_button_pressed"]

@@ -1,0 +1,44 @@
+[gd_scene load_steps=2 format=3 uid="uid://csnpkdk57fm7x"]
+
+[ext_resource type="Script" path="res://ui/turn_timer/turn_timer.gd" id="1_iethl"]
+
+[node name="MarginContainer" type="MarginContainer"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.5
+offset_top = 8.0
+offset_right = 100.5
+offset_bottom = 40.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+script = ExtResource("1_iethl")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="TurnTimer" type="ProgressBar" parent="VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+size_flags_vertical = 1
+max_value = 6000.0
+step = 1.0
+show_percentage = false
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/TurnTimer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 6
+
+[node name="TurnNumber" type="Label" parent="VBoxContainer/TurnTimer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Turn 1"

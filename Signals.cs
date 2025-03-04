@@ -4,7 +4,7 @@ using Godot.Collections;
 public partial class Signals : Node
 {
 	[Signal]
-	public delegate void PlayerZonedEventHandler(CharacterBody3D player_id, Node3D chunk_id);
+	public delegate void PlayerZonedEventHandler(CharacterBody3D player, Node3D chunk);
 
 	[Signal]
 	public delegate void NewTurnEventHandler(int turn_id);
@@ -14,4 +14,10 @@ public partial class Signals : Node
 
 	[Signal]
 	public delegate void TimeWarpEventHandler(int minutes, Array<Node3D> chunks);
+
+	[Signal]
+	public delegate void CurrentPlayerEventHandler(CharacterBody3D player);
+
+	[Signal]
+	public delegate void WarpSpeedChangedEventHandler(float value);
 }

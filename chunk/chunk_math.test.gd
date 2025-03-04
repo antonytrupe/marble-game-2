@@ -1,7 +1,7 @@
 extends GutTest
 
 var chunks_script = load("res://chunks.gd")
-var chunk_script = load("res://chunk.gd")
+var chunk_script = load("res://chunk/chunk.gd")
 
 var instance: Chunks
 

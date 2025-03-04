@@ -2,7 +2,7 @@ class_name Game
 extends Node
 
 const PORT = 9999
-const PLAYER_SCENE = preload("res://player.tscn")
+const PLAYER_SCENE = preload("res://player/player.tscn")
 const STONE_SCENE = preload("res://objects/stone/stone.tscn")
 const ACORN_SCENE = preload("res://objects/acorn/acorn.tscn")
 const BUSH_SCENE = preload("res://objects/bush/bush.tscn")
@@ -10,13 +10,13 @@ const TREE_SCENE = preload("res://objects/tree/tree.tscn")
 const WARP_VOTE_SCENE = preload("res://ui/warp_vote/warp_vote.tscn")
 const ROOT_WINDOW_SCRIPT = preload("res://root_window.gd")
 
-@export var turn_number = 1:
-	set = _update_turn_number,
-	get = _get_turn_number
+#@export var turn_number = 1:
+#set = _update_turn_number,
+#get = _get_turn_number
 
 var enet_peer = ENetMultiplayerPeer.new()
 
-var turn_start = 0
+#var turn_start = 0
 var player_id: String
 var is_server: bool = false
 var rng = RandomNumberGenerator.new()
@@ -30,17 +30,30 @@ var rng = RandomNumberGenerator.new()
 @onready var trade_ui: PlayerInteraction = %PlayerInteractionUI
 @onready var trade_ui_window = %PlayerInteractionWindow
 @onready var hud = $UI/HUD
-@onready var turn_number_label = %TurnNumber
-@onready var turn_timer = %TurnTimer
+#@onready var turn_number_label = %TurnNumber
 @onready var server_camera = $CameraPivot/ServerCamera3D
 @onready var world = %World
 @onready var players = %Players
 @onready var cross_hair = %CrossHair
 @onready var chunks: Chunks = %Chunks
 @onready var warp_votes = %WarpVotes
+@onready var turn_timer:TurnTimerUI =%TurnTimer
+@onready var warp_settings:WarpSettingsUI=%WarpSettings
+
+
+func _set_current_player(player:MarbleCharacter):
+	cross_hair.show()
+	inventory_ui.me = player
+	craft_ui.me = player
+	trade_ui.me = player
+	warp_vote_ui.me = player
+	turn_timer.player=player
+	warp_settings.player=player
 
 
 func _ready():
+	Signals.CurrentPlayer.connect(_set_current_player)
+
 	var view_port: Window
 	view_port = get_tree().get_root().get_window()
 	view_port.set_script(ROOT_WINDOW_SCRIPT)
@@ -89,8 +102,8 @@ func _ready():
 	elif config.has("player_id"):
 		player_id = config["player_id"]
 		_start_client()
-		_on_join_button_pressed(config.remote_ip)
-		get_viewport().get_window().title += " - " + player_id
+		_create_client(config.remote_ip)
+		#get_viewport().get_window().title += " - " + player_id
 		print("started client")
 	else:
 		print("not a client nor a server")
@@ -153,22 +166,9 @@ func _unhandled_input(_event):
 		cross_hair.visible = true
 
 
-func _process(_delta):
-	var now = Time.get_ticks_msec()
-
-	if multiplayer.is_server():
-		turn_timer.value = (now + world.world_age) % 6000
-		var new_turn_number = (now + world.world_age) / (6 * 1000) + 1
-		if turn_number != new_turn_number:
-			turn_number = new_turn_number
-
-	else:
-		turn_timer.value = (now - turn_start) % 6000
-
-
 ##server code
 @rpc("any_peer")
-func call_warp_vote(minutes, pid):
+func call_warp_vote(minutes:int, pid:String):
 	if !multiplayer.is_server():
 		return
 	var player: MarbleCharacter = get_player(pid)
@@ -262,22 +262,22 @@ func _spawn_stones(quantity: int, p: Vector3):
 func command(cmd: String, player: MarbleCharacter):
 	if !multiplayer.is_server():
 		return
-	var parts:PackedStringArray = cmd.replace("/", "").split(" ")
+	var parts: PackedStringArray = cmd.replace("/", "").split(" ")
 	match parts[0]:
 		"wander":
-			var angle=0
+			var count = 10
 			if parts.size() >= 2:
-				angle = int(parts[1])
-			player.wander(5)
+				count = int(parts[1])
+			player.wander(count)
 		"action":
 			#todo create the action
-			var count=1
-			var frequency=1
+			var count = 1
+			var frequency = 1
 			if parts.size() >= 2:
 				count = int(parts[1])
 				if parts.size() >= 3:
 					frequency = int(parts[2])
-			player.add_action(count,frequency)
+			player.add_action(count, frequency)
 		"spawn", "/spawn":
 			match parts[1]:
 				"stone", "stones":
@@ -357,7 +357,7 @@ func _server_disconnected():
 	get_tree().quit()
 
 
-func _on_join_button_pressed(ip_address):
+func _create_client(ip_address):
 	print("joining ", ip_address)
 	hud.show()
 
@@ -372,10 +372,10 @@ func _on_connected_to_server():
 
 
 @rpc("any_peer", "reliable")
-func _register_player(pid):
+func _register_player(_player_id):
 	var peer_id = multiplayer.get_remote_sender_id()
-	_add_player(peer_id, pid)
-	send_world_age.rpc_id(peer_id, Time.get_ticks_msec() + world.world_age)
+	_add_player(peer_id, _player_id)
+	#send_world_age.rpc_id(peer_id, Time.get_ticks_msec() + world.world_age)
 
 
 @rpc("authority", "call_local", "reliable")
@@ -401,15 +401,14 @@ func _add_player(_peer_id, _player_id):
 	player.peer_id = _peer_id
 
 
-func _update_turn_number(value):
-	turn_number = value
-	turn_number_label.text = "turn " + str(value)
-	turn_start = Time.get_ticks_msec()
-	Signals.NewTurn.emit(turn_number)
+#func _update_turn_number(value):
+#turn_number = value
+##turn_number_label.text = "turn " + str(value)
+#turn_start = Time.get_ticks_msec()
+#Signals.NewTurn.emit(turn_number)
 
-
-func _get_turn_number():
-	return turn_number
+#func _get_turn_number():
+#return turn_number
 
 
 func _on_host_button_pressed():
@@ -516,12 +515,13 @@ func _save_server():
 	print("saved ", save_file.get_path_absolute())
 	DirAccess.copy_absolute(
 		save_file.get_path_absolute(),
-		"user://savegame_" + str(Time.get_ticks_msec() + world.world_age) + ".save"
+		"user://savegame_" + str(Time.get_ticks_msec()) + ".save"
 	)
 
 
 func _start_client():
 	_load_client()
+	get_viewport().get_window().title += " - " + player_id
 
 
 func _load_client():

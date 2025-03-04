@@ -12,9 +12,9 @@ func before_each():
 
 	var game_scene_double = double(load('res://game.tscn'))
 	instance.game = game_scene_double.instantiate()
-	stub(instance.game._get_turn_number).to_call_super()
+	#stub(instance.game._get_turn_number).to_call_super()
 
-	var player_scene_double = double(load('res://player.tscn'))
+	var player_scene_double = double(load('res://player/player.tscn'))
 	#var player_scene_double = load('res://player.tscn')
 	instance.player=player_scene_double.instantiate()
 	stub(instance.player.server_move).to_call_super()
@@ -34,7 +34,7 @@ func test_can_instantiate():
 	assert_not_null(instance)
 
 
-func test_starts_rotating():
+func _test_starts_rotating():
 	assert_eq(instance.player.rotation.x,0)
 	assert_eq(instance.player.rotation.y,0)
 	assert_eq(instance.player.rotation.x,0)

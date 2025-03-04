@@ -1,6 +1,6 @@
-[gd_scene load_steps=19 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=20 format=3 uid="uid://xcjrjq5cbn7y"]
 
-[ext_resource type="Script" path="res://Player.gd" id="1_2v3wm"]
+[ext_resource type="Script" path="res://player/Player.gd" id="1_2v3wm"]
 [ext_resource type="PackedScene" uid="uid://dyx3xv5lckl7h" path="res://ui/character_sheet/character_sheet.tscn" id="3_eahd0"]
 [ext_resource type="PackedScene" uid="uid://d35hxvmomxu3p" path="res://ui/actions/actions.tscn" id="4_72q5g"]
 [ext_resource type="PackedScene" uid="uid://cblqeddvc1mon" path="res://ui/quests/quest_creator.tscn" id="8_cvl0s"]
@@ -27,39 +27,42 @@ properties/5/replication_mode = 2
 properties/6/path = NodePath(".:speed")
 properties/6/spawn = true
 properties/6/replication_mode = 2
-properties/7/path = NodePath(".:birth_date")
+properties/7/path = NodePath("CameraPivot:rotation")
 properties/7/spawn = true
 properties/7/replication_mode = 2
-properties/8/path = NodePath(".:extra_age")
+properties/8/path = NodePath(".:inventory")
 properties/8/spawn = true
 properties/8/replication_mode = 2
-properties/9/path = NodePath("CameraPivot:rotation")
+properties/9/path = NodePath(".:trading")
 properties/9/spawn = true
 properties/9/replication_mode = 2
-properties/10/path = NodePath(".:inventory")
+properties/10/path = NodePath(".:my_trade_inventory")
 properties/10/spawn = true
 properties/10/replication_mode = 2
-properties/11/path = NodePath(".:trading")
+properties/11/path = NodePath(".:other_trade_inventory")
 properties/11/spawn = true
 properties/11/replication_mode = 2
-properties/12/path = NodePath(".:my_trade_inventory")
+properties/12/path = NodePath(".:quests")
 properties/12/spawn = true
 properties/12/replication_mode = 2
-properties/13/path = NodePath(".:other_trade_inventory")
+properties/13/path = NodePath(".:other_player_quests")
 properties/13/spawn = true
 properties/13/replication_mode = 2
-properties/14/path = NodePath(".:quests")
+properties/14/path = NodePath(".:warp_votes")
 properties/14/spawn = true
 properties/14/replication_mode = 2
-properties/15/path = NodePath(".:other_player_quests")
+properties/15/path = NodePath(".:current_turn_actions")
 properties/15/spawn = true
 properties/15/replication_mode = 2
-properties/16/path = NodePath(".:warp_votes")
+properties/16/path = NodePath(".:age")
 properties/16/spawn = true
 properties/16/replication_mode = 2
-properties/17/path = NodePath(".:current_turn_actions")
+properties/17/path = NodePath(".:warp_speed")
 properties/17/spawn = true
-properties/17/replication_mode = 1
+properties/17/replication_mode = 2
+properties/18/path = NodePath(".:turn_number")
+properties/18/spawn = true
+properties/18/replication_mode = 2
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_x3s4a"]
 resource_local_to_scene = true
@@ -453,6 +456,9 @@ _data = {
 "fade": SubResource("Animation_77lh1")
 }
 
+[sub_resource type="SphereShape3D" id="SphereShape3D_145g5"]
+radius = 3.0
+
 [node name="Player" type="CharacterBody3D" groups=["persist"]]
 collision_layer = 2
 collision_mask = 15
@@ -558,4 +564,14 @@ visible = false
 billboard = 1
 text = "?"
 
+[node name="Area3D" type="Area3D" parent="."]
+collision_layer = 2
+collision_mask = 12
+
+[node name="WarpScanner" type="CollisionShape3D" parent="Area3D"]
+unique_name_in_owner = true
+shape = SubResource("SphereShape3D_145g5")
+
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
+[connection signal="body_entered" from="Area3D" to="." method="_on_area_3d_body_entered"]
+[connection signal="body_exited" from="Area3D" to="." method="_on_area_3d_body_exited"]

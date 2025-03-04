@@ -15,7 +15,7 @@ func _physics_process(_delta):
 		return
 
 	#if its a new turn, pick a new angle
-	if(last_turn==null or game.turn_number>last_turn):
+	if(last_turn==null or player.turn_number>last_turn):
 		print('picking new direction')
 		angle_velocity=get_angle_velocity()
 		speed_velocity=get_speed_velocity()
@@ -27,7 +27,7 @@ func _physics_process(_delta):
 	#forward
 	player.server_move(speed_velocity)
 
-	last_turn=game.turn_number
+	last_turn=player.turn_number
 
 
 func get_angle_velocity():

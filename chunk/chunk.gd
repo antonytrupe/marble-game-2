@@ -1,38 +1,42 @@
 class_name Chunk
 extends Node3D
 
-@export var birth_date: int = 0:
-	set = set_birth_date
-@export var extra_age: int = 0:
-	set = set_extra_age
+##milliseconds
+#@export var age: float = 0
+#@export var warp_speed: float = 1
+
+#@export var turn_number:int = 1
 
 @export var flora: Node3D
 @export var fauna: Node3D
 @export var terra: Node3D
 ##list of warp_vote id's
-@export var warp_votes: Array = []
+#@export var warp_votes: Array = []
 
 var rng = RandomNumberGenerator.new()
 
-var calculated_age: int:
-	get = calculate_age
 
-@onready var label = %AgeLabel
+#@onready var label = %AgeLabel
 @onready var world = $/root/Game/World
 @onready var flora_fauna_scanner = %FloraFaunaScanner
 @onready var player_scanner = %PlayerScanner
 
 
-func set_birth_date(value):
-	birth_date = value
+#func _ready():
+	#Signals.WarpSpeedChanged.connect(_on_warp_speed_changed)
 
 
-func set_extra_age(value):
-	extra_age = value
+#func _physics_process(delta: float) -> void:
+	#if multiplayer.is_server():
+		#age = age + delta * warp_speed
+		#var new_turn_number:int = (age) / (6 ) + 1
+		#if turn_number != new_turn_number:
+			#print('new turn:',new_turn_number)
+			#turn_number = new_turn_number
 
 
-func calculate_age():
-	return world.world_age + extra_age + Time.get_ticks_msec() - birth_date
+#func _on_warp_speed_changed(value):
+	#warp_speed = value
 
 
 func get_players() -> Array[Node3D]:
@@ -47,40 +51,40 @@ func get_flora_fauna() -> Array[Node3D]:
 	return entities
 
 
-func time_warp(minutes: int):
-	if !multiplayer.is_server():
-		print("someone trying to call time_warp")
-		return
-	extra_age = extra_age + 1000 * 60 * minutes
-
-	# TODO get everythng else in this chunk and time warp it
-	var flora_fauna = get_flora_fauna()
-	for f in flora_fauna:
-		f.time_warp(minutes)
-
-	# tell all the players there was a timewarp
-	var players = get_players()
-	for p: MarbleCharacter in players:
-		p.time_warp(minutes)
-		p.play_fade.rpc()
+#func time_warp(minutes: int):
+	#if !multiplayer.is_server():
+		#print("someone trying to call time_warp")
+		#return
+	#age = age + 1000 * 60 * minutes
+#
+	## TODO get everythng else in this chunk and time warp it
+	#var flora_fauna = get_flora_fauna()
+	#for f in flora_fauna:
+		#f.time_warp(minutes)
+#
+	## tell all the players there was a timewarp
+	#var players = get_players()
+	#for p: MarbleCharacter in players:
+		#p.time_warp(minutes)
+		#p.play_fade.rpc()
 
 
 func save_node():
 	var save_dict = {
 		transform = JSON3D.Transform3DtoDictionary(transform),
-		birth_date = birth_date,
-		extra_age = extra_age,
-		warp_votes = warp_votes,
+		#age = age,
+		#warp_speed = warp_speed,
+		#warp_votes = warp_votes,
 	}
 	return save_dict
 
 
 func load_node(node_data):
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
-	if "birth_date" in node_data:
-		birth_date = node_data.birth_date
-	if "extra_age" in node_data:
-		extra_age = node_data.extra_age
+	#if "age" in node_data:
+		#age = node_data.age
+	#if "warp_speed" in node_data:
+		#warp_speed = node_data.warp_speed
 
 
 func generate_terrain():

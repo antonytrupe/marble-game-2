@@ -30,22 +30,22 @@ func stop():
 
 func _process(_delta):
 	#if we aren't supposed to start yet
-	if game.turn_number < start_turn:
+	if player.turn_number < start_turn:
 		print("wait for first turn")
 		return
 	#if we already did it this turn
 	#if game.turn_number<=last_turn:
 	#return
 	#if its not time to do it again
-	if last_turn != null and last_turn + frequency > game.turn_number:
+	if last_turn != null and last_turn + frequency > player.turn_number:
 		print("wait for next turn")
 		print('last turn',last_turn)
-		print('game.turn_number',game.turn_number)
+		print('player.turn_number',player.turn_number)
 		return
 
 	do()
 
-	last_turn = game.turn_number
+	last_turn = player.turn_number
 
 	remaining = remaining - 1
 	if remaining <= 0:
