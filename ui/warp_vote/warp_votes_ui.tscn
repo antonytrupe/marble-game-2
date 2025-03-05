@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dih5jvxkn0uk0"]
 
-[ext_resource type="Script" path="res://ui/warp_vote/warp_votes_ui.gd" id="1_qnhi3"]
+[ext_resource type="Script" uid="uid://ufbcxj6li542" path="res://ui/warp_vote/warp_votes_ui.gd" id="1_qnhi3"]
 [ext_resource type="Texture2D" uid="uid://dvbfdyrl8lg37" path="res://ui/inventory/inventory9patch.png" id="2_xatsl"]
 
 [node name="WarpVoteUI" type="Panel"]

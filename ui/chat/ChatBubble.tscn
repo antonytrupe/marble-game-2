@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://pg17mx8uunen"]
 
-[ext_resource type="Script" path="res://ui/chat/chat_bubble.gd" id="1_nfq3l"]
+[ext_resource type="Script" uid="uid://bf0wr2q8vygdu" path="res://ui/chat/chat_bubble.gd" id="1_nfq3l"]
 
 [node name="Node3D" type="Node3D"]
 script = ExtResource("1_nfq3l")

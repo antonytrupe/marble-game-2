@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=3 uid="uid://cyyfjbicwvflj"]
 
-[ext_resource type="Script" path="res://ui/craft/craft_ui.gd" id="1_gakny"]
+[ext_resource type="Script" uid="uid://lkjpemx1tn4v" path="res://ui/craft/craft_ui.gd" id="1_gakny"]
 [ext_resource type="Texture2D" uid="uid://dvbfdyrl8lg37" path="res://ui/inventory/inventory9patch.png" id="2_pasp1"]
-[ext_resource type="Script" path="res://tool_drop.gd" id="3_v3e7l"]
-[ext_resource type="Script" path="res://reagents_drop.gd" id="4_qdcdx"]
+[ext_resource type="Script" uid="uid://d4lr76tb1qaqr" path="res://tool_drop.gd" id="3_v3e7l"]
+[ext_resource type="Script" uid="uid://dt7hxvbhb64y" path="res://reagents_drop.gd" id="4_qdcdx"]
 
 [node name="CraftUI" type="Panel"]
 anchors_preset = 15

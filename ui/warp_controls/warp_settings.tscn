@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://0uges5c52oep"]
 
-[ext_resource type="Script" path="res://ui/warp_controls/warp_settings.gd" id="1_k4yft"]
-[ext_resource type="Script" path="res://ui/warp_controls/warp_slider.gd" id="1_xsg02"]
+[ext_resource type="Script" uid="uid://brfak6cwj0iuv" path="res://ui/warp_controls/warp_settings.gd" id="1_k4yft"]
+[ext_resource type="Script" uid="uid://j8jq7alm200t" path="res://ui/warp_controls/warp_slider.gd" id="1_xsg02"]
 
 [node name="WarpSettings" type="PanelContainer"]
 offset_right = 254.0

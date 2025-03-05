@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cblqeddvc1mon"]
 
 [ext_resource type="Texture2D" uid="uid://dvbfdyrl8lg37" path="res://ui/inventory/inventory9patch.png" id="1_bcd1y"]
-[ext_resource type="Script" path="res://ui/quests/quest_creator.gd" id="1_i2wdf"]
+[ext_resource type="Script" uid="uid://c34b6yvf0dgho" path="res://ui/quests/quest_creator.gd" id="1_i2wdf"]
 
 [node name="QuestManager" type="CanvasLayer"]
 script = ExtResource("1_i2wdf")

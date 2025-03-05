@@ -9,7 +9,7 @@ extends Node3D
 @export var warp_speed:float=1
 
 @onready var world = $/root/Game/World
-@onready var ageLabel = $Node3D
+@onready var ageLabel = %AgeLabel
 
 
 func save_node():
@@ -35,3 +35,12 @@ func time_warp(minutes):
 func _process(_delta: float) -> void:
 	var s = clampf(float(age) / maturity, .1, 1.0)
 	scale = Vector3(s, s, s)
+
+
+func _physics_process(delta):
+	if is_server():
+		age = age + delta * warp_speed
+
+
+func is_server()->bool:
+	return multiplayer.is_server()

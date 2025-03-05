@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://cxdxuhs5yk36t"]
 
-[ext_resource type="Script" path="res://objects/stone/stone.gd" id="1_qlija"]
-[ext_resource type="Script" path="res://objects/stone/rigid_body_3d.gd" id="2_tnobb"]
+[ext_resource type="Script" uid="uid://dg7ytwyxkdyqq" path="res://objects/stone/stone.gd" id="1_qlija"]
+[ext_resource type="Script" uid="uid://dbjm8wse8jbx7" path="res://objects/stone/rigid_body_3d.gd" id="2_tnobb"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_gvsq1"]
 radius = 0.1

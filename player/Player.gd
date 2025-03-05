@@ -189,7 +189,7 @@ func _physics_process(delta):
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
-	if multiplayer.is_server():
+	if is_server():
 		age = age + delta * warp_speed
 		#print(age)
 		var new_turn_number:int = age / 6  + 1

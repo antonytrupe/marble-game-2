@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://7uo4tekqeki4"]
 
-[ext_resource type="Script" path="res://ui/warp_vote/warp_vote.gd" id="1_hpwqv"]
+[ext_resource type="Script" uid="uid://cppjhvgj8nd35" path="res://ui/warp_vote/warp_vote.gd" id="1_hpwqv"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_idjl2"]
 properties/0/path = NodePath(".:players")

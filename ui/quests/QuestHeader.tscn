@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://eod2h6ieqy6n"]
 
-[ext_resource type="Script" path="res://ui/quests/quest_header.gd" id="1_t3qv6"]
+[ext_resource type="Script" uid="uid://camx2avsn5b63" path="res://ui/quests/quest_header.gd" id="1_t3qv6"]
 
 [node name="QuestHeader" type="HBoxContainer"]
 size_flags_horizontal = 3

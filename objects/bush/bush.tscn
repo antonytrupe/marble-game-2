@@ -1,7 +1,7 @@
 [gd_scene load_steps=26 format=3 uid="uid://damvmfs7dqebu"]
 
-[ext_resource type="Script" path="res://objects/bush/bush.gd" id="1_ww0ai"]
-[ext_resource type="Script" path="res://objects/bush/bush_staticbody.gd" id="2_ggt4o"]
+[ext_resource type="Script" uid="uid://bsctidn2uowx1" path="res://objects/bush/bush.gd" id="1_ww0ai"]
+[ext_resource type="Script" uid="uid://bv3dl61gkc7tm" path="res://objects/bush/bush_staticbody.gd" id="2_ggt4o"]
 [ext_resource type="PackedScene" uid="uid://cc70lwfyjqg1d" path="res://age.tscn" id="3_qldcy"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_vjxuo"]

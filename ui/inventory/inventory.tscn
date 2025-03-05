@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://b1q2vj4f542ay"]
 
 [ext_resource type="Texture2D" uid="uid://dvbfdyrl8lg37" path="res://ui/inventory/inventory9patch.png" id="1_cyvvh"]
-[ext_resource type="Script" path="res://ui/inventory/inventory.gd" id="1_dlwpd"]
-[ext_resource type="Script" path="res://ui/inventory/inventory_drop.gd" id="3_roy6r"]
+[ext_resource type="Script" uid="uid://bgutm5r7hmf23" path="res://ui/inventory/inventory.gd" id="1_dlwpd"]
+[ext_resource type="Script" uid="uid://3d1flpvqdqh1" path="res://ui/inventory/inventory_drop.gd" id="3_roy6r"]
 
 [node name="Inventory" type="Panel"]
 anchors_preset = 15

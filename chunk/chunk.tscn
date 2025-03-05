@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://cgfpsf73dbmvb"]
 
-[ext_resource type="Script" path="res://chunk/chunk.gd" id="1_u5yfe"]
+[ext_resource type="Script" uid="uid://davta0l1mnnhh" path="res://chunk/chunk.gd" id="1_u5yfe"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_3g0se"]
 properties/0/path = NodePath(".:position")
