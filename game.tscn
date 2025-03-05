@@ -137,7 +137,7 @@ unique_name_in_owner = true
 script = ExtResource("7_eouhd")
 
 [node name="ChunkSpawner" type="MultiplayerSpawner" parent="World/Chunks"]
-_spawnable_scenes = PackedStringArray("res://chunk/chunk.tscn")
+_spawnable_scenes = PackedStringArray("uid://cgfpsf73dbmvb")
 spawn_path = NodePath("..")
 
 [node name="[0,0,0]" parent="World/Chunks" instance=ExtResource("3_pdr6q")]
@@ -147,7 +147,7 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 
 [node name="PlayerSpawner" type="MultiplayerSpawner" parent="World/Players"]
-_spawnable_scenes = PackedStringArray("res://player/player.tscn")
+_spawnable_scenes = PackedStringArray("uid://xcjrjq5cbn7y")
 spawn_path = NodePath("..")
 
 [node name="30ftRuler" type="MeshInstance3D" parent="World"]

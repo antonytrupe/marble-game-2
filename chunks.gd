@@ -114,9 +114,9 @@ func generate_chunks(chunk: Chunk):
 	var chunk_json = JSON.parse_string(chunk.name)
 	for x in range(-1, 1 + 1):
 		for z in range(-1, 1 + 1):
-			var adj_x = chunk_json[0] + x
-			var adj_y = chunk_json[1] + 0
-			var adj_z = chunk_json[2] + z
+			var adj_x:int = chunk_json[0] + x
+			var adj_y:int = chunk_json[1] + 0
+			var adj_z:int = chunk_json[2] + z
 			var adj_chunk_name = "[%s,%s,%s]" % [adj_x, adj_y, adj_z]
 
 			var adj_chunk = get_node_or_null(adj_chunk_name)
