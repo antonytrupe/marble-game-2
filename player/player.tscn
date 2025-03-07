@@ -1,9 +1,15 @@
-[gd_scene load_steps=20 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=22 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" uid="uid://2b0awvfb7hmr" path="res://player/Player.gd" id="1_2v3wm"]
 [ext_resource type="PackedScene" uid="uid://dyx3xv5lckl7h" path="res://ui/character_sheet/character_sheet.tscn" id="3_eahd0"]
 [ext_resource type="PackedScene" uid="uid://d35hxvmomxu3p" path="res://ui/actions/actions.tscn" id="4_72q5g"]
+[ext_resource type="Script" uid="uid://da1h20icesqo6" path="res://player/warp_scanner.gd" id="5_qjkh3"]
 [ext_resource type="PackedScene" uid="uid://cblqeddvc1mon" path="res://ui/quests/quest_creator.tscn" id="8_cvl0s"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_x3s4a"]
+resource_local_to_scene = true
+radius = 0.17
+height = 1.7
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_hn37q"]
 properties/0/path = NodePath(".:position")
@@ -63,11 +69,6 @@ properties/17/replication_mode = 2
 properties/18/path = NodePath(".:turn_number")
 properties/18/spawn = true
 properties/18/replication_mode = 2
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_x3s4a"]
-resource_local_to_scene = true
-radius = 0.17
-height = 1.7
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_h6xeb"]
 resource_local_to_scene = true
@@ -457,6 +458,9 @@ _data = {
 }
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_145g5"]
+radius = 6.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_yw30f"]
 radius = 3.0
 
 [node name="Player" type="CharacterBody3D" groups=["persist"]]
@@ -464,12 +468,12 @@ collision_layer = 2
 collision_mask = 15
 script = ExtResource("1_2v3wm")
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
-replication_config = SubResource("SceneReplicationConfig_hn37q")
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
 shape = SubResource("CapsuleShape3D_x3s4a")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_hn37q")
 
 [node name="Body" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
@@ -565,13 +569,24 @@ billboard = 1
 text = "?"
 
 [node name="Area3D" type="Area3D" parent="."]
-collision_layer = 2
-collision_mask = 12
+collision_layer = 0
+collision_mask = 14
+script = ExtResource("5_qjkh3")
 
-[node name="WarpScanner" type="CollisionShape3D" parent="Area3D"]
+[node name="WarpScannerx2" type="CollisionShape3D" parent="Area3D"]
 unique_name_in_owner = true
 shape = SubResource("SphereShape3D_145g5")
 
+[node name="Area3D2" type="Area3D" parent="."]
+collision_layer = 2
+collision_mask = 14
+
+[node name="WarpScannerx4" type="CollisionShape3D" parent="Area3D2"]
+unique_name_in_owner = true
+shape = SubResource("SphereShape3D_yw30f")
+
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
-[connection signal="body_entered" from="Area3D" to="." method="_on_area_3d_body_entered"]
-[connection signal="body_exited" from="Area3D" to="." method="_on_area_3d_body_exited"]
+[connection signal="body_entered" from="Area3D" to="." method="_on_2x_warp_enter"]
+[connection signal="body_exited" from="Area3D" to="." method="_on_2x_warp_exit"]
+[connection signal="body_entered" from="Area3D2" to="." method="_on_4x_warp_enter"]
+[connection signal="body_exited" from="Area3D2" to="." method="_on_4x_warp_exit"]

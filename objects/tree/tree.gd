@@ -2,11 +2,11 @@ class_name MarbleTree
 extends Node3D
 
 #50 years
-@export var maturity: int = int(1000 * 60 * 60 * 24 * 360 * (50))
+@export var maturity: int = int(1000 * 60 * 60 * 24 * 360 * (1))
 
-##seconds
-@export var age: float = 0
-@export var warp_speed:float=1
+##milliseconds
+@export var age: int = 0
+@export var warp_speed: float = 1
 
 @onready var world = $/root/Game/World
 @onready var ageLabel = %AgeLabel
@@ -15,7 +15,8 @@ extends Node3D
 func save_node():
 	var save_dict = {
 		"transform": JSON3D.Transform3DtoDictionary(transform),
-		"age": age
+		"age": age,
+		"warp_speed": warp_speed,
 	}
 	return save_dict
 
@@ -24,6 +25,8 @@ func load_node(node_data):
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
 	if "age" in node_data:
 		age = node_data.age
+	if "warp_speed" in node_data:
+		warp_speed = node_data.warp_speed
 
 
 func time_warp(minutes):
@@ -37,10 +40,11 @@ func _process(_delta: float) -> void:
 	scale = Vector3(s, s, s)
 
 
-func _physics_process(delta):
+#delta is in seconds
+func _physics_process(delta: float):
 	if is_server():
-		age = age + delta * warp_speed
+		age = age + delta * warp_speed * 1000.0
 
 
-func is_server()->bool:
+func is_server() -> bool:
 	return multiplayer.is_server()

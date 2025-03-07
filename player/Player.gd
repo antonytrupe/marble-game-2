@@ -21,17 +21,17 @@ const JUMP_VELOCITY = 5.0
 	set = _set_mode
 @export var speed = 30.0
 #@export var birth_date: int = 0:
-	#set = _set_birth_date
+#set = _set_birth_date
 
 ##seconds
 @export var age: float = 0.0:
 	set = _set_age
 
-@export var warp_speed:float=1.0:
-	set=_set_warp_speed
+@export var warp_speed: float = 1.0:
+	set = _set_warp_speed
 
-@export var turn_number:int=1:
-	set= _set_turn_number
+@export var turn_number: int = 1:
+	set = _set_turn_number
 
 @export var current_turn_actions = {"move": null, "action": null}:
 	set = _set_action
@@ -56,7 +56,7 @@ var trade_partner: MarbleCharacter:
 	set = _set_trade_partner
 #we need otherTradeInventory on the client side because we can't sync trade_partner
 #var calculated_age: int:
-	#get = calculate_age
+#get = calculate_age
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chat_mode = false
@@ -76,14 +76,15 @@ var chat_mode = false
 @onready var fade_anim = %AnimationPlayer
 
 @onready var quest_indicator = %"?"
-@onready var warp_scanner:CollisionShape3D=%WarpScanner
+@onready var warp_scanner: CollisionShape3D = %WarpScannerx2
 
-func _set_warp_speed(value:float):
-	warp_speed=value
+
+func _set_warp_speed(value: float):
+	warp_speed = value
 	#(warp_scanner.shape as SphereShape3D).radius=(warp_speed-1)*300
 
 
-func wander(count:int):
+func wander(count: int):
 	var w = Wander.new()
 	w.remaining = count
 	w.start_turn = game.turn_number
@@ -91,7 +92,7 @@ func wander(count:int):
 	w.player = self
 
 
-func add_action(count:int, frequency:int):
+func add_action(count: int, frequency: int):
 	var a = QuantityAction.new()
 	a.remaining = count
 	a.frequency = frequency
@@ -183,6 +184,7 @@ func _unhandled_input(event):
 			server_chat.rpc_id(1, chat_text_edit.text)
 			chat_text_edit.text = ""
 
+
 #delta is in seconds
 func _physics_process(delta):
 	# Add the gravity.
@@ -192,7 +194,7 @@ func _physics_process(delta):
 	if is_server():
 		age = age + delta * warp_speed
 		#print(age)
-		var new_turn_number:int = age / 6  + 1
+		var new_turn_number: int = age / 6 + 1
 		#print(new_turn_number)
 		if turn_number != new_turn_number:
 			#print('new turn:',new_turn_number)
@@ -238,7 +240,7 @@ func _physics_process(delta):
 			else:
 				interact.rpc_id(1)
 		# Get the input direction and handle the movement/deceleration.
-		var input_dir:Vector2 = Input.get_vector("left", "right", "up", "down")
+		var input_dir: Vector2 = Input.get_vector("left", "right", "up", "down")
 		if is_server():
 			server_move(input_dir)
 		else:
@@ -247,8 +249,9 @@ func _physics_process(delta):
 	move_and_slide()
 
 
-func is_server()->bool:
+func is_server() -> bool:
 	return multiplayer.is_server()
+
 
 func _set_warp_votes(value):
 	warp_votes = value
@@ -451,18 +454,18 @@ func get_chunks() -> Array[Chunk]:
 
 
 @rpc("any_peer")
-func set_warp_speed(value:float):
-	print('player.set_warp_speed')
+func set_warp_speed(value: float):
+	print("player.set_warp_speed")
 	if is_server():
-		print('setting world warp speed')
+		print("setting world warp speed")
 		warp_speed = value
 
 
 func _set_turn_number(value):
-	turn_number=value
+	turn_number = value
 
 
-func _set_age(value:float):
+func _set_age(value: float):
 	age = value
 
 
@@ -511,8 +514,7 @@ func save_node():
 
 
 #func _on_new_turn(_turn_id):
-	#reset_actions()
-
+#reset_actions()
 
 #func _on_player_zoned(player: MarbleCharacter, chunk: Node3D):
 #if game.player_id == player.name:
@@ -676,7 +678,7 @@ func server_jump():
 
 #this is the function that runs on the server that any peer can call
 @rpc("any_peer")
-func server_move(d:Vector2):
+func server_move(d: Vector2):
 	if !is_server():
 		return
 	#print(d)
@@ -699,9 +701,21 @@ func server_move(d:Vector2):
 	#play_animation.rpc("RESET")
 
 
-func _on_area_3d_body_entered(body: Node3D) -> void:
-	print('found a body:',body.name)
+func _on_2x_warp_exit(body: Node3D) -> void:
+	print("unfound a body 2x:", body.name)
+	body.warp_speed = 1
 
 
-func _on_area_3d_body_exited(body: Node3D) -> void:
-	print('unfound a body:',body.name)
+func _on_2x_warp_enter(body: Node3D) -> void:
+	print("found a body 2x:", body.name)
+	body.warp_speed = 10
+
+
+func _on_4x_warp_exit(body: Node3D) -> void:
+	print("unfound a body 4x:", body.name)
+	body.warp_speed = 10
+
+
+func _on_4x_warp_enter(body: Node3D) -> void:
+	print("found a body 4x:", body.name)
+	body.warp_speed = 100

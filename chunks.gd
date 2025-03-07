@@ -2,7 +2,7 @@ class_name Chunks
 extends Node3D
 const ChunkResource = preload("res://chunk/chunk.tscn")
 
-@onready var game = $"/root/Game"
+#@onready var game = $"/root/Game"
 @onready var world = %World
 @onready var day_night_cycle: DayNightCycle = %DayNightCycle
 
@@ -29,7 +29,8 @@ func vector3_from_chunk_name(chunk_name):
 
 func get_chunk_name(p: Vector3):
 	var chunk_name = (
-		"[%s,%s,%s]" % [floor((p.x + 30) / 60), floor((p.y + 30) / 60), floor((p.z + 30) / 60)]
+		"[%s,%s,%s]"
+		% [int(floor((p.x + 30) / 60)), int(floor((p.y + 30) / 60)), int(floor((p.z + 30) / 60))]
 	)
 	return chunk_name
 
@@ -92,7 +93,7 @@ func _on_player_zoned(player: MarbleCharacter, chunk: Chunk):
 	#print("_on_player_zoned %s in %s on %s" % [player.name, chunk.name, game.player_id])
 	#this should probably be somewhere else
 	#if game.player_id == player.name:
-		#update_day_night_cycle(player)
+	#update_day_night_cycle(player)
 
 	# check if we're the server
 	if !multiplayer.is_server():
@@ -114,9 +115,9 @@ func generate_chunks(chunk: Chunk):
 	var chunk_json = JSON.parse_string(chunk.name)
 	for x in range(-1, 1 + 1):
 		for z in range(-1, 1 + 1):
-			var adj_x:int = chunk_json[0] + x
-			var adj_y:int = chunk_json[1] + 0
-			var adj_z:int = chunk_json[2] + z
+			var adj_x: int = chunk_json[0] + x
+			var adj_y: int = chunk_json[1] + 0
+			var adj_z: int = chunk_json[2] + z
 			var adj_chunk_name = "[%s,%s,%s]" % [adj_x, adj_y, adj_z]
 
 			var adj_chunk = get_node_or_null(adj_chunk_name)
