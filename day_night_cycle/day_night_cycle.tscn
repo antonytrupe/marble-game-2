@@ -1,0 +1,34 @@
+[gd_scene load_steps=6 format=3 uid="uid://nmvk3bgvgsnm"]
+
+[ext_resource type="Script" uid="uid://cf428jtdicx4k" path="res://day_night_cycle/day_night_cycle.gd" id="1_u1c4j"]
+
+[sub_resource type="Curve" id="Curve_1se3c"]
+_data = [Vector2(0.148148, 0), 0.0, 0.0, 0, 0, Vector2(0.35, 1), 0.0, 0.0, 0, 0, Vector2(0.65, 1), 0.0, 0.0, 0, 0, Vector2(0.854167, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jat3s"]
+sky_top_color = Color(0.242901, 0.450387, 0.729387, 1)
+sky_horizon_color = Color(0.647059, 0.654902, 0.670588, 1)
+ground_curve = 0.0828214
+
+[sub_resource type="Sky" id="Sky_bq4b2"]
+sky_material = SubResource("ProceduralSkyMaterial_jat3s")
+
+[sub_resource type="Environment" id="Environment_cqcki"]
+background_mode = 2
+sky = SubResource("Sky_bq4b2")
+volumetric_fog_density = 0.0434
+
+[node name="DayNightCycle" type="Node"]
+script = ExtResource("1_u1c4j")
+intensity = SubResource("Curve_1se3c")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_cqcki")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, -0.378374, 0.925653, 0, -0.925653, -0.378374, 0, 10, 0)
+light_color = Color(0.961513, 0.961513, 2.31028e-06, 1)
+light_angular_distance = 0.5
+shadow_enabled = true

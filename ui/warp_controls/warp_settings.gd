@@ -5,7 +5,7 @@ extends PanelContainer
 @export var world: World
 @export var player: MarbleCharacter:
 	set = _set_player
-@export var custom_values: Array[float] = [1, 2, 3, 4, 6, 8, 10, 12, 16, 20]
+@export var custom_values: Array[float] = [1]
 
 @onready var slider: WarpSlider = %PlayerWarpSlider
 
@@ -19,12 +19,12 @@ func _set_player(value: MarbleCharacter):
 
 
 func _on_short_rest_button_pressed() -> void:
-	game.call_warp_vote(60, game.player_id)
-
+	#game.call_warp_vote(60, game.player_id)
+	player.time_warp.rpc_id(1,60)
 
 func _on_long_rest_button_pressed() -> void:
-	game.call_warp_vote(60 * 8, game.player_id)
-
+	#game.call_warp_vote(60 * 8, game.player_id)
+	player.time_warp.rpc_id(1,60*8)
 
 func _on_player_warp_slider_value_changed(value: float) -> void:
 	print(value)

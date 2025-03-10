@@ -1,7 +1,7 @@
 class_name WarpSlider
 extends HSlider
 
-@export var custom_values: Array[float] = [ 1, 2, 3, 4, 6, 8, 10,12,16,20]
+@export var custom_values: Array[float] = [ 1, 2, 3, 4, 6, 8, 10,12,16,20,100,500,3000]
 @export var custom_value: float = 1.0:
 	set=_set_custom_value
 
@@ -49,28 +49,28 @@ func get_custom_value_from_normalized_position(normalized_position: float) -> fl
 	return custom_values[custom_values_count - 1]
 
 
-func get_normalized_position_from_custom_value(custom_value: float) -> float:
+func get_normalized_position_from_custom_value(cv: float) -> float:
 
 	if custom_values.is_empty():
 		return -1.0
 
 	var custom_values_count = custom_values.size()
 	if custom_values_count == 1:
-		if custom_values[0] == custom_value:
+		if custom_values[0] == cv:
 			return 0.0
 		else:
 			return -1.0
 
 	for i in range(custom_values_count - 1):
-		if custom_value >= custom_values[i] and custom_value <= custom_values[i + 1]:
+		if cv >= custom_values[i] and cv <= custom_values[i + 1]:
 			# Linear interpolation to find the normalized position within the segment
-			var segment_position = (custom_value - custom_values[i]) / (custom_values[i + 1] - custom_values[i])
+			var segment_position = (cv - custom_values[i]) / (custom_values[i + 1] - custom_values[i])
 			return (i + segment_position) / (custom_values_count - 1)
 
 	# Handle edge cases
-	if custom_value <= custom_values[0]:
+	if cv <= custom_values[0]:
 		return 0.0
-	elif custom_value >= custom_values[custom_values_count - 1]:
+	elif cv >= custom_values[custom_values_count - 1]:
 		return 1.0
 
 	return -1.0  # Custom value not found within the range

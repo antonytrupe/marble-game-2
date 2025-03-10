@@ -54,10 +54,6 @@ const JUMP_VELOCITY = 5.0
 
 var trade_partner: MarbleCharacter:
 	set = _set_trade_partner
-#we need otherTradeInventory on the client side because we can't sync trade_partner
-#var calculated_age: int:
-#get = calculate_age
-# Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var chat_mode = false
 
@@ -192,9 +188,9 @@ func _physics_process(delta):
 		velocity.y -= gravity * delta
 
 	if is_server():
-		age = age + delta * warp_speed
+		age = age + delta * warp_speed *1000
 		#print(age)
-		var new_turn_number: int = age / 6 + 1
+		var new_turn_number: int = int(age / 6000 + 1)
 		#print(new_turn_number)
 		if turn_number != new_turn_number:
 			#print('new turn:',new_turn_number)

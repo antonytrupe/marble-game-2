@@ -1,14 +1,14 @@
 extends Node
 
-
-func get_age_parts(agems:int):
+#age in seconds
+func get_age_parts(agems:float):
 	return {
-		"years": agems / (1000 * 60 * 60 * 24 * 30 * 360),
-		"months": (agems / (1000 * 60 * 60 * 24 * 30)) % 360,
-		"days": (agems / (1000 * 60 * 60 * 24)) % 30,
-		"hours": (agems / (1000 * 60 * 60)) % 24,
-		"minutes": (agems / (1000 * 60)) % 60,
-		"seconds": (agems / 1000) % 60,
+		"years": int(agems / (1000 * 60 * 60 * 24 * 30 * 12)),
+		"months": int(agems / (1000 * 60 * 60 * 24 * 30)) % 12,
+		"days": int(agems / (1000 * 60 * 60 * 24)) % 30,
+		"hours": int(agems / (1000 * 60 * 60)) % 24,
+		"minutes": int(agems / (1000 * 60)) % 60,
+		"seconds": int(agems/ 1000)% 60,
 	}
 
 

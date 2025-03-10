@@ -39,7 +39,7 @@ var rng = RandomNumberGenerator.new()
 @onready var warp_votes = %WarpVotes
 @onready var turn_timer:TurnTimerUI =%TurnTimer
 @onready var warp_settings:WarpSettingsUI=%WarpSettings
-
+@onready var day_night_cycle=%DayNightCycle
 
 func _set_current_player(player:MarbleCharacter):
 	cross_hair.show()
@@ -49,7 +49,7 @@ func _set_current_player(player:MarbleCharacter):
 	warp_vote_ui.me = player
 	turn_timer.player=player
 	warp_settings.player=player
-
+	day_night_cycle.player=player
 
 func _ready():
 	Signals.CurrentPlayer.connect(_set_current_player)

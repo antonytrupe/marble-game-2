@@ -5,7 +5,7 @@ extends Node3D
 @export var maturity: int = int(1000 * 60 * 60 * 24 * 360 * (1))
 
 ##milliseconds
-@export var age: int = 0
+@export var age: float = 0
 @export var warp_speed: float = 1
 
 @onready var world = $/root/Game/World

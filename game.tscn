@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=20 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" uid="uid://dewiwais134am" path="res://game.gd" id="1_2iwba"]
 [ext_resource type="Script" uid="uid://jh0v2n157q0y" path="res://world.gd" id="1_6tkge"]
@@ -6,8 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://2jputlhry6c" path="res://crosshair.png" id="3_cajfn"]
 [ext_resource type="PackedScene" uid="uid://cgfpsf73dbmvb" path="res://chunk/chunk.tscn" id="3_pdr6q"]
 [ext_resource type="PackedScene" uid="uid://csnpkdk57fm7x" path="res://ui/turn_timer/turn_timer.tscn" id="3_pr48h"]
-[ext_resource type="Script" uid="uid://cf428jtdicx4k" path="res://day_night_cycle.gd" id="3_qlg17"]
 [ext_resource type="Script" uid="uid://cne7h1dx1en0a" path="res://chunks.gd" id="7_eouhd"]
+[ext_resource type="PackedScene" uid="uid://nmvk3bgvgsnm" path="res://day_night_cycle/day_night_cycle.tscn" id="8_80cx4"]
 [ext_resource type="Script" uid="uid://bya61tl3cyfd4" path="res://startupProbe.gd" id="10_mnyh5"]
 [ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://ui/inventory/inventory.tscn" id="12_pmfyc"]
 [ext_resource type="PackedScene" uid="uid://dih5jvxkn0uk0" path="res://ui/warp_vote/warp_votes_ui.tscn" id="13_3x44d"]
@@ -32,23 +32,6 @@ properties/2/replication_mode = 2
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_jysef"]
 size = Vector2(30, 2)
-
-[sub_resource type="Curve" id="Curve_1se3c"]
-_data = [Vector2(0.2, 0), 0.0, 0.0, 0, 0, Vector2(0.35, 1), 0.0, 0.0, 0, 0, Vector2(0.65, 1), 0.0, 0.0, 0, 0, Vector2(0.8, 0), 0.0, 0.0, 0, 0]
-point_count = 4
-
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jat3s"]
-sky_top_color = Color(0.242901, 0.450387, 0.729387, 1)
-sky_horizon_color = Color(0.647059, 0.654902, 0.670588, 1)
-ground_curve = 0.0828214
-
-[sub_resource type="Sky" id="Sky_bq4b2"]
-sky_material = SubResource("ProceduralSkyMaterial_jat3s")
-
-[sub_resource type="Environment" id="Environment_cqcki"]
-background_mode = 2
-sky = SubResource("Sky_bq4b2")
-volumetric_fog_density = 0.0434
 
 [node name="Game" type="Node" groups=["persist", "persist-client"]]
 script = ExtResource("1_2iwba")
@@ -156,21 +139,9 @@ visible = false
 mesh = SubResource("PlaneMesh_jysef")
 skeleton = NodePath("../..")
 
-[node name="DayNightCycle" type="Node" parent="World"]
+[node name="DayNightCycle" parent="World" node_paths=PackedStringArray("world") instance=ExtResource("8_80cx4")]
 unique_name_in_owner = true
-script = ExtResource("3_qlg17")
-intensity = SubResource("Curve_1se3c")
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="World/DayNightCycle"]
-environment = SubResource("Environment_cqcki")
-
-[node name="Sun" type="DirectionalLight3D" parent="World/DayNightCycle"]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 1, 0)
-layers = 0
-light_color = Color(0.961513, 0.961513, 2.31028e-06, 1)
-light_angular_distance = 0.5
-shadow_enabled = true
+world = NodePath("..")
 
 [node name="startupProbe" type="Node" parent="."]
 script = ExtResource("10_mnyh5")

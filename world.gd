@@ -1,7 +1,7 @@
 class_name World
 extends Node3D
 
-##the date this world was created in seconds
+##milliseconds
 @export var age: float = 0
 
 @export var warp_speed:float=1.0
@@ -20,12 +20,12 @@ func set_warp_speed(value:float) -> void:
 		print('setting world warp speed')
 		warp_speed=value
 
-
+#delta is in seconds
 func _physics_process(delta):
 	if multiplayer.is_server():
-		age = age + delta * warp_speed
+		age = age + delta * warp_speed *1000
 		#print(age)
-		var new_turn_number:int = age / 6  + 1
+		var new_turn_number:int = int(age / 6000  + 1)
 		#print(new_turn_number)
 		if turn_number != new_turn_number:
 			#print('new turn:',new_turn_number)
