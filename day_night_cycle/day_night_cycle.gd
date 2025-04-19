@@ -3,10 +3,9 @@ extends Node
 @export var intensity: Curve
 
 @export var player: MarbleCharacter
-
-@onready var sun = %Sun
 @export var world: World
 
+@onready var sun = %Sun
 
 func get_vector_from_hour(hour: float):
 	var radians = hour / 24.0 * 2.0 * PI + PI / 2.0
@@ -51,7 +50,7 @@ func _process(_delta: float) -> void:
 	var current = fposmod(sun.rotation.x, PI * 2)
 
 	#.001 is a little slow
-	var rotation_x = lerp_angle(current, end, .01)
+	var rotation_x = lerp_angle(current, end, .05)
 	#TODO make sure the sun doesn't go backwards
 	#skip lerp for troubleshooting
 	#rotation_x = end
