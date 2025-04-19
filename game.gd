@@ -331,6 +331,7 @@ func _spawn_trees(count: int, center: Vector3):
 	for i in count:
 		var tree = TREE_SCENE.instantiate()
 		tree.name = tree.name + "%010d" % rng.randi()
+		#TODO do this more righter
 		tree.global_position = _get_random_vector(10, center)
 		var chunk = chunks.get_chunk(tree.global_position)
 		chunk.flora.add_child(tree)
