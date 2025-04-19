@@ -2,7 +2,7 @@ extends GutTest
 
 
 func test_fposmod():
-	var Foo = load("res://day_night_cycle.gd")
+	var Foo = load("res://day_night_cycle/day_night_cycle.gd")
 	var partial = partial_double(Foo).new()
 
 	var a = fposmod(partial.get_vector_from_hour(0).angle(), PI * 2)
