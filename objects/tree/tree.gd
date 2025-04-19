@@ -1,5 +1,5 @@
 class_name MarbleTree
-extends Node3D
+extends StaticBody3D
 
 #50 years
 @export var maturity: int = int(1000 * 60 * 60 * 24 * 360 * (1))
