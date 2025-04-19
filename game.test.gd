@@ -23,5 +23,5 @@ func test_create_tree():
 	assert_not_null(flora)
 	var children = flora.get_children()
 	assert_eq(children.size(), 2)
-	var tree = flora.find_child("Tree*")
+	var tree = flora.find_child("Tree*",true,false)
 	assert_not_null(tree)
