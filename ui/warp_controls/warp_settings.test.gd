@@ -20,10 +20,11 @@ func test_default_custom_value():
 	assert_eq(instance.slider.custom_value,1)
 
 
-func test_when_player_is_set():
+func test_when_player_warp_speed_is_set():
 	var player:MarbleCharacter= double(load("res://player/Player.gd")).new()
-	player.warp_speed=2.0
+	add_child(player)
 	instance.player=player
+	player.warp_speed=2.0
 	assert_eq(2.0,2.0)
 	assert_eq(instance.slider.custom_value,2.0)
 
