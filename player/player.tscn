@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://xcjrjq5cbn7y"]
+[gd_scene load_steps=21 format=3 uid="uid://xcjrjq5cbn7y"]
 
 [ext_resource type="Script" uid="uid://2b0awvfb7hmr" path="res://player/Player.gd" id="1_2v3wm"]
 [ext_resource type="PackedScene" uid="uid://dyx3xv5lckl7h" path="res://ui/character_sheet/character_sheet.tscn" id="3_eahd0"]
@@ -458,10 +458,7 @@ _data = {
 }
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_145g5"]
-radius = 6.0
-
-[sub_resource type="SphereShape3D" id="SphereShape3D_yw30f"]
-radius = 3.0
+radius = 30.0
 
 [node name="Player" type="CharacterBody3D" groups=["persist"]]
 collision_layer = 2
@@ -568,25 +565,16 @@ visible = false
 billboard = 1
 text = "?"
 
-[node name="Area3D" type="Area3D" parent="."]
+[node name="WarpScannerArea3D" type="Area3D" parent="."]
+unique_name_in_owner = true
 collision_layer = 0
 collision_mask = 14
 script = ExtResource("5_qjkh3")
 
-[node name="WarpScannerx2" type="CollisionShape3D" parent="Area3D"]
+[node name="WarpScanner" type="CollisionShape3D" parent="WarpScannerArea3D"]
 unique_name_in_owner = true
 shape = SubResource("SphereShape3D_145g5")
 
-[node name="Area3D2" type="Area3D" parent="."]
-collision_layer = 2
-collision_mask = 14
-
-[node name="WarpScannerx4" type="CollisionShape3D" parent="Area3D2"]
-unique_name_in_owner = true
-shape = SubResource("SphereShape3D_yw30f")
-
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
-[connection signal="body_entered" from="Area3D" to="." method="_on_2x_warp_enter"]
-[connection signal="body_exited" from="Area3D" to="." method="_on_2x_warp_exit"]
-[connection signal="body_entered" from="Area3D2" to="." method="_on_4x_warp_enter"]
-[connection signal="body_exited" from="Area3D2" to="." method="_on_4x_warp_exit"]
+[connection signal="body_entered" from="WarpScannerArea3D" to="." method="_on_2x_warp_enter"]
+[connection signal="body_exited" from="WarpScannerArea3D" to="." method="_on_2x_warp_exit"]

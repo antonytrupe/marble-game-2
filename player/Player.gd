@@ -72,13 +72,29 @@ var chat_mode = false
 @onready var fade_anim = %AnimationPlayer
 
 @onready var quest_indicator = %"?"
-@onready var warp_scanner: CollisionShape3D = %WarpScannerx2
-
+@onready var warp_scanner:Area3D =%WarpScannerArea3D
 
 func _set_warp_speed(value: float):
 	warp_speed = value
 	#(warp_scanner.shape as SphereShape3D).radius=(warp_speed-1)*300
 
+
+@rpc("any_peer")
+func set_warp_speed(value: float):
+	print("player.set_warp_speed")
+	if is_server():
+		print("setting world warp speed")
+		warp_speed = value
+
+
+func update_local_warp():
+	var local_bodies=warp_scanner.get_overlapping_bodies()
+	#local_bodies.all(func(element): return element > 5)
+	for body in local_bodies:
+		#var distance=body.position.direction_to(position)
+		#var ratio=distance/warp_scanner.shape.radius
+
+		body.warp_speed=warp_speed
 
 func wander(count: int):
 	var w = Wander.new()
@@ -185,10 +201,10 @@ func _unhandled_input(event):
 func _physics_process(delta):
 	# Add the gravity.
 	if not is_on_floor():
-		velocity.y -= gravity * delta
+		velocity.y -= gravity * delta * warp_speed
 
 	if is_server():
-		age = age + delta * warp_speed *1000
+		age = age + delta * warp_speed * 1000
 		#print(age)
 		var new_turn_number: int = int(age / 6000 + 1)
 		#print(new_turn_number)
@@ -449,12 +465,7 @@ func get_chunks() -> Array[Chunk]:
 	return chunks
 
 
-@rpc("any_peer")
-func set_warp_speed(value: float):
-	print("player.set_warp_speed")
-	if is_server():
-		print("setting world warp speed")
-		warp_speed = value
+
 
 
 func _set_turn_number(value):
@@ -483,9 +494,9 @@ func play_animation(animation_name):
 
 
 func load_node(node_data):
+	print(node_data)
 	player_id = node_data["player_id"]
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
-	#transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
 	for p in node_data:
 		if p in self and p not in ["transform", "parent"]:
 			self[p] = node_data[p]
@@ -669,7 +680,7 @@ func remove_from_inventory(loot: Dictionary) -> bool:
 func server_jump():
 	if !is_server():
 		return
-	velocity.y = JUMP_VELOCITY
+	velocity.y = JUMP_VELOCITY * warp_speed
 
 
 #this is the function that runs on the server that any peer can call
@@ -682,11 +693,11 @@ func server_move(d: Vector2):
 
 	#m*SPEED_MULTIPLIER*speed
 	if direction:
-		velocity.x = direction.x * mode * SPEED_MULTIPLIER * speed
-		velocity.z = direction.z * mode * SPEED_MULTIPLIER * speed
+		velocity.x = direction.x * mode * SPEED_MULTIPLIER * speed * warp_speed
+		velocity.z = direction.z * mode * SPEED_MULTIPLIER * speed * warp_speed
 	else:
-		velocity.x = move_toward(velocity.x, 0, mode * SPEED_MULTIPLIER * speed)
-		velocity.z = move_toward(velocity.z, 0, mode * SPEED_MULTIPLIER * speed)
+		velocity.x = move_toward(velocity.x, 0, mode * SPEED_MULTIPLIER * speed * warp_speed)
+		velocity.z = move_toward(velocity.z, 0, mode * SPEED_MULTIPLIER * speed * warp_speed)
 	if !is_zero_approx(velocity.x) or !is_zero_approx(velocity.z):
 		set_action({"move": mode})
 		play_animation.rpc("walking")
@@ -699,19 +710,9 @@ func server_move(d: Vector2):
 
 func _on_2x_warp_exit(body: Node3D) -> void:
 	print("unfound a body 2x:", body.name)
-	body.warp_speed = 1
+	#body.warp_speed = 1
 
 
 func _on_2x_warp_enter(body: Node3D) -> void:
 	print("found a body 2x:", body.name)
-	body.warp_speed = 10
-
-
-func _on_4x_warp_exit(body: Node3D) -> void:
-	print("unfound a body 4x:", body.name)
-	body.warp_speed = 10
-
-
-func _on_4x_warp_enter(body: Node3D) -> void:
-	print("found a body 4x:", body.name)
-	body.warp_speed = 100
+	#body.warp_speed = 10
