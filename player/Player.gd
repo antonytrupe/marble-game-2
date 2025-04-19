@@ -46,11 +46,6 @@ const JUMP_VELOCITY = 5.0
 @export var peer_id: int
 
 @export var skills = {}
-##the warp vote this player called
-@export var warp_vote: String
-##the warp votes this player is in range of
-@export var warp_votes = []:
-	set = _set_warp_votes
 
 var trade_partner: MarbleCharacter:
 	set = _set_trade_partner
@@ -81,9 +76,7 @@ func _set_warp_speed(value: float):
 
 @rpc("any_peer")
 func set_warp_speed(value: float):
-	print("player.set_warp_speed")
 	if is_server():
-		print("setting world warp speed")
 		warp_speed = value
 
 
@@ -127,8 +120,6 @@ func _ready():
 		game.inventory_ui.me = self
 		game.craft_ui.me = self
 		game.trade_ui.me = self
-		game.warp_vote_ui.me = self
-		game.warp_vote_ui.game = game
 
 
 func _unhandled_input(event):
@@ -263,13 +254,6 @@ func _physics_process(delta):
 
 func is_server() -> bool:
 	return multiplayer.is_server()
-
-
-func _set_warp_votes(value):
-	warp_votes = value
-	if game and game.warp_vote_ui:
-		game.warp_vote_ui.update()
-	#print()
 
 
 func skillup(skill, amount):
@@ -514,23 +498,9 @@ func save_node():
 		inventory = inventory,
 		skills = skills,
 		quests = quests,
-		warp_vote = warp_vote,
-		warp_votes = warp_votes,
 	}
 	return save_dict
 
-
-#func _on_new_turn(_turn_id):
-#reset_actions()
-
-#func _on_player_zoned(player: MarbleCharacter, chunk: Node3D):
-#if game.player_id == player.name:
-##get all the chunks the player is overlapping
-#var chunks = player.get_zones()
-#if !chunks:
-#print('%s not in any chunks' % [player.name])
-## tell the daynightcycle node what chunks the player is in
-#dayNightCycle.chunks = chunks
 
 @rpc("authority")
 func play_fade():

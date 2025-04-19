@@ -23,20 +23,16 @@ var rng = RandomNumberGenerator.new()
 
 @onready var inventory_ui: PlayerInventory = %InventoryUI
 @onready var inventory_ui_window = %InventoryUIWindow
-@onready var warp_vote_ui = %WarpVoteUI
-@onready var warp_vote_window = %WarpVoteWindow
 @onready var craft_ui = %CraftUI
 @onready var craft_ui_window = %CraftUIWindow
 @onready var trade_ui: PlayerInteraction = %PlayerInteractionUI
 @onready var trade_ui_window = %PlayerInteractionWindow
 @onready var hud = $UI/HUD
-#@onready var turn_number_label = %TurnNumber
 @onready var server_camera = $CameraPivot/ServerCamera3D
 @onready var world = %World
 @onready var players = %Players
 @onready var cross_hair = %CrossHair
 @onready var chunks: Chunks = %Chunks
-@onready var warp_votes = %WarpVotes
 @onready var turn_timer:TurnTimerUI =%TurnTimer
 @onready var warp_settings:WarpSettingsUI=%WarpSettings
 @onready var day_night_cycle=%DayNightCycle
@@ -46,7 +42,6 @@ func _set_current_player(player:MarbleCharacter):
 	inventory_ui.me = player
 	craft_ui.me = player
 	trade_ui.me = player
-	warp_vote_ui.me = player
 	turn_timer.player=player
 	warp_settings.player=player
 	day_night_cycle.player=player
@@ -120,23 +115,17 @@ func _unhandled_input(_event):
 		else:
 			inventory_ui_window.hide()
 
-	if Input.is_action_just_pressed("warp_vote"):
-		warp_vote_ui.update()
-		warp_vote_window.visible = !warp_vote_window.visible
-
 	if Input.is_action_just_pressed("long_rest"):
-		var minutes = 8 * 60
 		if multiplayer.is_server():
-			call_warp_vote(minutes, player_id)
+			pass
 		else:
-			call_warp_vote.rpc_id(1, minutes, player_id)
+			pass
 
 	if Input.is_action_just_pressed("short_rest"):
-		var minutes = 60
 		if multiplayer.is_server():
-			call_warp_vote(minutes, player_id)
+			pass
 		else:
-			call_warp_vote.rpc_id(1, minutes, player_id)
+			pass
 
 	if Input.is_action_just_pressed("quit"):
 		if inventory_ui_window.visible:
@@ -158,7 +147,7 @@ func _unhandled_input(_event):
 		craft_ui_window.visible
 		or inventory_ui_window.visible
 		or trade_ui_window.visible
-		or warp_vote_window.visible
+		#or warp_vote_window.visible
 	):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		cross_hair.visible = false
@@ -166,87 +155,6 @@ func _unhandled_input(_event):
 		cross_hair.visible = true
 
 
-##server code
-@rpc("any_peer")
-func call_warp_vote(minutes:int, pid:String):
-	if !multiplayer.is_server():
-		return
-	var player: MarbleCharacter = get_player(pid)
-	if player.warp_vote:
-		print("player already has a warp vote")
-		return
-	var player_chunks: Array[Chunk] = player.get_chunks()
-	var warp_chunks: Dictionary = chunks.get_adjacent_chunks(player_chunks, minutes)
-	var vote_id = _create_warp_vote(warp_chunks, pid)
-	player.warp_vote = vote_id
-	approve_warp(vote_id, pid)
-
-
-##server code
-@rpc("any_peer")
-func approve_warp(vote_id: String, pid: String):
-	if !multiplayer.is_server():
-		return
-	var vote: WarpVote = warp_votes.get_node_or_null(vote_id)
-	vote.players[pid] = true
-
-	if not vote.players.values().any(func(value): return !value):
-		#do the warp now
-		chunks.time_warp(vote)
-		#clean up the warp_vote
-		_delete_warp_vote(vote_id)
-
-
-func _delete_warp_vote(vote_id: String):
-	print("deleting warp vote %s" % vote_id)
-	var vote: WarpVote = warp_votes.get_node_or_null(vote_id)
-	#clean up player data
-	for p in vote.players.keys():
-		var pp = get_player(p)
-		pp.warp_votes.erase(vote_id)
-		if pp.warp_vote == vote_id:
-			pp.warp_vote = ""
-
-	#clean up chunk data
-	for c in vote.chunks.keys():
-		var cc = get_chunk(c)
-		if cc:
-			cc.warp_votes.erase(vote_id)
-
-	warp_votes.remove_child(vote)
-	vote.queue_free()
-
-
-func _create_warp_vote(warp_chunks: Dictionary, pid) -> String:
-	var guid = str(randi_range(10000, 99999))
-	#get the players in the chunks
-	var warp_players = {}
-	for chunk_name: String in warp_chunks:
-		#print("looking for players in chunk %s" % chunk_name)
-		var chunk: Chunk = chunks.get_node_or_null(chunk_name)
-		if chunk:
-			#print("found the chunk in the scene tree")
-			#add the info to the chunk
-			chunk.warp_votes.append(guid)
-			var ps = chunk.get_players()
-			for p: MarbleCharacter in ps:
-				warp_players[p.player_id] = p.player_id == pid
-				#add the info to the player
-				p.warp_votes.append(guid)
-				p.warp_votes = p.warp_votes
-		else:
-			pass
-			#print("did not find the chunk in the scene tree")
-	var v = WARP_VOTE_SCENE.instantiate()
-	v.name = str(guid)
-	v.players = warp_players
-	v.chunks = warp_chunks
-
-	warp_votes.add_child(v)
-	# print(v.name)
-	# print(v.players)
-	# print(v.chunks)
-	return guid
 
 
 func _spawn_stones(quantity: int, p: Vector3):
@@ -264,6 +172,9 @@ func command(cmd: String, player: MarbleCharacter):
 		return
 	var parts: PackedStringArray = cmd.replace("/", "").split(" ")
 	match parts[0]:
+		"teleport":
+			if parts.size() >= 4:
+				player.position=Vector3(float(parts[1]),float(parts[2]),float(parts[3]))
 		"wander":
 			var count = 10
 			if parts.size() >= 2:

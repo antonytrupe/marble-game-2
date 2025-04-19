@@ -54,21 +54,18 @@ properties/12/replication_mode = 2
 properties/13/path = NodePath(".:other_player_quests")
 properties/13/spawn = true
 properties/13/replication_mode = 2
-properties/14/path = NodePath(".:warp_votes")
+properties/14/path = NodePath(".:current_turn_actions")
 properties/14/spawn = true
 properties/14/replication_mode = 2
-properties/15/path = NodePath(".:current_turn_actions")
+properties/15/path = NodePath(".:age")
 properties/15/spawn = true
 properties/15/replication_mode = 2
-properties/16/path = NodePath(".:age")
+properties/16/path = NodePath(".:warp_speed")
 properties/16/spawn = true
 properties/16/replication_mode = 2
-properties/17/path = NodePath(".:warp_speed")
+properties/17/path = NodePath(".:turn_number")
 properties/17/spawn = true
 properties/17/replication_mode = 2
-properties/18/path = NodePath(".:turn_number")
-properties/18/spawn = true
-properties/18/replication_mode = 2
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_h6xeb"]
 resource_local_to_scene = true

@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=19 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" uid="uid://dewiwais134am" path="res://game.gd" id="1_2iwba"]
 [ext_resource type="Script" uid="uid://jh0v2n157q0y" path="res://world.gd" id="1_6tkge"]
@@ -10,7 +10,6 @@
 [ext_resource type="PackedScene" uid="uid://nmvk3bgvgsnm" path="res://day_night_cycle/day_night_cycle.tscn" id="8_80cx4"]
 [ext_resource type="Script" uid="uid://bya61tl3cyfd4" path="res://startupProbe.gd" id="10_mnyh5"]
 [ext_resource type="PackedScene" uid="uid://b1q2vj4f542ay" path="res://ui/inventory/inventory.tscn" id="12_pmfyc"]
-[ext_resource type="PackedScene" uid="uid://dih5jvxkn0uk0" path="res://ui/warp_vote/warp_votes_ui.tscn" id="13_3x44d"]
 [ext_resource type="PackedScene" uid="uid://np5o15k15boe" path="res://window_scene.tscn" id="13_d8uop"]
 [ext_resource type="PackedScene" uid="uid://cxvp48ihr6wkw" path="res://window_bar.tscn" id="14_dqtqv"]
 [ext_resource type="PackedScene" uid="uid://cyyfjbicwvflj" path="res://ui/craft/craft_ui.tscn" id="14_sxr83"]
@@ -146,12 +145,6 @@ world = NodePath("..")
 [node name="startupProbe" type="Node" parent="."]
 script = ExtResource("10_mnyh5")
 
-[node name="WarpVotes" type="Node" parent="."]
-unique_name_in_owner = true
-
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="WarpVotes"]
-spawn_path = NodePath("..")
-
 [node name="InventoryUIWindow" parent="." groups=["persist-client"] instance=ExtResource("13_d8uop")]
 unique_name_in_owner = true
 title = "Inventory"
@@ -187,18 +180,6 @@ visible = false
 [node name="PlayerInteractionUI" parent="PlayerInteractionWindow" instance=ExtResource("15_xo6pa")]
 unique_name_in_owner = true
 
-[node name="WarpVoteWindow" parent="." groups=["persist-client"] instance=ExtResource("13_d8uop")]
-unique_name_in_owner = true
-auto_translate_mode = 1
-title = "Warp Votes"
-position = Vector2i(800, 100)
-size = Vector2i(200, 400)
-visible = false
-
-[node name="WarpVoteUI" parent="WarpVoteWindow" node_paths=PackedStringArray("game") instance=ExtResource("13_3x44d")]
-unique_name_in_owner = true
-game = NodePath("../..")
-
 [node name="WindowListWindow" parent="." instance=ExtResource("13_d8uop")]
 position = Vector2i(400, 40)
 size = Vector2i(304, 128)
@@ -224,4 +205,3 @@ world = NodePath("../World")
 [connection signal="visibility_changed" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_visibility_changed"]
 [connection signal="visibility_changed" from="CraftUIWindow" to="CraftUIWindow" method="_on_visibility_changed"]
 [connection signal="visibility_changed" from="PlayerInteractionWindow" to="PlayerInteractionWindow" method="_on_visibility_changed"]
-[connection signal="visibility_changed" from="WarpVoteWindow" to="WarpVoteWindow" method="_on_visibility_changed"]

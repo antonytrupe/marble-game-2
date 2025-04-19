@@ -32,8 +32,6 @@ func set_custom_value(value):
 	slider.custom_value=value
 
 func _on_player_warp_slider_value_changed(value: float) -> void:
-	print(value)
-	print(str(value))
 	if current_speed_label:
 		current_speed_label.text=str(snapped(value,.1))
 	if player:
