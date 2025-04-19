@@ -1,7 +1,7 @@
 class_name WarpSlider
 extends HSlider
 
-@export var custom_values: Array[float] = [ 1, 2, 3, 4, 6, 8, 10,12,16,20,100,500,3000]
+@export var custom_values: Array[int] = [ 1, 2, 3, 4, 6, 8, 10,12,16,20,100,500,3000]
 @export var custom_value: float = 1.0:
 	set=_set_custom_value
 
@@ -22,9 +22,8 @@ func _set_custom_value(v:float):
 
 func _on_value_changed(new_value):
 	custom_value = get_custom_value_from_normalized_position(new_value)
-	#print("Custom Value: ", custom_value)
-	#Signals.WarpSpeedChanged.emit(custom_value)
 	custom_value_changed.emit(custom_value)
+
 
 func get_custom_value_from_normalized_position(normalized_position: float) -> float:
 	if custom_values.is_empty():
