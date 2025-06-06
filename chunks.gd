@@ -89,7 +89,7 @@ func update_day_night_cycle(player: MarbleCharacter):
 
 
 ##chunk could be the old chunk or new chunk
-func _on_player_zoned(player: MarbleCharacter, chunk: Chunk):
+func _on_player_zoned(_player: MarbleCharacter, chunk: Chunk):
 	#print("_on_player_zoned %s in %s on %s" % [player.name, chunk.name, game.player_id])
 	#this should probably be somewhere else
 	#if game.player_id == player.name:
@@ -101,14 +101,6 @@ func _on_player_zoned(player: MarbleCharacter, chunk: Chunk):
 
 	#only generate chunks on the server
 	generate_chunks(chunk)
-
-	update_warp_votes(player, chunk)
-
-
-func update_warp_votes(player: MarbleCharacter, chunk: Chunk):
-	#TODO
-	print(player)
-	print(chunk)
 
 
 func generate_chunks(chunk: Chunk):

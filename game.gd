@@ -46,6 +46,7 @@ func _set_current_player(player:MarbleCharacter):
 	warp_settings.player=player
 	day_night_cycle.player=player
 
+
 func _ready():
 	Signals.CurrentPlayer.connect(_set_current_player)
 
@@ -153,8 +154,6 @@ func _unhandled_input(_event):
 		cross_hair.visible = false
 	else:
 		cross_hair.visible = true
-
-
 
 
 func _spawn_stones(quantity: int, p: Vector3):

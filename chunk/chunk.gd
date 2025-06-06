@@ -51,24 +51,6 @@ func get_flora_fauna() -> Array[Node3D]:
 	return entities
 
 
-#func time_warp(minutes: int):
-	#if !multiplayer.is_server():
-		#print("someone trying to call time_warp")
-		#return
-	#age = age + 1000 * 60 * minutes
-#
-	## TODO get everythng else in this chunk and time warp it
-	#var flora_fauna = get_flora_fauna()
-	#for f in flora_fauna:
-		#f.time_warp(minutes)
-#
-	## tell all the players there was a timewarp
-	#var players = get_players()
-	#for p: MarbleCharacter in players:
-		#p.time_warp(minutes)
-		#p.play_fade.rpc()
-
-
 func save_node():
 	var save_dict = {
 		transform = JSON3D.Transform3DtoDictionary(transform),
