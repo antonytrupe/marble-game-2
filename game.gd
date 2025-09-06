@@ -14,7 +14,8 @@ const ROOT_WINDOW_SCRIPT = preload("res://root_window.gd")
 #set = _update_turn_number,
 #get = _get_turn_number
 
-var enet_peer = ENetMultiplayerPeer.new()
+var multiplayer_peer = ENetMultiplayerPeer.new()
+#var client_peer = ENetMultiplayerPeer.new()
 
 #var turn_start = 0
 var player_id: String
@@ -57,7 +58,6 @@ func _ready():
 
 	var config_file = ConfigFile.new()
 	# Load data from a file.
-	#var err = config.load("user://config.cfg")
 	var err = config_file.load("res://config.cfg")
 	# If the file didn't load, ignore it.
 	if err != OK:
@@ -68,7 +68,7 @@ func _ready():
 	for key in config_file.get_section_keys("default"):
 		config[key] = config_file.get_value("default", key, "")
 
-	print("config:", config)
+	#print("config:", config)
 
 	var arguments = {}
 	for argument in OS.get_cmdline_user_args():
@@ -80,28 +80,36 @@ func _ready():
 			# with the value set to an empty string.
 			arguments[argument.trim_prefix("--")] = ""
 
-	print("arguments:", arguments)
+	#print("arguments:", arguments)
 	config.merge(arguments, true)
 
-	print("merged:", config)
+	#print("merged:", config)
+	if config.has("player_id"):
+		print('client')
+		#server_camera.hide()
+		#server_camera.current = false
+		player_id = config["player_id"]
+		_load_client()
+
+		get_viewport().get_window().title += " - " + player_id
+		if not config.server:
+			print("just client")
+			_create_client(config.remote_ip)
 
 	if config.server:
+		print('server')
 		is_server = true
-		_start_server()
-		#main_menu.hide()
-		hud.show()
-		#health_bar.hide()
-		server_camera.show()
-		server_camera.current = true
+		_create_server()
+		if not config.has("player_id"):
+			print('just server')
+
+			server_camera.show()
+			server_camera.current = true
 		get_viewport().get_window().title += " - SERVER"
-	#TODO make this an if
-	elif config.has("player_id"):
-		player_id = config["player_id"]
-		_start_client()
-		_create_client(config.remote_ip)
-		#get_viewport().get_window().title += " - " + player_id
-		print("started client")
-	else:
+
+
+
+	if not config.server and not config.has("player_id"):
 		print("not a client nor a server")
 
 
@@ -256,9 +264,9 @@ func _get_random_vector(radius: float, center: Vector3) -> Vector3:
 	return Vector3(x, 0, z)
 
 
-func _start_server():
-	enet_peer.create_server(PORT)
-	multiplayer.multiplayer_peer = enet_peer
+func _create_server():
+	multiplayer_peer.create_server(PORT)
+	multiplayer.multiplayer_peer = multiplayer_peer
 	_load_server()
 	print("started server")
 
@@ -272,10 +280,10 @@ func _create_client(ip_address):
 	print("joining ", ip_address)
 	hud.show()
 
-	enet_peer.create_client(ip_address, PORT)
+	multiplayer_peer.create_client(ip_address, PORT)
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.server_disconnected.connect(_server_disconnected)
-	multiplayer.multiplayer_peer = enet_peer
+	multiplayer.multiplayer_peer = multiplayer_peer
 
 
 func _on_connected_to_server():
@@ -322,9 +330,9 @@ func _add_player(_peer_id, _player_id):
 #return turn_number
 
 
-func _on_host_button_pressed():
-	hud.show()
-	_start_server()
+#func _on_host_button_pressed():
+	#hud.show()
+	#_start_server()
 
 
 func get_player(id) -> MarbleCharacter:
@@ -338,8 +346,6 @@ func get_chunk(id) -> Chunk:
 
 
 func save_node():
-	# print(get_viewport().get_window().position)
-	# print(get_viewport().get_window().current_screen)
 	var save_dict = {
 		#
 		host_player_id = player_id,
@@ -430,9 +436,9 @@ func _save_server():
 	)
 
 
-func _start_client():
-	_load_client()
-	get_viewport().get_window().title += " - " + player_id
+#func _start_client():
+	#_load_client()
+	#get_viewport().get_window().title += " - " + player_id
 
 
 func _load_client():

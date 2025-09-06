@@ -96,9 +96,11 @@ texture = ExtResource("3_cajfn")
 
 [node name="CameraPivot" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 200, 0)
+visible = false
 
 [node name="ServerCamera3D" type="Camera3D" parent="CameraPivot"]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+visible = false
 current = true
 
 [node name="World" type="Node3D" parent="." groups=["persist"]]

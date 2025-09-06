@@ -184,7 +184,10 @@ func _unhandled_input(event):
 			chat_text_edit.grab_focus()
 		else:
 			chat_text_edit.release_focus()
-			server_chat.rpc_id(1, chat_text_edit.text)
+			if is_server():
+				server_chat(chat_text_edit.text)
+			else:
+				server_chat.rpc_id(1, chat_text_edit.text)
 			chat_text_edit.text = ""
 
 
@@ -547,7 +550,7 @@ func server_chat(message: String):
 func client_chat(message):
 	if multiplayer.get_remote_sender_id() != 1:
 		return
-	var bubble = load("res://ChatBubble.tscn").instantiate()
+	var bubble = load("res://ui/chat/ChatBubble.tscn").instantiate()
 	bubble.text = message
 	chat_bubbles.add_child(bubble)
 
@@ -678,11 +681,13 @@ func server_move(d: Vector2):
 	#play_animation.rpc("RESET")
 
 
-func _on_2x_warp_exit(body: Node3D) -> void:
-	print("unfound a body 2x:", body.name)
+func _on_2x_warp_exit(_body: Node3D) -> void:
+	# print("unfound a body 2x:", body.name)
 	#body.warp_speed = 1
+	pass
 
 
-func _on_2x_warp_enter(body: Node3D) -> void:
-	print("found a body 2x:", body.name)
+func _on_2x_warp_enter(_body: Node3D) -> void:
+	# print("found a body 2x:", body.name)
 	#body.warp_speed = 10
+	pass
