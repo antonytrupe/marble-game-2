@@ -89,7 +89,7 @@ func update_local_warp():
 
 		body.warp_speed=warp_speed
 
-func wander(count: int):
+func _wander(count: int):
 	var w = Wander.new()
 	w.remaining = count
 	w.start_turn = game.turn_number
@@ -97,7 +97,7 @@ func wander(count: int):
 	w.player = self
 
 
-func add_action(count: int, frequency: int):
+func _add_action(count: int, frequency: int):
 	var a = QuantityAction.new()
 	a.remaining = count
 	a.frequency = frequency
@@ -176,6 +176,16 @@ func _unhandled_input(event):
 	#get_viewport().set_input_as_handled()
 
 	#craft_ui_window.hide()
+	if Input.is_action_just_pressed("command"):
+		chat_text_edit.visible = !chat_text_edit.visible
+		chat_mode = !chat_mode
+
+		if chat_mode:
+			chat_text_edit.grab_focus()
+			chat_text_edit.text='/'
+			chat_text_edit.set_caret_column(1)
+		else:
+			chat_text_edit.release_focus()
 
 	if Input.is_action_just_pressed("chat"):
 		chat_text_edit.visible = !chat_text_edit.visible
@@ -185,8 +195,10 @@ func _unhandled_input(event):
 		else:
 			chat_text_edit.release_focus()
 			if is_server():
+				#print('is_server')
 				server_chat(chat_text_edit.text)
 			else:
+				#print('not is_server')
 				server_chat.rpc_id(1, chat_text_edit.text)
 			chat_text_edit.text = ""
 
@@ -308,7 +320,7 @@ func craft(action: String, tool: Dictionary, reagents: Dictionary):
 	var result = instance.call(action, self, reagents)
 	remove_from_inventory(reagents)
 
-	add_to_inventory(result)
+	_add_to_inventory(result)
 
 	if peer_id:
 		game.inventory_ui.update.rpc_id(peer_id)
@@ -346,7 +358,7 @@ func accept_trade():
 		#TODO make sure the whole trade will succeed before doing any part
 		#swap loot
 		if trade_partner.remove_from_inventory(trade_partner.my_trade_inventory):
-			add_to_inventory(trade_partner.my_trade_inventory)
+			_add_to_inventory(trade_partner.my_trade_inventory)
 
 		if remove_from_inventory(my_trade_inventory):
 			trade_partner.add_to_inventory(my_trade_inventory)
@@ -520,8 +532,8 @@ func server_mode(new_mode: MOVE.MODE):
 		mode = new_mode
 
 
-func approve_warp_vote(vote_id: String):
-	game.approve_warp.rpc_id(1, vote_id, player_id)
+# func approve_warp_vote(vote_id: String):
+# 	game.approve_warp.rpc_id(1, vote_id, player_id)
 
 
 ##server code
@@ -595,6 +607,9 @@ func cancel_trade():
 func get_actions():
 	return ["trade"]
 
+func get_target():
+	var entity = raycast.get_collider()
+	return entity
 
 @rpc("any_peer")
 func interact():
@@ -605,7 +620,7 @@ func interact():
 		cancel_trade()
 		return
 	if raycast.is_colliding():
-		var entity = raycast.get_collider()
+		var entity = get_target()
 
 		if entity.has_method("start_trade"):
 			start_trade(entity)
@@ -617,7 +632,7 @@ func interact():
 			if current_turn_actions.action != null and current_turn_actions.action != action:
 				return
 			var loot = entity.pick_berry()
-			add_to_inventory(loot)
+			_add_to_inventory(loot)
 			set_action({"action": "pick_berry"})
 
 		if entity.has_method("pick_up"):
@@ -626,11 +641,11 @@ func interact():
 			if current_turn_actions.action != null and current_turn_actions.action != action:
 				return
 			var loot = entity.pick_up()
-			add_to_inventory(loot)
+			_add_to_inventory(loot)
 			set_action({"action": "pick_up"})
 
 
-func add_to_inventory(loot: Dictionary):
+func _add_to_inventory(loot: Dictionary):
 	if !is_server():
 		return
 	for item in loot.keys():

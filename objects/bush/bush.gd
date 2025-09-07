@@ -8,17 +8,16 @@ extends Node3D
 		berries = value
 		setup()
 
-@export var birth_date: int = 0:
-	set = set_birth_date
-@export var extra_age: int = 0:
-	set = set_extra_age
 
-var calculated_age: int:
-	get = calculate_age
-
-var rng = RandomNumberGenerator.new()
+##milliseconds
+@export var age: float = 0
+@export var warp_speed: float = 1
 
 @onready var world = $/root/Game/World
+@onready var ageLabel = %AgeLabel
+
+#var rng = RandomNumberGenerator.new()
+
 @onready var b = [
 	$BushMeshInstance3D/BerryMeshInstance3D1,
 	$BushMeshInstance3D/BerryMeshInstance3D2,
@@ -36,33 +35,33 @@ func get_actions():
 	return ["pick_berry"]
 
 
-func set_birth_date(value):
-	birth_date = value
+#func set_birth_date(value):
+	#birth_date = value
 
 
-func set_extra_age(value):
-	extra_age = value
-
-
-func calculate_age():
-	return world.world_age + extra_age + Time.get_ticks_msec() - birth_date
+#func set_extra_age(value):
+	#extra_age = value
+#
+#
+#func calculate_age():
+	#return world.world_age + extra_age + Time.get_ticks_msec() - birth_date
 
 
 func save_node():
 	var save_dict = {
 		"transform": JSON3D.Transform3DtoDictionary(transform),
-		"birth_date": birth_date,
-		"extra_age": extra_age,
+		"age": age,
+		#"extra_age": extra_age,
 	}
 	return save_dict
 
 
 func load_node(node_data):
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
-	if "birth_date" in node_data:
-		birth_date = node_data.birth_date
-	if "extra_age" in node_data:
-		extra_age = node_data.extra_age
+	if "age" in node_data:
+		age = node_data.age
+	#if "extra_age" in node_data:
+		#extra_age = node_data.extra_age
 
 
 func pick_berry():
@@ -93,11 +92,11 @@ func setup():
 
 
 func _process(_delta):
-	var s = clampf(float(calculated_age) / maturity, .1, 1.0)
+	var s = clampf(float(age) / maturity, .1, 1.0)
 	scale = Vector3(s, s, s)
 
 	if multiplayer.is_server():
 		if berries < 9:
-			if rng.randi_range(0, 1000) <= 1:
+			if randi_range(0, 1000) <= 1:
 				print("spawn a berry")
 				berries = berries + 1

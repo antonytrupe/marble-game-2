@@ -11,6 +11,11 @@ const MOB_SCENE = preload("res://objects/monster/monster.tscn")
 const WARP_VOTE_SCENE = preload("res://ui/warp_vote/warp_vote.tscn")
 const ROOT_WINDOW_SCRIPT = preload("res://root_window.gd")
 
+
+var auth_ticket: Dictionary     # Your auth ticket
+var client_auth_tickets: Array  # Array of tickets from other clients
+
+
 #@export var turn_number = 1:
 #set = _update_turn_number,
 #get = _get_turn_number
@@ -49,8 +54,77 @@ func _set_current_player(player:MarbleCharacter):
 	day_night_cycle.player=player
 
 
+# Callback from getting the auth ticket from Steam
+func _on_get_auth_session_ticket_response(this_auth_ticket: int, result: int) -> void:
+	print("Auth session result: %s" % result)
+	print("Auth session ticket handle: %s" % this_auth_ticket)
+
+
+# Callback from attempting to validate the auth ticket
+func _on_validate_auth_ticket_response(auth_id: int, response: int, owner_id: int) -> void:
+	print("Ticket Owner: %s" % auth_id)
+
+	# Make the response more verbose, highly unnecessary but good for this example
+	var verbose_response: String
+	match response:
+		0: verbose_response = (
+			"Steam has verified the user is online, the ticket is valid "
+			+ "and ticket has not been reused."
+		)
+		1: verbose_response = "The user in question is not connected to Steam."
+		2: verbose_response = "The user doesn't have a license for this App ID or the ticket has expired."
+		3: verbose_response = "The user is VAC banned for this game."
+		4: verbose_response = (
+			"The user account has logged in elsewhere and the session containing "
+			+ "the game instance has been disconnected."
+		)
+		5: verbose_response = "VAC has been unable to perform anti-cheat checks on this user."
+		6: verbose_response = "The ticket has been canceled by the issuer."
+		7: verbose_response = "This ticket has already been used, it is not valid."
+		8: verbose_response = "This ticket is not from a user instance currently connected to steam."
+		9: verbose_response = (
+			"The user is banned for this game. The ban came via the Web API "
+			+ "and not VAC."
+		)
+	print("Auth response: %s" % verbose_response)
+	print("Game owner ID: %s" % owner_id)
+
+
+func validate_auth_session(ticket: Dictionary, steam_id: int) -> void:
+	var auth_response: int = Steam.beginAuthSession(ticket.buffer, ticket.size, steam_id)
+
+	# Get a verbose response; unnecessary but useful in this example
+	var verbose_response: String
+	match auth_response:
+		0: verbose_response = "Ticket is valid for this game and this Steam ID."
+		1: verbose_response = "The ticket is invalid."
+		2: verbose_response = "A ticket has already been submitted for this Steam ID."
+		3: verbose_response = "Ticket is from an incompatible interface version."
+		4: verbose_response = "Ticket is not for this game."
+		5: verbose_response = "Ticket has expired."
+	print("Auth verifcation response: %s" % verbose_response)
+
+	if auth_response == 0:
+		print("Validation successful, adding user to client_auth_tickets")
+		client_auth_tickets.append({"id": steam_id, "ticket": ticket.id})
+
+	# You can now add the client to the game
+
+
 func _ready():
 	Signals.CurrentPlayer.connect(_set_current_player)
+
+	Steam.get_auth_session_ticket_response.connect(_on_get_auth_session_ticket_response)
+	Steam.validate_auth_ticket_response.connect(_on_validate_auth_ticket_response)
+
+	if Steam.isSteamRunning():
+		print('steam is running')
+	else:
+		print('steam is not running')
+
+	var steam_id=Steam.getSteamID()
+	var steam_persona_name=Steam.getFriendPersonaName(steam_id)
+	print(steam_persona_name)
 
 	var view_port: Window
 	view_port = get_tree().get_root().get_window()
@@ -177,9 +251,17 @@ func _spawn_stones(quantity: int, p: Vector3):
 
 func command(cmd: String, player: MarbleCharacter):
 	if !multiplayer.is_server():
+		print('not server')
 		return
 	var parts: PackedStringArray = cmd.replace("/", "").split(" ")
 	match parts[0]:
+		"s","switch":
+			print('switch')
+			var target=player.get_target()
+			if target:
+				print(target.name)
+			else:
+				print('no target')
 		"teleport":
 			if parts.size() >= 4:
 				player.position=Vector3(float(parts[1]),float(parts[2]),float(parts[3]))
@@ -187,7 +269,7 @@ func command(cmd: String, player: MarbleCharacter):
 			var count = 10
 			if parts.size() >= 2:
 				count = int(parts[1])
-			player.wander(count)
+			player._wander(count)
 		"action":
 			#todo create the action
 			var count = 1
