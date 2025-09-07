@@ -123,7 +123,7 @@ func _ready():
 
 
 func _unhandled_input(event):
-	if game and !is_current_player():
+	if !game or !is_current_player():
 		return
 
 	var something_visible = false
@@ -481,7 +481,7 @@ func play_animation(animation_name):
 
 
 func load_node(node_data):
-	print(node_data)
+	#print(node_data)
 	player_id = node_data["player_id"]
 	transform = JSON3D.DictionaryToTransform3D(node_data["transform"])
 	for p in node_data:
@@ -666,11 +666,11 @@ func server_move(d: Vector2):
 
 	#m*SPEED_MULTIPLIER*speed
 	if direction:
-		velocity.x = direction.x * mode * SPEED_MULTIPLIER * speed * warp_speed
-		velocity.z = direction.z * mode * SPEED_MULTIPLIER * speed * warp_speed
+		velocity.x = direction.x * mode * SPEED_MULTIPLIER * speed * min(warp_speed,20)
+		velocity.z = direction.z * mode * SPEED_MULTIPLIER * speed * min(warp_speed,20)
 	else:
-		velocity.x = move_toward(velocity.x, 0, mode * SPEED_MULTIPLIER * speed * warp_speed)
-		velocity.z = move_toward(velocity.z, 0, mode * SPEED_MULTIPLIER * speed * warp_speed)
+		velocity.x = move_toward(velocity.x, 0, mode * SPEED_MULTIPLIER * speed * min(warp_speed,20))
+		velocity.z = move_toward(velocity.z, 0, mode * SPEED_MULTIPLIER * speed * min(warp_speed,20))
 	if !is_zero_approx(velocity.x) or !is_zero_approx(velocity.z):
 		set_action({"move": mode})
 		play_animation.rpc("walking")

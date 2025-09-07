@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://cgfpsf73dbmvb"]
+[gd_scene load_steps=10 format=3 uid="uid://cgfpsf73dbmvb"]
 
 [ext_resource type="Script" uid="uid://davta0l1mnnhh" path="res://chunk/chunk.gd" id="1_u5yfe"]
 
@@ -24,6 +24,13 @@ size = Vector3(60, 60, 60)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_p2tpf"]
 size = Vector3(60, 60, 60)
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_yof0q"]
+vertices = PackedVector3Array(-29.5, 0.5, -29.5, -29.5, 0.5, 29.5, 29.5, 0.5, 29.5, 29.5, 0.5, -29.5)
+polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1)]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_yof0q"]
+size = Vector2(60, 60)
 
 [node name="Chunk" type="Node3D" node_paths=PackedStringArray("flora", "fauna", "terra") groups=["persist"]]
 script = ExtResource("1_u5yfe")
@@ -70,6 +77,7 @@ spawn_path = NodePath("..")
 unique_name_in_owner = true
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Fauna"]
+_spawnable_scenes = PackedStringArray("uid://dd71wveta0ct4")
 spawn_path = NodePath("..")
 
 [node name="Terra" type="Node3D" parent="."]
@@ -78,6 +86,12 @@ unique_name_in_owner = true
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Terra"]
 _spawnable_scenes = PackedStringArray("uid://cxdxuhs5yk36t")
 spawn_path = NodePath("..")
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavigationMesh_yof0q")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D"]
+mesh = SubResource("PlaneMesh_yof0q")
 
 [connection signal="body_entered" from="PlayerScanner" to="." method="_on_area_3d_body_entered"]
 [connection signal="body_exited" from="PlayerScanner" to="." method="_on_chunk_area_3d_body_exited"]

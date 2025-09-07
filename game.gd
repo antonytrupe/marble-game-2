@@ -7,6 +7,7 @@ const STONE_SCENE = preload("res://objects/stone/stone.tscn")
 const ACORN_SCENE = preload("res://objects/acorn/acorn.tscn")
 const BUSH_SCENE = preload("res://objects/bush/bush.tscn")
 const TREE_SCENE = preload("res://objects/tree/tree.tscn")
+const MOB_SCENE = preload("res://objects/monster/monster.tscn")
 const WARP_VOTE_SCENE = preload("res://ui/warp_vote/warp_vote.tscn")
 const ROOT_WINDOW_SCRIPT = preload("res://root_window.gd")
 
@@ -20,7 +21,7 @@ var multiplayer_peer = ENetMultiplayerPeer.new()
 #var turn_start = 0
 var player_id: String
 var is_server: bool = false
-var rng = RandomNumberGenerator.new()
+#var rng = RandomNumberGenerator.new()
 
 @onready var inventory_ui: PlayerInventory = %InventoryUI
 @onready var inventory_ui_window = %InventoryUIWindow
@@ -168,7 +169,7 @@ func _spawn_stones(quantity: int, p: Vector3):
 	quantity = clampi(quantity, 1, 100)
 	for i in quantity:
 		var stone = STONE_SCENE.instantiate()
-		stone.name = stone.name + "%010d" % rng.randi()
+		stone.name = stone.name + "%010d" % randi()
 		stone.global_position = _get_random_vector(10, p)
 		var chunk: Chunk = chunks.get_chunk(stone.global_position)
 		chunk.terra.add_child(stone)
@@ -198,6 +199,11 @@ func command(cmd: String, player: MarbleCharacter):
 			player.add_action(count, frequency)
 		"spawn", "/spawn":
 			match parts[1]:
+				"mob","monster":
+					var count = 1
+					if parts.size() >= 3:
+						count = int(parts[2])
+					_spawn_mob(count, player.position)
 				"stone", "stones":
 					var count = 1
 					if parts.size() >= 3:
@@ -228,7 +234,7 @@ func _spawn_acorns(count: int, center: Vector3):
 	count = clampi(count, 1, 100)
 	for i in count:
 		var acorn = ACORN_SCENE.instantiate()
-		acorn.name = acorn.name + "%010d" % rng.randi()
+		acorn.name = acorn.name + "%010d" % randi()
 		acorn.global_position = _get_random_vector(10, center)
 		var chunk = chunks.get_chunk(acorn.global_position)
 		chunk.flora.add_child(acorn)
@@ -238,7 +244,7 @@ func _spawn_bushes(count: int, center: Vector3):
 	count = clampi(count, 1, 100)
 	for i in count:
 		var bush = BUSH_SCENE.instantiate()
-		bush.name = bush.name + "%010d" % rng.randi()
+		bush.name = bush.name + "%010d" % randi()
 		bush.global_position = _get_random_vector(10, center)
 		var chunk = chunks.get_chunk(bush.global_position)
 		chunk.flora.add_child(bush)
@@ -248,17 +254,32 @@ func _spawn_trees(count: int, center: Vector3):
 	count = clampi(count, 1, 100)
 	for i in count:
 		var tree = TREE_SCENE.instantiate()
-		tree.name = tree.name + "%010d" % rng.randi()
+		tree.name = tree.name + "%010d" % randi()
 		#TODO do this more righter
 		tree.global_position = _get_random_vector(10, center)
 		var chunk = chunks.get_chunk(tree.global_position)
 		chunk.flora.add_child(tree)
 
 
+func _spawn_mob(count: int,center: Vector3):
+	for i in count:
+		var mob = MOB_SCENE.instantiate()
+		mob.name = mob.name + "%010d" % randi()
+		var chunk = chunks.get_chunk(center)
+		var y=randf_range(0,PI)
+		print("y:", y)  # Debug
+
+		mob.rotation.y=y
+		chunk.fauna.add_child(mob)
+
+		print("After rotation:", mob.rotation.y)  # Debug
+		mob.position = _get_random_vector(10, center)
+
+
 func _get_random_vector(radius: float, center: Vector3) -> Vector3:
 	#var rng = RandomNumberGenerator.new()
-	var r = radius * sqrt(rng.randf())
-	var theta = rng.randf() * 2 * PI
+	var r = radius * sqrt(randf())
+	var theta = randf() * 2 * PI
 	var x = center.x + r * cos(theta)
 	var z = center.z + r * sin(theta)
 	return Vector3(x, 0, z)

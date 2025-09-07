@@ -112,6 +112,7 @@ root_path = NodePath("../..")
 replication_config = SubResource("SceneReplicationConfig_vl0i4")
 
 [node name="FloorStaticBody" type="StaticBody3D" parent="World"]
+collision_mask = 0
 
 [node name="FloorCollisionShape3D" type="CollisionShape3D" parent="World/FloorStaticBody"]
 shape = SubResource("WorldBoundaryShape3D_pnarc")

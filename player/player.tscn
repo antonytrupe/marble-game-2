@@ -459,7 +459,7 @@ radius = 30.0
 
 [node name="Player" type="CharacterBody3D" groups=["persist"]]
 collision_layer = 2
-collision_mask = 15
+collision_mask = 31
 script = ExtResource("1_2v3wm")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -571,6 +571,8 @@ script = ExtResource("5_qjkh3")
 [node name="WarpScanner" type="CollisionShape3D" parent="WarpScannerArea3D"]
 unique_name_in_owner = true
 shape = SubResource("SphereShape3D_145g5")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
 [connection signal="body_entered" from="WarpScannerArea3D" to="." method="_on_2x_warp_enter"]
