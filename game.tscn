@@ -128,10 +128,10 @@ spawn_path = NodePath("..")
 [node name="[0,0,0]" parent="World/Chunks" instance=ExtResource("3_pdr6q")]
 unique_name_in_owner = true
 
-[node name="Players" type="Node3D" parent="World"]
+[node name="Characters" type="Node3D" parent="World"]
 unique_name_in_owner = true
 
-[node name="PlayerSpawner" type="MultiplayerSpawner" parent="World/Players"]
+[node name="CharacterSpawner" type="MultiplayerSpawner" parent="World/Characters"]
 _spawnable_scenes = PackedStringArray("uid://xcjrjq5cbn7y")
 spawn_path = NodePath("..")
 

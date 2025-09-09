@@ -1,10 +1,10 @@
 [gd_scene load_steps=21 format=3 uid="uid://xcjrjq5cbn7y"]
 
-[ext_resource type="Script" uid="uid://2b0awvfb7hmr" path="res://player/Player.gd" id="1_2v3wm"]
-[ext_resource type="PackedScene" uid="uid://dyx3xv5lckl7h" path="res://ui/character_sheet/character_sheet.tscn" id="3_eahd0"]
-[ext_resource type="PackedScene" uid="uid://d35hxvmomxu3p" path="res://ui/actions/actions.tscn" id="4_72q5g"]
-[ext_resource type="Script" uid="uid://da1h20icesqo6" path="res://player/warp_scanner.gd" id="5_qjkh3"]
-[ext_resource type="PackedScene" uid="uid://cblqeddvc1mon" path="res://ui/quests/quest_creator.tscn" id="8_cvl0s"]
+[ext_resource type="Script" uid="uid://2b0awvfb7hmr" path="res://character/character.gd" id="1_0rvpn"]
+[ext_resource type="PackedScene" uid="uid://dyx3xv5lckl7h" path="res://ui/character_sheet/character_sheet.tscn" id="2_o6jyn"]
+[ext_resource type="PackedScene" uid="uid://d35hxvmomxu3p" path="res://ui/actions/actions.tscn" id="3_tgjim"]
+[ext_resource type="PackedScene" uid="uid://cblqeddvc1mon" path="res://ui/quests/quest_creator.tscn" id="4_wy5t8"]
+[ext_resource type="Script" uid="uid://da1h20icesqo6" path="res://character/warp_scanner.gd" id="5_dy06j"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_x3s4a"]
 resource_local_to_scene = true
@@ -457,10 +457,10 @@ _data = {
 [sub_resource type="SphereShape3D" id="SphereShape3D_145g5"]
 radius = 30.0
 
-[node name="Player" type="CharacterBody3D" groups=["persist"]]
+[node name="Character" type="CharacterBody3D" groups=["persist"]]
 collision_layer = 2
 collision_mask = 31
-script = ExtResource("1_2v3wm")
+script = ExtResource("1_0rvpn")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
@@ -525,11 +525,11 @@ transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 
 target_position = Vector3(0, 0, 18)
 collision_mask = 30
 
-[node name="CharacterSheet" parent="." instance=ExtResource("3_eahd0")]
+[node name="CharacterSheet" parent="." instance=ExtResource("2_o6jyn")]
 unique_name_in_owner = true
 visible = false
 
-[node name="ActionsUI" parent="." instance=ExtResource("4_72q5g")]
+[node name="ActionsUI" parent="." instance=ExtResource("3_tgjim")]
 unique_name_in_owner = true
 visible = false
 
@@ -550,7 +550,7 @@ libraries = {
 &"": SubResource("AnimationLibrary_auoph")
 }
 
-[node name="QuestCreator" parent="." node_paths=PackedStringArray("me") instance=ExtResource("8_cvl0s")]
+[node name="QuestCreator" parent="." node_paths=PackedStringArray("me") instance=ExtResource("4_wy5t8")]
 unique_name_in_owner = true
 visible = false
 me = NodePath("..")
@@ -566,7 +566,7 @@ text = "?"
 unique_name_in_owner = true
 collision_layer = 0
 collision_mask = 14
-script = ExtResource("5_qjkh3")
+script = ExtResource("5_dy06j")
 
 [node name="WarpScanner" type="CollisionShape3D" parent="WarpScannerArea3D"]
 unique_name_in_owner = true

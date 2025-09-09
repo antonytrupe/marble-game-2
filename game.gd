@@ -2,7 +2,7 @@ class_name Game
 extends Node
 
 const PORT = 9999
-const PLAYER_SCENE = preload("res://player/player.tscn")
+const CHARACTER_SCENE = preload("res://character/character.tscn")
 const STONE_SCENE = preload("res://objects/stone/stone.tscn")
 const ACORN_SCENE = preload("res://objects/acorn/acorn.tscn")
 const BUSH_SCENE = preload("res://objects/bush/bush.tscn")
@@ -17,6 +17,7 @@ var client_auth_tickets: Array  # Array of tickets from other clients
 #var multiplayer_peer = ENetMultiplayerPeer.new()
 var player_id: String
 var is_server: bool = false
+var player_data={}
 
 @onready var inventory_ui: PlayerInventory = %InventoryUI
 @onready var inventory_ui_window = %InventoryUIWindow
@@ -27,7 +28,7 @@ var is_server: bool = false
 @onready var hud = $UI/HUD
 @onready var server_camera = $CameraPivot/ServerCamera3D
 @onready var world = %World
-@onready var players = %Players
+@onready var characters = %Characters
 @onready var cross_hair = %CrossHair
 @onready var chunks: Chunks = %Chunks
 @onready var turn_timer:TurnTimerUI =%TurnTimer
@@ -368,7 +369,6 @@ func _create_server():
 	var multiplayer_peer=ENetMultiplayerPeer.new()
 	multiplayer_peer.create_server(PORT)
 	multiplayer.multiplayer_peer = multiplayer_peer
-	multiplayer.peer_connected
 	_load_server()
 	print("started server")
 
@@ -408,37 +408,28 @@ func send_world_age(_world_age):
 
 
 func _add_player(_peer_id, _player_id):
-	print("%s connected" % _player_id)
+	print("%s connected %s" % [_player_id,_peer_id])
 	#first check if this player already has a node
-	var player = players.get_node_or_null(_player_id)
-	if !player:
-		player = PLAYER_SCENE.instantiate()
-		player.name = _player_id
-		player.player_id = _player_id
+	var player_character
+	var character
+	if player_data.has(_player_id):
+		player_character=player_data[_player_id]
+		character = characters.get_node_or_null(player_character)
 
-		player.position.x = RandomNumberGenerator.new().randi_range(-5, 5)
-		player.position.z = RandomNumberGenerator.new().randi_range(-5, 5)
-		players.add_child(player)
-	player.peer_id = _peer_id
+	if !character:
+		character = CHARACTER_SCENE.instantiate()
+		character.name = _player_id
+		character.player_id = _player_id
 
-
-#func _update_turn_number(value):
-#turn_number = value
-##turn_number_label.text = "turn " + str(value)
-#turn_start = Time.get_ticks_msec()
-#Signals.NewTurn.emit(turn_number)
-
-#func _get_turn_number():
-#return turn_number
-
-
-#func _on_host_button_pressed():
-	#hud.show()
-	#_start_server()
+		character.position.x = RandomNumberGenerator.new().randi_range(-5, 5)
+		character.position.z = RandomNumberGenerator.new().randi_range(-5, 5)
+		characters.add_child(character)
+	character.peer_id = _peer_id
+	player_data[_player_id]=character.name
 
 
 func get_player(id) -> MarbleCharacter:
-	var p = players.get_node_or_null(id)
+	var p = characters.get_node_or_null(id)
 	return p
 
 
@@ -452,6 +443,7 @@ func save_node():
 		#
 		host_player_id = player_id,
 		position = 0,
+		player_data=player_data,
 	}
 	return save_dict
 
