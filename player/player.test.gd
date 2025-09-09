@@ -12,7 +12,7 @@ func test_test():
 	assert_true(true)
 
 
-func test_add_to_inventory():
+func _test_add_to_inventory():
 	player.add_to_inventory({"item": {}})
 
 

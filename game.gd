@@ -11,22 +11,12 @@ const MOB_SCENE = preload("res://objects/monster/monster.tscn")
 const WARP_VOTE_SCENE = preload("res://ui/warp_vote/warp_vote.tscn")
 const ROOT_WINDOW_SCRIPT = preload("res://root_window.gd")
 
-
 var auth_ticket: Dictionary     # Your auth ticket
 var client_auth_tickets: Array  # Array of tickets from other clients
 
-
-#@export var turn_number = 1:
-#set = _update_turn_number,
-#get = _get_turn_number
-
-var multiplayer_peer = ENetMultiplayerPeer.new()
-#var client_peer = ENetMultiplayerPeer.new()
-
-#var turn_start = 0
+#var multiplayer_peer = ENetMultiplayerPeer.new()
 var player_id: String
 var is_server: bool = false
-#var rng = RandomNumberGenerator.new()
 
 @onready var inventory_ui: PlayerInventory = %InventoryUI
 @onready var inventory_ui_window = %InventoryUIWindow
@@ -45,6 +35,7 @@ var is_server: bool = false
 @onready var day_night_cycle=%DayNightCycle
 
 func _set_current_player(player:MarbleCharacter):
+	player_id=player.name
 	cross_hair.show()
 	inventory_ui.me = player
 	craft_ui.me = player
@@ -123,8 +114,9 @@ func _ready():
 		print('steam is not running')
 
 	var steam_id=Steam.getSteamID()
+	print('steam_id:',steam_id)
 	var steam_persona_name=Steam.getFriendPersonaName(steam_id)
-	print(steam_persona_name)
+	print('steam_persona_name:',steam_persona_name)
 
 	var view_port: Window
 	view_port = get_tree().get_root().get_window()
@@ -158,6 +150,9 @@ func _ready():
 	#print("arguments:", arguments)
 	config.merge(arguments, true)
 
+	if steam_id and !config.has("player_id"):
+		config['player_id']='steam:'+str(steam_id)
+
 	#print("merged:", config)
 	if config.has("player_id"):
 		print('client')
@@ -180,9 +175,9 @@ func _ready():
 
 			server_camera.show()
 			server_camera.current = true
+		else:
+			_register_player(player_id)
 		get_viewport().get_window().title += " - SERVER"
-
-
 
 	if not config.server and not config.has("player_id"):
 		print("not a client nor a server")
@@ -260,6 +255,8 @@ func command(cmd: String, player: MarbleCharacter):
 			var target=player.get_target()
 			if target:
 				print(target.name)
+				print(target)
+				Signals.CurrentPlayer.emit(target)
 			else:
 				print('no target')
 		"teleport":
@@ -368,8 +365,10 @@ func _get_random_vector(radius: float, center: Vector3) -> Vector3:
 
 
 func _create_server():
+	var multiplayer_peer=ENetMultiplayerPeer.new()
 	multiplayer_peer.create_server(PORT)
 	multiplayer.multiplayer_peer = multiplayer_peer
+	multiplayer.peer_connected
 	_load_server()
 	print("started server")
 
@@ -382,7 +381,7 @@ func _server_disconnected():
 func _create_client(ip_address):
 	print("joining ", ip_address)
 	hud.show()
-
+	var multiplayer_peer=ENetMultiplayerPeer.new()
 	multiplayer_peer.create_client(ip_address, PORT)
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.server_disconnected.connect(_server_disconnected)

@@ -83,3 +83,12 @@ replication_config = SubResource("SceneReplicationConfig_cbetc")
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16.213, 0)
 entity = NodePath("..")
+
+[node name="NavigationObstacle3D" type="NavigationObstacle3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+radius = 2.0
+height = 2.0
+affect_navigation_mesh = true
+carve_navigation_mesh = true
+avoidance_layers = 4
+use_3d_avoidance = true

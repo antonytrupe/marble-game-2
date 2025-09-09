@@ -153,6 +153,6 @@ shape = SubResource("CapsuleShape3D_olmtm")
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_wxu3a")
 
-[node name="Age" parent="." node_paths=PackedStringArray("entity") instance=ExtResource("3_qldcy")]
+[node name="AgeLabel" parent="." node_paths=PackedStringArray("entity") instance=ExtResource("3_qldcy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.14011, 0)
 entity = NodePath("..")

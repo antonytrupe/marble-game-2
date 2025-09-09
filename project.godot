@@ -154,10 +154,20 @@ command={
 [layer_names]
 
 3d_physics/layer_1="environment"
+3d_navigation/layer_1="environment"
 3d_physics/layer_2="players"
+3d_navigation/layer_2="players"
 3d_physics/layer_3="flora"
+3d_navigation/layer_3="flora"
 3d_physics/layer_4="fauna"
+3d_navigation/layer_4="fauna"
 3d_physics/layer_5="terra"
+3d_navigation/layer_5="terra"
+avoidance/layer_1="environment"
+avoidance/layer_2="players"
+avoidance/layer_3="flora"
+avoidance/layer_4="fauna"
+avoidance/layer_5="terra"
 
 [rendering]
 

@@ -14,7 +14,7 @@ extends Node3D
 @export var warp_speed: float = 1
 
 @onready var world = $/root/Game/World
-@onready var ageLabel = %AgeLabel
+#@onready var ageLabel = %AgeLabel
 
 #var rng = RandomNumberGenerator.new()
 

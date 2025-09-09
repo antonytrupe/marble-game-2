@@ -13,6 +13,7 @@ func _ready() -> void:
 
 func create_movement_target()->Vector3:
 	return Utilities._get_random_vector(10,position)
+	#return Utilities.get_random_point_in_cone_of_sphere(position,velocity,10,PI/2)
 
 func set_movement_target(movement_target: Vector3):
 	navigation_agent.set_target_position(movement_target)
@@ -43,6 +44,8 @@ func _on_velocity_computed(safe_velocity: Vector3):
 	var old_y=velocity.y
 	velocity = safe_velocity
 	velocity.y=old_y
+	if velocity != Vector3(0,0,0):
+		look_at(transform.origin + velocity, Vector3.FORWARD)
 	move_and_slide()
 
 

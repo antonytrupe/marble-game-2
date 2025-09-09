@@ -1,5 +1,6 @@
-extends Node3D
 class_name Stone
+extends RigidBody3D
+
 
 @export var birth_date: int = 0:
 	set = set_birth_date
@@ -9,7 +10,7 @@ class_name Stone
 var brittleness: float
 var hardness: float
 var sharpness: float
-var mass:float
+#var mass:float
 var volume:float
 
 @onready var world = $/root/Game/World

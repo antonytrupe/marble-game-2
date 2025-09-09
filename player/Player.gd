@@ -58,7 +58,7 @@ var chat_mode = false
 @onready var chat_bubbles = %ChatBubbles
 @onready var camera_pivot = $CameraPivot
 @onready var camera = %Camera3D
-@onready var raycast = %RayCast3D
+@onready var raycast = %TargetRayCast
 @onready var anim_player = $AnimationPlayer
 @onready var chunk_scanner: Area3D = %ChunkScanner
 @onready var character_sheet = %CharacterSheet
@@ -107,19 +107,24 @@ func _add_action(count: int, frequency: int):
 	a.player = self
 
 
+func set_up_current_player(player: MarbleCharacter):
+	camera.current = true
+	actions_ui.show()
+	game.cross_hair.show()
+	game.inventory_ui.me = self
+	game.craft_ui.me = self
+	game.trade_ui.me = self
+
+
 func _ready():
 	actions_ui.player_id = player_id
+	Signals.CurrentPlayer.connect(set_up_current_player)
 	#Signals.NewTurn.connect(_on_new_turn)
 	#if is_server():
 	#Signals.PlayerZoned.connect(_on_player_zoned)
 	if is_current_player():
 		Signals.CurrentPlayer.emit(self)
-		camera.current = true
-		actions_ui.show()
-		game.cross_hair.show()
-		game.inventory_ui.me = self
-		game.craft_ui.me = self
-		game.trade_ui.me = self
+		#set_up_current_player()
 
 
 func _unhandled_input(event):
@@ -607,9 +612,16 @@ func cancel_trade():
 func get_actions():
 	return ["trade"]
 
+
 func get_target():
 	var entity = raycast.get_collider()
 	return entity
+
+
+func get_target_distance()->float:
+	var point:Vector3=raycast.get_collision_point()
+	return point.distance_to(raycast.position)
+
 
 @rpc("any_peer")
 func interact():

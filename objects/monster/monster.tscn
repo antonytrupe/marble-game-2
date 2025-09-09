@@ -36,7 +36,10 @@ transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0.2
 mesh = SubResource("CapsuleMesh_okp8s")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+navigation_layers = 31
 avoidance_enabled = true
+use_3d_avoidance = true
+avoidance_layers = 8
 avoidance_mask = 31
 debug_enabled = true
 
