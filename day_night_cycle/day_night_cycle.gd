@@ -2,7 +2,7 @@ class_name DayNightCycle
 extends Node
 @export var intensity: Curve
 
-@export var player: MarbleCharacter
+@export var character: MarbleCharacter
 @export var world: World
 
 @onready var sun = %Sun
@@ -17,8 +17,8 @@ func get_target_position():
 	var total = Vector2(0.0, 0.0)
 	#for c:Chunk in _chunks:
 	var t = {hours = 0, minutes = 0, seconds = 0}
-	if player:
-		t = GameTime.get_age_parts(player.age)
+	if character:
+		t = GameTime.get_age_parts(character.age)
 		#print("using player")
 	elif world:
 		t = GameTime.get_age_parts(world.age)

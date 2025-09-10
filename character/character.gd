@@ -67,7 +67,8 @@ var chat_mode = false
 @onready var fade_anim = %AnimationPlayer
 
 @onready var quest_indicator = %"?"
-@onready var warp_scanner:Area3D =%WarpScannerArea3D
+@onready var warp_scanner: Area3D = %WarpScannerArea3D
+
 
 func _set_warp_speed(value: float):
 	warp_speed = value
@@ -81,13 +82,14 @@ func set_warp_speed(value: float):
 
 
 func update_local_warp():
-	var local_bodies=warp_scanner.get_overlapping_bodies()
+	var local_bodies = warp_scanner.get_overlapping_bodies()
 	#local_bodies.all(func(element): return element > 5)
 	for body in local_bodies:
 		#var distance=body.position.direction_to(position)
 		#var ratio=distance/warp_scanner.shape.radius
 
-		body.warp_speed=warp_speed
+		body.warp_speed = warp_speed
+
 
 func _wander(count: int):
 	var w = Wander.new()
@@ -122,13 +124,13 @@ func _ready():
 	#Signals.NewTurn.connect(_on_new_turn)
 	#if is_server():
 	#Signals.PlayerZoned.connect(_on_player_zoned)
-	if is_current_player():
+	if is_current_character():
 		Signals.CurrentPlayer.emit(self)
 		#set_up_current_player()
 
 
 func _unhandled_input(event):
-	if !game or !is_current_player():
+	if !game or !is_current_character():
 		return
 
 	var something_visible = false
@@ -187,7 +189,7 @@ func _unhandled_input(event):
 
 		if chat_mode:
 			chat_text_edit.grab_focus()
-			chat_text_edit.text='/'
+			chat_text_edit.text = "/"
 			chat_text_edit.set_caret_column(1)
 		else:
 			chat_text_edit.release_focus()
@@ -224,7 +226,7 @@ func _physics_process(delta):
 			turn_number = new_turn_number
 			reset_actions()
 
-	if is_current_player() and !chat_mode:
+	if is_current_character() and !chat_mode:
 		# TODO check just_press/just_release, or is_pressed?
 		# crouch
 		if Input.is_action_just_pressed("crouch"):
@@ -347,7 +349,7 @@ func _set_other_trade_inventory(loot):
 
 func _set_trade_inventory(loot):
 	my_trade_inventory = loot
-	if game and game.trade_ui and is_current_player():
+	if game and game.trade_ui and is_current_character():
 		game.trade_ui.update()
 	if trade_partner:
 		trade_partner.other_trade_inventory = loot
@@ -394,15 +396,32 @@ func add_to_trade(item: Dictionary):
 	#trade_partner.updateTradeUI.rpc()
 
 
-func is_current_player():
-	return game and player_id and player_id == game.player_id
+func is_current_character():
+	return (
+		game
+		and player_id
+		and player_id == game.player_id
+		#TODO
+		#and game.player_data.has(game.player_id)
+		#and game.player_data[game.player_id] == name
+	)
+
+
+#func is_current_player():
+	#return (
+		#game
+		#and player_id
+		#and player_id == game.player_id
+		#and game.player_data.has(game.player_id)
+		#and game.player_data[game.player_id] == name
+	#)
 
 
 #is this always on the server?
 func _set_trading(value):
 	trading = value
 	#if the tradeui is ready and this is the current player
-	if game and game.trade_ui and is_current_player():
+	if game and game.trade_ui and is_current_character():
 		if trading:
 			game.trade_ui.other_player_trade = other_trade_inventory
 			game.trade_ui.other_player_quests = other_player_quests
@@ -467,9 +486,6 @@ func get_chunks() -> Array[Chunk]:
 	for area: Area3D in areas:
 		chunks.append(area.get_parent())
 	return chunks
-
-
-
 
 
 func _set_turn_number(value):
@@ -539,7 +555,6 @@ func server_mode(new_mode: MOVE.MODE):
 
 # func approve_warp_vote(vote_id: String):
 # 	game.approve_warp.rpc_id(1, vote_id, player_id)
-
 
 ##server code
 @rpc("any_peer")
@@ -618,8 +633,8 @@ func get_target():
 	return entity
 
 
-func get_target_distance()->float:
-	var point:Vector3=raycast.get_collision_point()
+func get_target_distance() -> float:
+	var point: Vector3 = raycast.get_collision_point()
 	return point.distance_to(raycast.position)
 
 
@@ -693,11 +708,15 @@ func server_move(d: Vector2):
 
 	#m*SPEED_MULTIPLIER*speed
 	if direction:
-		velocity.x = direction.x * mode * SPEED_MULTIPLIER * speed * min(warp_speed,20)
-		velocity.z = direction.z * mode * SPEED_MULTIPLIER * speed * min(warp_speed,20)
+		velocity.x = direction.x * mode * SPEED_MULTIPLIER * speed * min(warp_speed, 20)
+		velocity.z = direction.z * mode * SPEED_MULTIPLIER * speed * min(warp_speed, 20)
 	else:
-		velocity.x = move_toward(velocity.x, 0, mode * SPEED_MULTIPLIER * speed * min(warp_speed,20))
-		velocity.z = move_toward(velocity.z, 0, mode * SPEED_MULTIPLIER * speed * min(warp_speed,20))
+		velocity.x = move_toward(
+			velocity.x, 0, mode * SPEED_MULTIPLIER * speed * min(warp_speed, 20)
+		)
+		velocity.z = move_toward(
+			velocity.z, 0, mode * SPEED_MULTIPLIER * speed * min(warp_speed, 20)
+		)
 	if !is_zero_approx(velocity.x) or !is_zero_approx(velocity.z):
 		set_action({"move": mode})
 		play_animation.rpc("walking")

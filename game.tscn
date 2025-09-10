@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://c8oqxmm2w2wvv"]
+[gd_scene load_steps=20 format=3 uid="uid://c8oqxmm2w2wvv"]
 
 [ext_resource type="Script" uid="uid://dewiwais134am" path="res://game.gd" id="1_2iwba"]
 [ext_resource type="Script" uid="uid://jh0v2n157q0y" path="res://world.gd" id="1_6tkge"]
@@ -31,6 +31,11 @@ properties/2/replication_mode = 2
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_jysef"]
 size = Vector2(30, 2)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_7sc4i"]
+properties/0/path = NodePath(".:player_data")
+properties/0/spawn = true
+properties/0/replication_mode = 2
 
 [node name="Game" type="Node" groups=["persist", "persist-client"]]
 script = ExtResource("1_2iwba")
@@ -204,6 +209,9 @@ offset_right = 430.0
 offset_bottom = 154.0
 game = NodePath("..")
 world = NodePath("../World")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_7sc4i")
 
 [connection signal="visibility_changed" from="InventoryUIWindow" to="InventoryUIWindow" method="_on_visibility_changed"]
 [connection signal="visibility_changed" from="CraftUIWindow" to="CraftUIWindow" method="_on_visibility_changed"]

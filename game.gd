@@ -11,13 +11,13 @@ const MOB_SCENE = preload("res://objects/monster/monster.tscn")
 const WARP_VOTE_SCENE = preload("res://ui/warp_vote/warp_vote.tscn")
 const ROOT_WINDOW_SCRIPT = preload("res://root_window.gd")
 
-var auth_ticket: Dictionary     # Your auth ticket
+var auth_ticket: Dictionary  # Your auth ticket
 var client_auth_tickets: Array  # Array of tickets from other clients
 
 #var multiplayer_peer = ENetMultiplayerPeer.new()
 var player_id: String
 var is_server: bool = false
-var player_data={}
+@export var player_data = {}
 
 @onready var inventory_ui: PlayerInventory = %InventoryUI
 @onready var inventory_ui_window = %InventoryUIWindow
@@ -31,19 +31,21 @@ var player_data={}
 @onready var characters = %Characters
 @onready var cross_hair = %CrossHair
 @onready var chunks: Chunks = %Chunks
-@onready var turn_timer:TurnTimerUI =%TurnTimer
-@onready var warp_settings:WarpSettingsUI=%WarpSettings
-@onready var day_night_cycle=%DayNightCycle
+@onready var turn_timer: TurnTimerUI = %TurnTimer
+@onready var warp_settings: WarpSettingsUI = %WarpSettings
+@onready var day_night_cycle = %DayNightCycle
 
-func _set_current_player(player:MarbleCharacter):
-	player_id=player.name
+
+func _set_current_player(character: MarbleCharacter):
+	player_id = character.player_id
+	# player_data[player_id]=character.name
 	cross_hair.show()
-	inventory_ui.me = player
-	craft_ui.me = player
-	trade_ui.me = player
-	turn_timer.player=player
-	warp_settings.player=player
-	day_night_cycle.player=player
+	inventory_ui.me = character
+	craft_ui.me = character
+	trade_ui.me = character
+	turn_timer.character = character
+	warp_settings.character = character
+	day_night_cycle.character = character
 
 
 # Callback from getting the auth ticket from Steam
@@ -59,25 +61,34 @@ func _on_validate_auth_ticket_response(auth_id: int, response: int, owner_id: in
 	# Make the response more verbose, highly unnecessary but good for this example
 	var verbose_response: String
 	match response:
-		0: verbose_response = (
-			"Steam has verified the user is online, the ticket is valid "
-			+ "and ticket has not been reused."
-		)
-		1: verbose_response = "The user in question is not connected to Steam."
-		2: verbose_response = "The user doesn't have a license for this App ID or the ticket has expired."
-		3: verbose_response = "The user is VAC banned for this game."
-		4: verbose_response = (
-			"The user account has logged in elsewhere and the session containing "
-			+ "the game instance has been disconnected."
-		)
-		5: verbose_response = "VAC has been unable to perform anti-cheat checks on this user."
-		6: verbose_response = "The ticket has been canceled by the issuer."
-		7: verbose_response = "This ticket has already been used, it is not valid."
-		8: verbose_response = "This ticket is not from a user instance currently connected to steam."
-		9: verbose_response = (
-			"The user is banned for this game. The ban came via the Web API "
-			+ "and not VAC."
-		)
+		0:
+			verbose_response = (
+				"Steam has verified the user is online, the ticket is valid "
+				+ "and ticket has not been reused."
+			)
+		1:
+			verbose_response = "The user in question is not connected to Steam."
+		2:
+			verbose_response = "The user doesn't have a license for this App ID or the ticket has expired."
+		3:
+			verbose_response = "The user is VAC banned for this game."
+		4:
+			verbose_response = (
+				"The user account has logged in elsewhere and the session containing "
+				+ "the game instance has been disconnected."
+			)
+		5:
+			verbose_response = "VAC has been unable to perform anti-cheat checks on this user."
+		6:
+			verbose_response = "The ticket has been canceled by the issuer."
+		7:
+			verbose_response = "This ticket has already been used, it is not valid."
+		8:
+			verbose_response = "This ticket is not from a user instance currently connected to steam."
+		9:
+			verbose_response = (
+				"The user is banned for this game. The ban came via the Web API " + "and not VAC."
+			)
 	print("Auth response: %s" % verbose_response)
 	print("Game owner ID: %s" % owner_id)
 
@@ -88,12 +99,18 @@ func validate_auth_session(ticket: Dictionary, steam_id: int) -> void:
 	# Get a verbose response; unnecessary but useful in this example
 	var verbose_response: String
 	match auth_response:
-		0: verbose_response = "Ticket is valid for this game and this Steam ID."
-		1: verbose_response = "The ticket is invalid."
-		2: verbose_response = "A ticket has already been submitted for this Steam ID."
-		3: verbose_response = "Ticket is from an incompatible interface version."
-		4: verbose_response = "Ticket is not for this game."
-		5: verbose_response = "Ticket has expired."
+		0:
+			verbose_response = "Ticket is valid for this game and this Steam ID."
+		1:
+			verbose_response = "The ticket is invalid."
+		2:
+			verbose_response = "A ticket has already been submitted for this Steam ID."
+		3:
+			verbose_response = "Ticket is from an incompatible interface version."
+		4:
+			verbose_response = "Ticket is not for this game."
+		5:
+			verbose_response = "Ticket has expired."
 	print("Auth verifcation response: %s" % verbose_response)
 
 	if auth_response == 0:
@@ -110,14 +127,14 @@ func _ready():
 	Steam.validate_auth_ticket_response.connect(_on_validate_auth_ticket_response)
 
 	if Steam.isSteamRunning():
-		print('steam is running')
+		print("steam is running")
 	else:
-		print('steam is not running')
+		print("steam is not running")
 
-	var steam_id=Steam.getSteamID()
-	print('steam_id:',steam_id)
-	var steam_persona_name=Steam.getFriendPersonaName(steam_id)
-	print('steam_persona_name:',steam_persona_name)
+	var steam_id = Steam.getSteamID()
+	print("steam_id:", steam_id)
+	var steam_persona_name = Steam.getFriendPersonaName(steam_id)
+	print("steam_persona_name:", steam_persona_name)
 
 	var view_port: Window
 	view_port = get_tree().get_root().get_window()
@@ -152,11 +169,11 @@ func _ready():
 	config.merge(arguments, true)
 
 	if steam_id and !config.has("player_id"):
-		config['player_id']='steam:'+str(steam_id)
+		config["player_id"] = "steam:" + str(steam_id)
 
 	#print("merged:", config)
 	if config.has("player_id"):
-		print('client')
+		print("client")
 		#server_camera.hide()
 		#server_camera.current = false
 		player_id = config["player_id"]
@@ -168,11 +185,11 @@ func _ready():
 			_create_client(config.remote_ip)
 
 	if config.server:
-		print('server')
+		print("server")
 		is_server = true
 		_create_server()
 		if not config.has("player_id"):
-			print('just server')
+			print("just server")
 
 			server_camera.show()
 			server_camera.current = true
@@ -223,12 +240,8 @@ func _unhandled_input(_event):
 			_save_client()
 			get_tree().quit()
 
-	if (
-		craft_ui_window.visible
-		or inventory_ui_window.visible
-		or trade_ui_window.visible
+	if craft_ui_window.visible or inventory_ui_window.visible or trade_ui_window.visible:
 		#or warp_vote_window.visible
-	):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		cross_hair.visible = false
 	else:
@@ -247,22 +260,22 @@ func _spawn_stones(quantity: int, p: Vector3):
 
 func command(cmd: String, player: MarbleCharacter):
 	if !multiplayer.is_server():
-		print('not server')
+		print("not server")
 		return
 	var parts: PackedStringArray = cmd.replace("/", "").split(" ")
 	match parts[0]:
-		"s","switch":
-			print('switch')
-			var target=player.get_target()
+		"s", "switch":
+			print("switch")
+			var target = player.get_target()
 			if target:
 				print(target.name)
 				print(target)
 				Signals.CurrentPlayer.emit(target)
 			else:
-				print('no target')
+				print("no target")
 		"teleport":
 			if parts.size() >= 4:
-				player.position=Vector3(float(parts[1]),float(parts[2]),float(parts[3]))
+				player.position = Vector3(float(parts[1]), float(parts[2]), float(parts[3]))
 		"wander":
 			var count = 10
 			if parts.size() >= 2:
@@ -279,7 +292,7 @@ func command(cmd: String, player: MarbleCharacter):
 			player.add_action(count, frequency)
 		"spawn", "/spawn":
 			match parts[1]:
-				"mob","monster":
+				"mob", "monster":
 					var count = 1
 					if parts.size() >= 3:
 						count = int(parts[2])
@@ -341,15 +354,15 @@ func _spawn_trees(count: int, center: Vector3):
 		chunk.flora.add_child(tree)
 
 
-func _spawn_mob(count: int,center: Vector3):
+func _spawn_mob(count: int, center: Vector3):
 	for i in count:
 		var mob = MOB_SCENE.instantiate()
 		mob.name = mob.name + "%010d" % randi()
 		var chunk = chunks.get_chunk(center)
-		var y=randf_range(0,PI)
+		var y = randf_range(0, PI)
 		print("y:", y)  # Debug
 
-		mob.rotation.y=y
+		mob.rotation.y = y
 		chunk.fauna.add_child(mob)
 
 		print("After rotation:", mob.rotation.y)  # Debug
@@ -366,7 +379,7 @@ func _get_random_vector(radius: float, center: Vector3) -> Vector3:
 
 
 func _create_server():
-	var multiplayer_peer=ENetMultiplayerPeer.new()
+	var multiplayer_peer = ENetMultiplayerPeer.new()
 	multiplayer_peer.create_server(PORT)
 	multiplayer.multiplayer_peer = multiplayer_peer
 	_load_server()
@@ -381,7 +394,7 @@ func _server_disconnected():
 func _create_client(ip_address):
 	print("joining ", ip_address)
 	hud.show()
-	var multiplayer_peer=ENetMultiplayerPeer.new()
+	var multiplayer_peer = ENetMultiplayerPeer.new()
 	multiplayer_peer.create_client(ip_address, PORT)
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.server_disconnected.connect(_server_disconnected)
@@ -408,24 +421,28 @@ func send_world_age(_world_age):
 
 
 func _add_player(_peer_id, _player_id):
-	print("%s connected %s" % [_player_id,_peer_id])
-	#first check if this player already has a node
-	var player_character
+	print("%s connected %s" % [_player_id, _peer_id])
+
+	var character_name
 	var character
+	# check if this player has a current character
 	if player_data.has(_player_id):
-		player_character=player_data[_player_id]
-		character = characters.get_node_or_null(player_character)
+		character_name = player_data[_player_id]
+		character = characters.get_node_or_null(NodePath(character_name))
 
 	if !character:
+		print("making a new character for %s" % _player_id)
 		character = CHARACTER_SCENE.instantiate()
 		character.name = _player_id
 		character.player_id = _player_id
 
 		character.position.x = RandomNumberGenerator.new().randi_range(-5, 5)
 		character.position.z = RandomNumberGenerator.new().randi_range(-5, 5)
+
+		player_data[_player_id] = character.name
 		characters.add_child(character)
+
 	character.peer_id = _peer_id
-	player_data[_player_id]=character.name
 
 
 func get_player(id) -> MarbleCharacter:
@@ -441,9 +458,9 @@ func get_chunk(id) -> Chunk:
 func save_node():
 	var save_dict = {
 		#
-		host_player_id = player_id,
-		position = 0,
-		player_data=player_data,
+		#host_player_id = player_id,
+		#position = 0,
+		#player_data = player_data,
 	}
 	return save_dict
 
@@ -525,14 +542,13 @@ func _save_server():
 	save_file.flush()
 	print("saved ", save_file.get_path_absolute())
 	DirAccess.copy_absolute(
-		save_file.get_path_absolute(),
-		"user://savegame_" + str(Time.get_ticks_msec()) + ".save"
+		save_file.get_path_absolute(), "user://savegame_" + str(Time.get_ticks_msec()) + ".save"
 	)
 
 
 #func _start_client():
-	#_load_client()
-	#get_viewport().get_window().title += " - " + player_id
+#_load_client()
+#get_viewport().get_window().title += " - " + player_id
 
 
 func _load_client():

@@ -3,7 +3,7 @@ extends PanelContainer
 
 @export var game: Game
 @export var world: World
-@export var player: MarbleCharacter:
+@export var character: MarbleCharacter:
 	set = _set_player
 @export var custom_values: Array[float] = [1]
 
@@ -13,19 +13,19 @@ extends PanelContainer
 
 
 func _set_player(value: MarbleCharacter):
-	player = value
-	if player:
-		slider.custom_value = player.warp_speed
+	character = value
+	if character:
+		slider.custom_value = character.warp_speed
 
 
 func _on_short_rest_button_pressed() -> void:
 	#game.call_warp_vote(60, game.player_id)
-	player.time_warp.rpc_id(1,60)
+	character.time_warp.rpc_id(1,60)
 
 
 func _on_long_rest_button_pressed() -> void:
 	#game.call_warp_vote(60 * 8, game.player_id)
-	player.time_warp.rpc_id(1,60*8)
+	character.time_warp.rpc_id(1,60*8)
 
 
 func set_custom_value(value):
@@ -34,11 +34,11 @@ func set_custom_value(value):
 func _on_player_warp_slider_value_changed(value: float) -> void:
 	if current_speed_label:
 		current_speed_label.text=str(snapped(value,.1))
-	if player:
-		if !player.is_server():
-			player.set_warp_speed.rpc_id(1, value)
+	if character:
+		if !character.is_server():
+			character.set_warp_speed.rpc_id(1, value)
 		else:
-			player.set_warp_speed(value)
+			character.set_warp_speed(value)
 	elif world:
 		if !world.is_server():
 			world.set_warp_speed.rpc_id(1, value)
